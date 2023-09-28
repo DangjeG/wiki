@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "wiki-backend"
+version = "0.0.1"
+description = ""
+authors = ["Your Name <you@example.com>", "Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{include = "wiki", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = {extras = ["all"], version = "^0.103.1"}
+sqlalchemy = "^2.0.21"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
