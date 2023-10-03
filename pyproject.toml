@@ -10,6 +10,7 @@ packages = [{include = "wiki", from = "backend"}]
 python = "^3.11"
 fastapi = {extras = ["all"], version = "^0.103.1"}
 sqlalchemy = "^2.0.21"
+uuid7 = "^0.1.0"
 
 
 [build-system]
