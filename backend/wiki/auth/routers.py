@@ -1,12 +1,19 @@
-from fastapi import APIRouter, Security, Request
+import logging
+
+from fastapi import APIRouter, Security, Request, Depends
 from starlette import status
 
 from wiki.auth.core import create_verify_token, create_access_token, WikiBearer
 from wiki.auth.deps import bearer_token
 from wiki.auth.schemas import UserLogin, UserLoginResponse, VerifyTokenData, UserVerifyResponse, AccessTokenData, \
     VerifyData
+from wiki.config import settings
+from wiki.emile.core import EmailProvider
+from wiki.emile.deps import get_email_provider
+from wiki.emile.schemas import EmailSchema
 
 auth_router = APIRouter()
+wiki_logger = logging.getLogger(settings.LOGGER_NAME)
 
 
 @auth_router.post(
@@ -16,13 +23,18 @@ auth_router = APIRouter()
     description="The endpoint for sending an email and receiving a login confirmation token."
                 "A confirmation code will be sent to the specified email."
 )
-async def login(user_in: UserLogin, request: Request):
+async def login(user_in: UserLogin, request: Request, email_provider: EmailProvider = Depends(get_email_provider)):
     verification_code, token = create_verify_token(VerifyTokenData(
         email=user_in.email,
         user_ip=request.client.host,
         user_agent=request.headers.get("User-Agent"))
     )
-    print(f"\n{verification_code}\n")
+    await email_provider.send_mail(EmailSchema(
+        email=[user_in.email],
+        code=verification_code,
+        subject="Your verification code to log in to the Wiki."
+    ))
+    wiki_logger.info(f"{user_in.email}: {verification_code}")
     return UserLoginResponse(email_to=user_in.email, verify_token=token)
 
 

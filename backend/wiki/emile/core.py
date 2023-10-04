@@ -1,5 +1,8 @@
+from aiosmtplib import SMTPException
 from fastapi_mail import ConnectionConfig, MessageSchema, FastMail, MessageType
+from starlette import status
 
+from wiki.common.exceptions import WikiException, WikiErrorCode
 from wiki.config import settings
 from wiki.emile.schemas import EmailSchema
 
@@ -31,4 +34,11 @@ class EmailProvider:
             subtype=MessageType.html
         )
 
-        await self.fm.send_message(message)
+        try:
+            await self.fm.send_message(message)
+        except SMTPException:
+            raise WikiException(
+                message="Sending a message failed",
+                error_code=WikiErrorCode.EMAIL_SENDING_ERROR,
+                http_status_code=status.HTTP_400_BAD_REQUEST
+            )

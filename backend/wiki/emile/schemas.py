@@ -5,5 +5,5 @@ from pydantic import BaseModel, EmailStr
 
 class EmailSchema(BaseModel):
     email: List[EmailStr]
-    code: str
+    code: int
     subject: str

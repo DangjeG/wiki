@@ -1,7 +1,14 @@
+from enum import Enum
 from functools import lru_cache
 
 from pydantic import AnyHttpUrl
 from pydantic_settings import BaseSettings
+
+
+class EnvironmentType(str, Enum):
+    DEV = "DEV"
+    LOCAL = "LOCAL"
+    PROD = "PROD"
 
 
 class Settings(BaseSettings):
@@ -10,8 +17,11 @@ class Settings(BaseSettings):
     VERSION: str = "0.0.1"
     API_V1_STR: str = "/api/v1"
 
+    ENVIRONMENT: EnvironmentType = EnvironmentType.DEV
+    DEBUG: bool = True
     DB_ECHO: bool = False
     LOG_FILENAME: str = "wiki.log"
+    LOGGER_NAME: str = "wiki_logger"
 
     AUTH_SECRET: bytes = b"33b974fedccff8f671d3691e89bf52857cfcaed716b9b2c76449216fd251f534"
     AUTH_ALGORITHM: str = "HS256"
@@ -51,7 +61,7 @@ class Settings(BaseSettings):
         return f"{self.DB_SCHEMA}+{self.DB_DRIVER}://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
     class Config:
-        env_file = ".env"
+        env_file = "./backend/.env"
         env_file_encoding = "utf-8"
         case_sensitive = False
 

@@ -8,7 +8,8 @@ class WikiErrorCode(IntEnum):
         Error codes of the Wiki API.
 
         Ranges:
-               0-1000: general errors
+            0-1000: general errors
+            3000-3999: email error
             4000-5000: user errors
         """
 
@@ -19,6 +20,9 @@ class WikiErrorCode(IntEnum):
 
     UNAUTHORIZED_REQUEST = 401
     TOO_MANY_REQUESTS = 429
+
+    # 3000-3999: email error
+    EMAIL_SENDING_ERROR = 3000
 
     # 4000-5000: user errors
     USER_NOT_SPECIFIED = 4000

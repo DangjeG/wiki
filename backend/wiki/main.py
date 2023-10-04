@@ -9,7 +9,7 @@ from wiki.api import api_router
 from wiki.common.exceptions import WikiException, WikiErrorCode
 from wiki.common.schemas import WikiErrorResponse
 from wiki.config import settings
-
+from wiki.wiki_logging import setup_logging
 
 api = FastAPI(
     title=f"{settings.PROJECT_NAME} API",
@@ -55,4 +55,5 @@ async def unhandled_exception_handler(request: Request, ex: Exception):
 
 
 if __name__ == "__main__":
+    setup_logging()
     uvicorn.run(api, host="0.0.0.0", port=8000)
