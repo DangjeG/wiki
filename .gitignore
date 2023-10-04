@@ -24,3 +24,6 @@ venv.bak/
 
 *.log
 *.db
+
+wiki_db_data/
+wiki_db_log/
