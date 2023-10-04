@@ -2,8 +2,8 @@ from sqlalchemy.orm import relationship
 from uuid_extensions.uuid7 import uuid7
 from sqlalchemy import Column, String
 
+from wiki.auth.models.emums import ProviderType
 from wiki.models.base import Base
-from wiki.auth.models.enums.provider_type import ProviderType
 
 
 class Account(Base):

@@ -1,0 +1,160 @@
+components:
+  schemas:
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          title: Detail
+          type: array
+      title: HTTPValidationError
+      type: object
+    UserLogin:
+      properties:
+        email:
+          format: email
+          title: Email
+          type: string
+      required:
+      - email
+      title: UserLogin
+      type: object
+    UserLoginResponse:
+      properties:
+        email_to:
+          format: email
+          title: Email To
+          type: string
+        expire_minutes:
+          default: 10
+          title: Expire Minutes
+          type: integer
+        verify_token:
+          title: Verify Token
+          type: string
+      required:
+      - email_to
+      - verify_token
+      title: UserLoginResponse
+      type: object
+    UserVerifyResponse:
+      properties:
+        access_token:
+          title: Access Token
+          type: string
+      required:
+      - access_token
+      title: UserVerifyResponse
+      type: object
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          title: Location
+          type: array
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+      type: object
+    VerifyData:
+      properties:
+        code:
+          title: Code
+          type: integer
+        token:
+          title: Token
+          type: string
+      required:
+      - token
+      - code
+      title: VerifyData
+      type: object
+  securitySchemes:
+    WikiBearer:
+      scheme: bearer
+      type: http
+info:
+  title: Wiki API
+  version: 0.0.1
+openapi: 3.1.0
+paths:
+  /auth/login:
+    post:
+      description: The endpoint for sending an email and receiving a login confirmation
+        token.A confirmation code will be sent to the specified email.
+      operationId: login_auth_login_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLoginResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Login
+      tags:
+      - Auth
+  /auth/test:
+    post:
+      description: Test endpoint to test the access token.
+      operationId: test_auth_test_post
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+      security:
+      - WikiBearer: []
+      summary: Test
+      tags:
+      - Auth
+  /auth/verify:
+    post:
+      description: Endpoint for confirming the code received by mail, issuing access
+        token to perform authorized actions.
+      operationId: verify_auth_verify_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyData'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserVerifyResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Verify
+      tags:
+      - Auth

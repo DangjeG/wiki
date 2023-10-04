@@ -3,15 +3,18 @@ name = "wiki-backend"
 version = "0.0.1"
 description = ""
 authors = ["Your Name <you@example.com>", "Your Name <you@example.com>"]
-readme = "README.md"
+readme = "./backend/README.md"
 packages = [{include = "wiki", from = "backend"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
 fastapi = {extras = ["all"], version = "^0.103.1"}
 sqlalchemy = "^2.0.21"
+aiosqlite = "^0.19.0"
+asyncpg = "^0.28.0"
 uuid7 = "^0.1.0"
-
+python-jose = "^3.3.0"
+fastapi-mail = "^1.4.1"
 
 [build-system]
 requires = ["poetry-core"]

@@ -1,19 +1,32 @@
+import uvicorn
+import yaml
 from fastapi import FastAPI
+from fastapi.openapi.utils import get_openapi
 
-from wiki.auth.schemas.user import User
+from wiki.api import api_router
+from wiki.config import settings
 
-app = FastAPI(
-    title="wiki"
+
+api = FastAPI(
+    title=f"{settings.PROJECT_NAME} API",
+    description=settings.PROJECT_DESCRIPTION,
+    version=settings.VERSION,
+    openapi_url=f"/docs/openapi.json",
+    docs_url="/docs",
+    redoc_url="/redoc",
 )
 
-@app.get("/start")
-def start():
-    return "hello"
+# frontend = FastAPI()
 
-@app.get("/account/{user_id}")
-def get_user(user_id: int):
-    return user_id
+api.include_router(api_router)
 
-@app.post("/auth")
-def enter_emile(user: User):
-    return {"status": 200, "email": user.email}
+@api.get(f"/swagger.yaml", include_in_schema=False)
+async def get_swagger():
+    openapi_schema = get_openapi(title=f"{settings.PROJECT_NAME} API", version=settings.VERSION, routes=api.routes)
+    with open("./docs/swagger.yaml", "w") as file:
+        yaml.dump(openapi_schema, file)
+    return openapi_schema
+
+
+if __name__ == "__main__":
+    uvicorn.run(api, host="0.0.0.0", port=8000)
