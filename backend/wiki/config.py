@@ -1,7 +1,6 @@
 from enum import Enum
 from functools import lru_cache
 
-from pydantic import AnyHttpUrl
 from pydantic_settings import BaseSettings
 
 
@@ -45,7 +44,7 @@ class Settings(BaseSettings):
     DB_POOL_SIZE: int = 75
     DB_MAX_OVERFLOW: int = 20
 
-    BACKEND_CORS_ORIGINS: list[AnyHttpUrl] = []
+    BACKEND_CORS_ORIGINS: list[str] = ["*"]
 
     EMAIL_HOST: str
     EMAIL_PORT: int
