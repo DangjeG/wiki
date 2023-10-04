@@ -37,6 +37,16 @@ class Settings(BaseSettings):
 
     BACKEND_CORS_ORIGINS: list[AnyHttpUrl] = []
 
+    EMAIL_HOST: str
+    EMAIL_PORT: int
+    EMAIL_USERNAME: str
+    EMAIL_PASSWORD: str
+    EMAIL_FROM: str
+    EMAIL_MAIL_STARTTLS: bool = False
+    EMAIL_MAIL_SSL_TLS: bool = True
+    EMAIL_USE_CREDENTIALS: bool = True
+    EMAIL_VALIDATE_CERTS: bool = True
+
     def get_db_url(self):
         return f"{self.DB_SCHEMA}+{self.DB_DRIVER}://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 

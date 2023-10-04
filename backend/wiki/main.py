@@ -24,7 +24,6 @@ api = FastAPI(
 
 api.include_router(api_router)
 
-
 @api.get(f"/swagger.yaml", include_in_schema=False)
 async def get_swagger():
     openapi_schema = get_openapi(title=f"{settings.PROJECT_NAME} API", version=settings.VERSION, routes=api.routes)
