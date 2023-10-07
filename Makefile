@@ -18,4 +18,4 @@ down:
 
 .PHONY: export-dep
 export-dep:
-		poetry export --without-hashes --without dev -f requirements.txt -o ./backend/requirements.txt
+		poetry export --without-hashes -f requirements.txt -o ./backend/requirements.txt

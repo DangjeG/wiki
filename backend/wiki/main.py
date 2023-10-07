@@ -1,3 +1,5 @@
+import logging
+
 import uvicorn
 import yaml
 from fastapi import FastAPI, Request
@@ -12,35 +14,19 @@ from wiki.common.schemas import WikiErrorResponse
 from wiki.config import settings
 from wiki.wiki_logging import setup_logging
 
+
+wiki_logger = logging.getLogger(__name__)
+
+
 api = FastAPI(
     title=f"{settings.PROJECT_NAME} API",
     description=settings.PROJECT_DESCRIPTION,
     version=settings.VERSION,
-    openapi_url=f"/docs/openapi.json",
+    openapi_url=f"{settings.API_V1_STR}/openapi.json",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    servers=settings.API_SERVERS
 )
-
-if settings.BACKEND_CORS_ORIGINS:
-    api.add_middleware(
-        CORSMiddleware,
-        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-
-# frontend = FastAPI()
-
-api.include_router(api_router)
-
-
-@api.get(f"/swagger.yaml", include_in_schema=False)
-async def get_swagger():
-    openapi_schema = get_openapi(title=f"{settings.PROJECT_NAME} API", version=settings.VERSION, routes=api.routes)
-    with open("./docs/swagger.yaml", "w") as file:
-        yaml.dump(openapi_schema, file)
-    return openapi_schema
 
 
 @api.exception_handler(WikiException)
@@ -63,6 +49,28 @@ async def unhandled_exception_handler(request: Request, ex: Exception):
             "error_code": WikiErrorCode.GENERIC_ERROR
         }
     )
+
+
+if settings.BACKEND_CORS_ORIGINS:
+    api.add_middleware(
+        CORSMiddleware,
+        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+
+@api.get(f"/swagger.yaml", include_in_schema=False)
+async def get_swagger():
+    openapi_schema = get_openapi(title=f"{settings.PROJECT_NAME} API", version=settings.VERSION, routes=api.routes)
+    with open("./docs/swagger.yaml", "w") as file:
+        yaml.dump(openapi_schema, file)
+    return openapi_schema
+
+
+# frontend = FastAPI()
+api.include_router(api_router, prefix=settings.API_V1_STR)
 
 
 if __name__ == "__main__":

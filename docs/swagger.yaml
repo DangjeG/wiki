@@ -37,15 +37,6 @@ components:
       - verify_token
       title: UserLoginResponse
       type: object
-    UserVerifyResponse:
-      properties:
-        access_token:
-          title: Access Token
-          type: string
-      required:
-      - access_token
-      title: UserVerifyResponse
-      type: object
     ValidationError:
       properties:
         loc:
@@ -67,19 +58,6 @@ components:
       - type
       title: ValidationError
       type: object
-    VerifyData:
-      properties:
-        code:
-          title: Code
-          type: integer
-        token:
-          title: Token
-          type: string
-      required:
-      - token
-      - code
-      title: VerifyData
-      type: object
   securitySchemes:
     WikiBearer:
       scheme: bearer
@@ -89,11 +67,11 @@ info:
   version: 0.0.1
 openapi: 3.1.0
 paths:
-  /auth/login:
+  /api/v1/auth/login:
     post:
       description: The endpoint for sending an email and receiving a login confirmation
         token.A confirmation code will be sent to the specified email.
-      operationId: login_auth_login_post
+      operationId: login_api_v1_auth_login_post
       requestBody:
         content:
           application/json:
@@ -116,10 +94,10 @@ paths:
       summary: Login
       tags:
       - Auth
-  /auth/test:
+  /api/v1/auth/test:
     post:
       description: Test endpoint to test the access token.
-      operationId: test_auth_test_post
+      operationId: test_api_v1_auth_test_post
       responses:
         '200':
           content:
@@ -131,23 +109,29 @@ paths:
       summary: Test
       tags:
       - Auth
-  /auth/verify:
-    post:
+  /api/v1/auth/verify:
+    get:
       description: Endpoint for confirming the code received by mail, issuing access
         token to perform authorized actions.
-      operationId: verify_auth_verify_post
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/VerifyData'
+      operationId: verify_api_v1_auth_verify_get
+      parameters:
+      - in: query
+        name: token
         required: true
+        schema:
+          title: Token
+          type: string
+      - in: query
+        name: code
+        required: true
+        schema:
+          title: Code
+          type: integer
       responses:
         '200':
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/UserVerifyResponse'
+              schema: {}
           description: Successful Response
         '422':
           content:

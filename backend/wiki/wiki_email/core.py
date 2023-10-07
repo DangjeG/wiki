@@ -4,7 +4,7 @@ from starlette import status
 
 from wiki.common.exceptions import WikiException, WikiErrorCode
 from wiki.config import settings
-from wiki.emile.schemas import EmailSchema
+from wiki.wiki_email.schemas import EmailSchema
 
 
 class EmailProvider:

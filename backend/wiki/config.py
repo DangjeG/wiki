@@ -15,6 +15,16 @@ class Settings(BaseSettings):
     PROJECT_DESCRIPTION: str = "Welcome to Wiki's API documentation! Here you will able to discover all of the ways you can interact with the Wiki API."
     VERSION: str = "0.0.1"
     API_V1_STR: str = "/api/v1"
+    API_SERVERS: list = [
+        {
+            "url": "http://localhost:8000",
+            "description": "Local server"
+        },
+        {
+            "url": "https://api.wiki.example.com",
+            "description": "Demo server"
+        }
+    ]
 
     ENVIRONMENT: EnvironmentType = EnvironmentType.DEV
     DEBUG: bool = True
@@ -22,7 +32,9 @@ class Settings(BaseSettings):
     LOG_FILENAME: str = "wiki.log"
     LOGGER_NAME: str = "wiki_logger"
 
-    AUTH_SECRET: bytes = b"33b974fedccff8f671d3691e89bf52857cfcaed716b9b2c76449216fd251f534"
+    AUTH_SECRET_MAIN: bytes = b"886862ad333aeea48c9b1a3e3e1ac21096aea3436d0190b300be96642a4a328612"
+    AUTH_SECRET_VERIFY: bytes = b"33b974fedccff8f671d3691e89bf52857cfcaed716b9b2c76449216fd251f534"
+
     AUTH_ALGORITHM: str = "HS256"
     AUTH_TOKEN_SEPARATOR: str = "_"
     AUTH_VERIFY_TOKEN_PREFIX: str = "verify"
