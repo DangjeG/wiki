@@ -19,14 +19,14 @@ components:
       - email
       title: UserLogin
       type: object
-    UserLoginResponse:
+    UserSignResponse:
       properties:
         email_to:
           format: email
           title: Email To
           type: string
         expire_minutes:
-          default: 10
+          default: 5
           title: Expire Minutes
           type: integer
         verify_token:
@@ -35,7 +35,71 @@ components:
       required:
       - email_to
       - verify_token
-      title: UserLoginResponse
+      title: UserSignResponse
+      type: object
+    UserSignupSchema:
+      properties:
+        display_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Display Name
+        email:
+          format: email
+          title: Email
+          type: string
+        first_name:
+          title: First Name
+          type: string
+        is_user_agreement_accepted:
+          title: Is User Agreement Accepted
+          type: boolean
+        last_name:
+          title: Last Name
+          type: string
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+        organization_id:
+          format: uuid
+          title: Organization Id
+          type: string
+        position:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Position
+        second_name:
+          title: Second Name
+          type: string
+        username:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+      required:
+      - email
+      - username
+      - display_name
+      - first_name
+      - last_name
+      - second_name
+      - position
+      - is_user_agreement_accepted
+      - organization_id
+      - message
+      title: UserSignupSchema
+      type: object
+    UserVerifyResponse:
+      properties:
+        access_token:
+          title: Access Token
+          type: string
+      required:
+      - access_token
+      title: UserVerifyResponse
       type: object
     ValidationError:
       properties:
@@ -59,6 +123,14 @@ components:
       title: ValidationError
       type: object
   securitySchemes:
+    WikiAccessToken:
+      in: cookie
+      name: wiki_access_token
+      type: apiKey
+    WikiApiKey:
+      in: header
+      name: X-Wiki-API-Key
+      type: apiKey
     WikiBearer:
       scheme: bearer
       type: http
@@ -83,7 +155,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserLoginResponse'
+                $ref: '#/components/schemas/UserSignResponse'
           description: Successful Response
         '422':
           content:
@@ -92,6 +164,32 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
       summary: Login
+      tags:
+      - Auth
+  /api/v1/auth/signup:
+    post:
+      description: Sending an application for registration in the system
+      operationId: signup_api_v1_auth_signup_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserSignupSchema'
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSignResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Signup
       tags:
       - Auth
   /api/v1/auth/test:
@@ -105,6 +203,9 @@ paths:
               schema: {}
           description: Successful Response
       security:
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
       - WikiBearer: []
       summary: Test
       tags:
@@ -122,16 +223,17 @@ paths:
           title: Token
           type: string
       - in: query
-        name: code
+        name: verification_code
         required: true
         schema:
-          title: Code
+          title: Verification Code
           type: integer
       responses:
         '200':
           content:
             application/json:
-              schema: {}
+              schema:
+                $ref: '#/components/schemas/UserVerifyResponse'
           description: Successful Response
         '422':
           content:

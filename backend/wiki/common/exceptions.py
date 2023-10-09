@@ -8,26 +8,50 @@ class WikiErrorCode(IntEnum):
         Error codes of the Wiki API.
 
         Ranges:
-            0-1000: general errors
-            3000-3999: email error
+               0-1000: general errors
+            2000-2999: auth error
+            3000-3999: wiki_email error
             4000-5000: user errors
+            5001-6000: permission errors
         """
 
     # 0-1000: general errors
     GENERIC_ERROR = 0
+    DATABASE_URI_NOT_SET = 1
+    API_CLIENT_NOT_AUTHORIZED = 2
+    ROOT_TOKEN_NOT_AUTHORIZED = 3
+    DATABASE_MAX_RETRIES_EXHAUSTED = 4
 
     OBJECT_NOT_FOUND = 404
 
     UNAUTHORIZED_REQUEST = 401
     TOO_MANY_REQUESTS = 429
 
-    # 3000-3999: email error
+    # 2000-2999: auth error
+    AUTH_NOT_VALIDATE_CREDENTIALS = 2000
+    AUTH_API_KEY_NOT_VALID_OR_EXPIRED = 2001
+    AUTH_TOKEN_NOT_VALID_OR_EXPIRED = 2002
+    AUTH_ORGANIZATION_NOT_ACCESS = 2003
+    AUTH_ORGANIZATION_NOT_ACCESS_API = 2004
+    AUTH_USER_NOT_FOUND = 2005
+    AUTH_API_CLIENT_NOT_FOUND = 2006
+
+    # 3000-3999: wiki_email error
     EMAIL_SENDING_ERROR = 3000
+    EMAIL_NOT_ALLOWED = 3001
 
     # 4000-5000: user errors
     USER_NOT_SPECIFIED = 4000
     USER_DISABLED = 4001
     USER_NOT_FOUND = 4002
+
+    ORGANIZATION_NOT_FOUND = 4100
+
+    API_CLIENT_NOT_FOUND = 4501
+    API_KEY_NOT_FOUND = 4502
+
+    # 5001-6000: permission errors
+    PERMISSION_DOMAIN_NOT_FOUND = 5001
 
 
 class WikiException(Exception):

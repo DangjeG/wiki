@@ -33,7 +33,19 @@ class Settings(BaseSettings):
     LOGGER_NAME: str = "wiki_logger"
 
     AUTH_SECRET_MAIN: bytes = b"886862ad333aeea48c9b1a3e3e1ac21096aea3436d0190b300be96642a4a328612"
+    AUTH_SECRET_API_KEY: bytes = b"bf48fbdd0a692198d4f5d6f1210646fae139930e1c46aa7f29c60ca1c437d1b6"
     AUTH_SECRET_VERIFY: bytes = b"33b974fedccff8f671d3691e89bf52857cfcaed716b9b2c76449216fd251f534"
+
+    AUTH_API_KEY_QUERY_NAME: str = "wiki_api_key"
+    AUTH_API_KEY_HEADER_NAME: str = "X-Wiki-API-Key"
+    AUTH_ACCESS_TOKEN_COOKIE_NAME: str = "wiki_access_token"
+    AUTH_REFRESH_TOKEN_COOKIE_NAME: str = "wiki_refresh_token"
+
+    AUTH_TOKEN_COOKIE_PATH: str = "/"
+    AUTH_TOKEN_COOKIE_DOMAIN: str = "localhost"
+    AUTH_TOKEN_COOKIE_SECURE: bool = False
+    AUTH_TOKEN_COOKIE_HTTP_ONLY: bool = True
+    AUTH_TOKEN_COOKIE_SAME_SITE: str = "lax"
 
     AUTH_ALGORITHM: str = "HS256"
     AUTH_TOKEN_SEPARATOR: str = "_"
@@ -41,9 +53,11 @@ class Settings(BaseSettings):
     AUTH_ACCESS_TOKEN_PREFIX: str = "access"
     AUTH_REFRESH_TOKEN_PREFIX: str = "refresh"
 
-    AUTH_VERIFY_TOKEN_EXPIRE_MINUTES: int = 10
+    AUTH_VERIFY_TOKEN_EXPIRE_MINUTES: int = 5
     AUTH_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     AUTH_REFRESH_TOKEN_EXPIRE_MINUTES: int = 10080  # 60 * 24 * 7
+
+    AUTH_ROOT_TOKENS: list[str] = ["12345"]
 
     DB_SCHEMA: str = "postgresql"
     DB_DRIVER: str = "asyncpg"

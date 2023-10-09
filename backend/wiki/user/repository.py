@@ -1,7 +1,7 @@
 from typing import Optional
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import select, func, or_
 from starlette import status
 
 from wiki.common.exceptions import WikiException, WikiErrorCode
@@ -28,6 +28,11 @@ class UserRepository(BaseRepository):
         error_code=WikiErrorCode.USER_NOT_FOUND,
         http_status_code=status.HTTP_404_NOT_FOUND
     )
+    _user_forbidden_exception = WikiException(
+        message="API key is not valid or expired.",
+        error_code=WikiErrorCode.AUTH_API_KEY_NOT_VALID_OR_EXPIRED,
+        http_status_code=status.HTTP_403_FORBIDDEN
+    )
 
     @menage_db_not_found_resul_method(NotFoundResultMode.EXCEPTION, ex=_user_not_found_exception)
     async def get_user_by_id(self, user_id: UUID) -> User:
@@ -37,6 +42,17 @@ class UserRepository(BaseRepository):
     @menage_db_not_found_resul_method(NotFoundResultMode.EXCEPTION, ex=_user_not_found_exception)
     async def get_user_by_email(self, email: str) -> User:
         st = select(User).where(User.email == email)
+        user_query = (await self.session.execute(st)).scalar()
+        return user_query
+
+    async def check_user_identification_data_is_available(self, email: str, username: Optional[str]) -> bool:
+        st = select(func.count(User.id)).where(or_(User.email == email, User.username == username))
+        count = (await self.session.execute(st)).scalar()
+        return not count > 0
+
+    @menage_db_not_found_resul_method(NotFoundResultMode.EXCEPTION, ex=_user_forbidden_exception)
+    async def get_user_by_wiki_api_client_id(self, api_client_id: UUID) -> User:
+        st = select(User).where(User.wiki_api_client_id == api_client_id)
         user_query = (await self.session.execute(st)).scalar()
         return user_query
 
@@ -59,7 +75,9 @@ class UserRepository(BaseRepository):
             display_name=create_user.display_name,
             first_name=create_user.first_name,
             last_name=create_user.last_name,
-            second_name=create_user.second_name
+            second_name=create_user.second_name,
+            position=create_user.position,
+            organization_id=create_user.organization_id
         )
 
         self.session.add(new_user)
@@ -75,7 +93,10 @@ class UserRepository(BaseRepository):
                           display_name: Optional[str] = None,
                           first_name: Optional[str] = None,
                           last_name: Optional[str] = None,
-                          second_name: Optional[str] = None) -> User:
+                          second_name: Optional[str] = None,
+                          position: Optional[str] = None,
+                          organization_id: Optional[UUID] = None,
+                          wiki_api_client_id: Optional[str] = None) -> User:
         user: User = await self.get_user_by_id(user_id)
         if email is not None:
             user.email = email
@@ -89,6 +110,12 @@ class UserRepository(BaseRepository):
             user.last_name = last_name
         if second_name is not None:
             user.second_name = second_name
+        if position is not None:
+            user.position = position
+        if organization_id is not None:
+            user.organization_id = organization_id
+        if wiki_api_client_id is not None:
+            user.wiki_api_client_id = wiki_api_client_id
 
         self.session.add(user)
 

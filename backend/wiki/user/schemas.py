@@ -1,13 +1,17 @@
 from typing import Optional
+from uuid import UUID
 
-from pydantic import BaseModel, EmailStr
+from pydantic import EmailStr
+
+from wiki.models import WikiBase
 
 
-class CreateUser(BaseModel):
+class CreateUser(WikiBase):
     email: EmailStr
     username: str
     display_name: Optional[str] = None
     first_name: str
     last_name: str
     second_name: Optional[str] = None
-    is_trusted: bool = False
+    position: Optional[str] = None,
+    organization_id: Optional[UUID] = None

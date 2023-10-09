@@ -5,5 +5,5 @@ from wiki.database.core import get_session
 
 async def get_db():
     session: AsyncSession = get_session()
-    with session.begin() as transaction:
+    async with session.begin() as transaction:
         yield session
