@@ -6,7 +6,6 @@ from starlette import status
 
 from wiki.auth.authenticators.verification_code import VerificationCodeAuthenticatorInterface
 from wiki.auth.authenticators.wiki_token import WikiTokenAuthenticatorInterface
-from wiki.auth.deps import get_user
 from wiki.auth.resolvers.email import EmailResolver
 from wiki.auth.resolvers.user_login import UserLoginResolver
 from wiki.auth.schemas import (
@@ -41,13 +40,18 @@ wiki_logger = logging.getLogger(__name__)
     "/login",
     response_model=UserSignResponse,
     status_code=status.HTTP_202_ACCEPTED,
-    description="The endpoint for sending an email and receiving a login confirmation token."
-                "A confirmation code will be sent to the specified email."
+    summary="Login by email or username",
+    response_description="Verification token data."
 )
 async def login(user_in: FrontendUserLogin,
                 request: Request,
                 session: AsyncSession = Depends(get_db),
                 email_provider: EmailProvider = Depends(get_email_provider)):
+    """
+    ## Logging in to a user account
+    The endpoint for sending an email or username and receiving a login confirmation token.
+    A confirmation code will be sent to the specified email.
+    """
     user_login_resolver = UserLoginResolver(session)
     await user_login_resolver.resolve(user_in)
     authenticator = VerificationCodeAuthenticatorInterface(session)
@@ -74,12 +78,17 @@ async def login(user_in: FrontendUserLogin,
     "/signup",
     response_model=UserSignResponse,
     status_code=status.HTTP_202_ACCEPTED,
-    description="Sending an application for registration in the system"
+    summary="Signup with user data entry",
+    response_description="Verification token data."
 )
 async def signup(user_signup: CreateUser,
                  request: Request,
                  session: AsyncSession = Depends(get_db),
                  email_provider: EmailProvider = Depends(get_email_provider)):
+    """
+    ## Registration - submitting an application
+    Sending an application for registration in the system.
+    """
     user_repository: UserRepository = UserRepository(session)
     is_available: bool = await user_repository.check_user_identification_data_is_available(user_signup.email,
                                                                                            user_signup.username)
@@ -152,11 +161,16 @@ async def signup(user_signup: CreateUser,
     "/verify",
     response_model=BaseResponse,
     status_code=status.HTTP_200_OK,
-    description="Endpoint for confirming the code received by mail, issuing access token to perform authorized actions."
+    summary="Verification by token and code",
+    response_description="Cookies are set. Success message."
 )
 async def verify(response: Response,
                  data: VerifyData = Depends(),
                  session: AsyncSession = Depends(get_db)):
+    """
+    ## Verification on the sent code
+    Endpoint for confirming the code received by mail, issuing access token to perform authorized actions.
+    """
     authenticator = VerificationCodeAuthenticatorInterface(session, verification_code=data.verification_code)
     data = await authenticator.validate(data.token)
     if isinstance(data, UserHandlerData):
@@ -181,12 +195,3 @@ async def verify(response: Response,
         user: User = await user_repository.get_user_by_email(email)
         user = await user_repository.update_user(user.id, is_verified_email=True)
         return BaseResponse(msg="Successful email verification.")
-
-
-@auth_router.post(
-    "/test",
-    status_code=status.HTTP_200_OK,
-    description="Test endpoint to test the access token."
-)
-async def test(user: UserHandlerData = Depends(get_user)):
-    return f"You have accessed a secure endpoint.. Your email: {user.email}"

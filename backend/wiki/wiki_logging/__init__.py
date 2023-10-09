@@ -93,6 +93,9 @@ class JSONLogFormatter(logging.Formatter):
             by_alias=True,
         )
 
+        if hasattr(record, "request_json_fields"):
+            json_log_object.update(record.request_json_fields)
+
         return json_log_object
 
 
@@ -122,7 +125,7 @@ LOG_CONFIG = {
             "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
         },
         "standard": {
-            "format": "%(asctime)s - [%(levelname)s] %(name)s [%(module)s.%(funcName)s:%(lineno)d]: %(message)s",
+            "format": "%(asctime)s - [%(levelname)s] %(name)s: %(message)s",
             "datefmt": "%Y-%m-%d %H:%M:%S"
         },
         "json": {

@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 
 from wiki.common.exceptions import WikiErrorCode
+from wiki.models import WikiBase
 
 
 class WikiErrorResponse(BaseModel):
@@ -10,6 +11,12 @@ class WikiErrorResponse(BaseModel):
     message: str
 
 
-class BaseResponse(BaseModel):
+class BaseResponse(WikiBase):
     status: str = "success"
     msg: str = ""
+
+
+class HealthCheck(WikiBase):
+    """Response model to validate and return when performing a health check."""
+
+    status: str = "OK"

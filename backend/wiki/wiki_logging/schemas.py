@@ -1,9 +1,12 @@
 from typing import Optional
+from uuid import UUID
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import Field, field_validator
+
+from wiki.models import WikiBase
 
 
-class BaseLogSchema(BaseModel):
+class BaseLogSchema(WikiBase):
     name: str                                               # Name of the logger (logging channel)
     level_name: str                                         # Text logging level for the message ("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL")
 
@@ -29,21 +32,24 @@ class BaseLogSchema(BaseModel):
         populate_by_name = True
 
 
-class RequestLogSchema(BaseModel):
+class RequestLogSchema(WikiBase):
     request_uri: str
     request_referer: str
+    request_protocol: str
     request_method: str
     request_path: str
     request_host: str
     request_size: int
     request_content_type: str
-    request_headers: dict
-    request_body: Optional[str]
+    request_headers: str
+    request_body: str
     request_direction: str
+    remote_ip: str
+    remote_port: int
     response_status_code: int
     response_size: int
-    response_headers: dict
-    response_body: Optional[str]
+    response_headers: str
+    response_body: str
     duration: int
 
     @classmethod
