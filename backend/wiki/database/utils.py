@@ -62,8 +62,8 @@ def menage_db_not_found_resul_method(
 ):
     def decorator(f):
         @wraps(f)
-        def wrapped_f(self, *args, **kwargs):
-            result = f(self, *args, **kwargs)
+        async def wrapped_f(self, *args, **kwargs):
+            result = await f(self, *args, **kwargs)
             match mode:
                 case NotFoundResultMode.NONE:
                     return result

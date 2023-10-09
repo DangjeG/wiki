@@ -3,7 +3,6 @@ import logging
 import uvicorn
 import yaml
 from fastapi import FastAPI, Request
-from fastapi.openapi.utils import get_openapi
 from starlette import status
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
@@ -12,6 +11,7 @@ from wiki.api import api_router
 from wiki.common.exceptions import WikiException, WikiErrorCode
 from wiki.common.schemas import WikiErrorResponse
 from wiki.config import settings
+from wiki.database.deps import db_metadata_create_all
 from wiki.wiki_logging import setup_logging
 
 
@@ -61,12 +61,18 @@ if settings.BACKEND_CORS_ORIGINS:
     )
 
 
-@api.get(f"/swagger.yaml", include_in_schema=False)
+@api.get(f"{settings.API_V1_STR}/swagger.yaml", include_in_schema=False)
 async def get_swagger():
-    openapi_schema = get_openapi(title=f"{settings.PROJECT_NAME} API", version=settings.VERSION, routes=api.routes)
+    openapi_json = api.openapi()
     with open("./docs/swagger.yaml", "w") as file:
-        yaml.dump(openapi_schema, file)
-    return openapi_schema
+        yaml.dump(openapi_json, file)
+    return openapi_json
+
+
+if settings.DB_METADATA_CREATE_ALL:
+    @api.on_event("startup")
+    async def startup_event_db_metadata_create_all():
+        await db_metadata_create_all()
 
 
 # frontend = FastAPI()

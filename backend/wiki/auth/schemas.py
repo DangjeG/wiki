@@ -10,8 +10,9 @@ from wiki.organization.models import Organization
 from wiki.wiki_api_client.models import WikiApiClient
 
 
-class UserLogin(WikiBase):
-    email: EmailStr
+class FrontendUserLogin(WikiBase):
+    email: Optional[EmailStr] = None
+    username:  Optional[str] = None
 
 
 class BaseTokenData(WikiBase):
@@ -19,7 +20,7 @@ class BaseTokenData(WikiBase):
 
 
 class AccessTokenData(BaseTokenData):
-    api_client_id: UUID
+    api_client_id: str
 
 
 class VerificationType(str, Enum):
@@ -39,21 +40,20 @@ class UserSignResponse(WikiBase):
     verify_token: str
 
 
-class UserSignupSchema(WikiBase):
-    email: EmailStr
-    username: Optional[str]
-    display_name: Optional[str]
-    first_name: str
-    last_name: str
-    second_name: str
-    position: Optional[str]
-    is_user_agreement_accepted: bool
-    organization_id: UUID
-    message: Optional[str]
+# class FrontendUserSignup(WikiBase):
+#     email: EmailStr
+#     username: Optional[str]
+#     display_name: Optional[str]
+#     first_name: str
+#     last_name: str
+#     second_name: str
+#     position: Optional[str]
+#     is_user_agreement_accepted: bool
+#     organization_id: UUID
 
 
-class UserVerifyResponse(WikiBase):
-    access_token: str
+# class UserVerifyResponse(WikiBase):
+#     access_token: str
 
 
 class VerifyData(WikiBase):
@@ -61,7 +61,7 @@ class VerifyData(WikiBase):
     verification_code: int
 
 
-class UserHandlerData(TypedDict):
+class UserHandlerData(WikiBase):
     id: UUID
     email: str
     username: Optional[str] = None

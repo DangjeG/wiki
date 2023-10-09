@@ -144,6 +144,11 @@ LOG_CONFIG = {
         }
     },
     "loggers": {
+        "root": {
+            "handlers": LOG_HANDLER,
+            "level": "INFO",
+            "propagate": False,
+        },
         "uvicorn": {
             "handlers": LOG_HANDLER,
             "level": "INFO",
@@ -154,11 +159,6 @@ LOG_CONFIG = {
             "level": "ERROR",
             "propagate": False,
         },
-    },
-    "root": {
-        "handlers": LOG_HANDLER,
-        "level": "INFO",
-        "propagate": False,
     },
 }
 

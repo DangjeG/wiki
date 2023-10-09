@@ -1,5 +1,81 @@
 components:
   schemas:
+    BaseResponse:
+      properties:
+        msg:
+          default: ''
+          title: Msg
+          type: string
+        status:
+          default: success
+          title: Status
+          type: string
+      title: BaseResponse
+      type: object
+    CreateUser:
+      properties:
+        display_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Display Name
+        email:
+          format: email
+          title: Email
+          type: string
+        first_name:
+          title: First Name
+          type: string
+        is_user_agreement_accepted:
+          default: false
+          title: Is User Agreement Accepted
+          type: boolean
+        last_name:
+          title: Last Name
+          type: string
+        organization_id:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Organization Id
+        position:
+          anyOf:
+          - type: string
+          - type: 'null'
+          default:
+          - null
+          title: Position
+        second_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Second Name
+        username:
+          title: Username
+          type: string
+      required:
+      - email
+      - username
+      - first_name
+      - last_name
+      title: CreateUser
+      type: object
+    FrontendUserLogin:
+      properties:
+        email:
+          anyOf:
+          - format: email
+            type: string
+          - type: 'null'
+          title: Email
+        username:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+      title: FrontendUserLogin
+      type: object
     HTTPValidationError:
       properties:
         detail:
@@ -8,16 +84,6 @@ components:
           title: Detail
           type: array
       title: HTTPValidationError
-      type: object
-    UserLogin:
-      properties:
-        email:
-          format: email
-          title: Email
-          type: string
-      required:
-      - email
-      title: UserLogin
       type: object
     UserSignResponse:
       properties:
@@ -36,70 +102,6 @@ components:
       - email_to
       - verify_token
       title: UserSignResponse
-      type: object
-    UserSignupSchema:
-      properties:
-        display_name:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Display Name
-        email:
-          format: email
-          title: Email
-          type: string
-        first_name:
-          title: First Name
-          type: string
-        is_user_agreement_accepted:
-          title: Is User Agreement Accepted
-          type: boolean
-        last_name:
-          title: Last Name
-          type: string
-        message:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Message
-        organization_id:
-          format: uuid
-          title: Organization Id
-          type: string
-        position:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Position
-        second_name:
-          title: Second Name
-          type: string
-        username:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Username
-      required:
-      - email
-      - username
-      - display_name
-      - first_name
-      - last_name
-      - second_name
-      - position
-      - is_user_agreement_accepted
-      - organization_id
-      - message
-      title: UserSignupSchema
-      type: object
-    UserVerifyResponse:
-      properties:
-        access_token:
-          title: Access Token
-          type: string
-      required:
-      - access_token
-      title: UserVerifyResponse
       type: object
     ValidationError:
       properties:
@@ -135,6 +137,8 @@ components:
       scheme: bearer
       type: http
 info:
+  description: Welcome to Wiki's API documentation! Here you will able to discover
+    all of the ways you can interact with the Wiki API.
   title: Wiki API
   version: 0.0.1
 openapi: 3.1.0
@@ -148,7 +152,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserLogin'
+              $ref: '#/components/schemas/FrontendUserLogin'
         required: true
       responses:
         '202':
@@ -174,7 +178,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserSignupSchema'
+              $ref: '#/components/schemas/CreateUser'
         required: true
       responses:
         '202':
@@ -233,7 +237,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserVerifyResponse'
+                $ref: '#/components/schemas/BaseResponse'
           description: Successful Response
         '422':
           content:
@@ -244,3 +248,8 @@ paths:
       summary: Verify
       tags:
       - Auth
+servers:
+- description: Local server
+  url: http://localhost:8000/
+- description: Demo server
+  url: https://api.wiki.example.com/

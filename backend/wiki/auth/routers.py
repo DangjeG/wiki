@@ -8,21 +8,27 @@ from wiki.auth.authenticators.verification_code import VerificationCodeAuthentic
 from wiki.auth.authenticators.wiki_token import WikiTokenAuthenticatorInterface
 from wiki.auth.deps import get_user
 from wiki.auth.resolvers.email import EmailResolver
+from wiki.auth.resolvers.user_login import UserLoginResolver
 from wiki.auth.schemas import (
-    UserLogin,
+    FrontendUserLogin,
     UserSignResponse,
     VerifyTokenData,
-    UserVerifyResponse,
     AccessTokenData,
     VerifyData,
     UserHandlerData,
-    UserSignupSchema,
     VerificationType
 )
 from wiki.common.exceptions import WikiException, WikiErrorCode
+from wiki.common.schemas import BaseResponse
 from wiki.config import settings
 from wiki.database.deps import get_db
+from wiki.user.models import User
 from wiki.user.repository import UserRepository
+from wiki.user.schemas import CreateUser
+from wiki.wiki_api_client.enums import ResponsibilityType
+from wiki.wiki_api_client.models import WikiApiClient
+from wiki.wiki_api_client.repository import WikiApiClientRepository
+from wiki.wiki_api_client.schemas import CreateWikiApiClient
 from wiki.wiki_email.core import EmailProvider
 from wiki.wiki_email.deps import get_email_provider
 from wiki.wiki_email.schemas import EmailSchema
@@ -38,16 +44,19 @@ wiki_logger = logging.getLogger(__name__)
     description="The endpoint for sending an email and receiving a login confirmation token."
                 "A confirmation code will be sent to the specified email."
 )
-async def login(user_in: UserLogin,
+async def login(user_in: FrontendUserLogin,
                 request: Request,
                 session: AsyncSession = Depends(get_db),
                 email_provider: EmailProvider = Depends(get_email_provider)):
+    user_login_resolver = UserLoginResolver(session)
+    await user_login_resolver.resolve(user_in)
     authenticator = VerificationCodeAuthenticatorInterface(session)
     code = authenticator.verification_code
-    token = await authenticator.create_verify_token(VerifyTokenData(
+    token = authenticator.create_verify_token(VerifyTokenData(
         email=user_in.email,
         user_ip=request.client.host,
-        user_agent=request.headers.get("User-Agent")),
+        user_agent=request.headers.get("User-Agent"),
+        appointment=VerificationType.login),
         verification_code=code
     )
 
@@ -67,12 +76,13 @@ async def login(user_in: UserLogin,
     status_code=status.HTTP_202_ACCEPTED,
     description="Sending an application for registration in the system"
 )
-async def signup(user_signup: UserSignupSchema,
+async def signup(user_signup: CreateUser,
                  request: Request,
                  session: AsyncSession = Depends(get_db),
                  email_provider: EmailProvider = Depends(get_email_provider)):
     user_repository: UserRepository = UserRepository(session)
-    is_available: bool = await user_repository.check_user_identification_data_is_available(user_signup.email)
+    is_available: bool = await user_repository.check_user_identification_data_is_available(user_signup.email,
+                                                                                           user_signup.username)
     if not is_available:
         raise WikiException(
             message="Your username or email is not available or you have already sent an application.",
@@ -86,7 +96,7 @@ async def signup(user_signup: UserSignupSchema,
             http_status_code=status.HTTP_400_BAD_REQUEST
         )
     email_resolver = EmailResolver(session)
-    await email_resolver.resolve(user_signup.email)
+    is_accept_now = await email_resolver.resolve(user_signup.email)
 
     authenticator = VerificationCodeAuthenticatorInterface(session)
     code = authenticator.verification_code
@@ -97,13 +107,39 @@ async def signup(user_signup: UserSignupSchema,
         appointment=VerificationType.signup
     ), code)
 
-    # Form an application and create a user
+    user = await user_repository.create_user(CreateUser(
+        email=user_signup.email,
+        username=user_signup.username,
+        display_name=user_signup.display_name,
+        first_name=user_signup.first_name,
+        last_name=user_signup.last_name,
+        second_name=user_signup.second_name,
+        position=user_signup.position,
+        organization_id=user_signup.organization_id
+    ))
 
-    # await email_provider.send_mail(EmailSchema(
-    #     email=[user_signup.email],
-    #     code=code,
-    #     subject="Your verification code to confirm your signup."
-    # ))
+    if is_accept_now:
+        api_client_repository = WikiApiClientRepository(session)
+        new_api_client: WikiApiClient = await api_client_repository.create_wiki_api_client(CreateWikiApiClient(
+            description="Wiki Api client.",
+            responsibility=ResponsibilityType.VIEWER,
+            is_enabled=True
+        ))
+        await user_repository.update_user(user.id, wiki_api_client_id=new_api_client.id)
+
+        await email_provider.send_mail(EmailSchema(
+            email=[user_signup.email],
+            code=code,
+            subject="You automatically accessed the system. "
+                    "Your verification code to confirm your signup."
+        ))
+    else:
+        await email_provider.send_mail(EmailSchema(
+            email=[user_signup.email],
+            code=code,
+            subject="Your verification code to confirm your signup."
+        ))
+
     wiki_logger.info(f"{user_signup.email}: {code}")
 
     return UserSignResponse(
@@ -114,19 +150,19 @@ async def signup(user_signup: UserSignupSchema,
 
 @auth_router.get(
     "/verify",
-    response_model=UserVerifyResponse,
+    response_model=BaseResponse,
     status_code=status.HTTP_200_OK,
     description="Endpoint for confirming the code received by mail, issuing access token to perform authorized actions."
 )
 async def verify(response: Response,
                  data: VerifyData = Depends(),
                  session: AsyncSession = Depends(get_db)):
-    authenticator = VerificationCodeAuthenticatorInterface(session, verification_code=data.code)
+    authenticator = VerificationCodeAuthenticatorInterface(session, verification_code=data.verification_code)
     data = await authenticator.validate(data.token)
     if isinstance(data, UserHandlerData):
         token = WikiTokenAuthenticatorInterface.create_access_token(AccessTokenData(
-            email=data["email"],
-            api_client_id=data["wiki_api_client"].id
+            email=data.email,
+            api_client_id=str(data.wiki_api_client.id)
         ))
         response.set_cookie(settings.AUTH_ACCESS_TOKEN_COOKIE_NAME,
                             token,
@@ -137,9 +173,14 @@ async def verify(response: Response,
                             settings.AUTH_TOKEN_COOKIE_SECURE,
                             settings.AUTH_TOKEN_COOKIE_HTTP_ONLY,
                             settings.AUTH_TOKEN_COOKIE_SAME_SITE)
+
+        return BaseResponse(msg="Successful login.")
     else:
-        # Confirm application
-        pass
+        email = data
+        user_repository: UserRepository = UserRepository(session)
+        user: User = await user_repository.get_user_by_email(email)
+        user = await user_repository.update_user(user.id, is_verified_email=True)
+        return BaseResponse(msg="Successful email verification.")
 
 
 @auth_router.post(
@@ -148,4 +189,4 @@ async def verify(response: Response,
     description="Test endpoint to test the access token."
 )
 async def test(user: UserHandlerData = Depends(get_user)):
-    return f"You have accessed a secure endpoint.. Your email: {user['email']}"
+    return f"You have accessed a secure endpoint.. Your email: {user.email}"

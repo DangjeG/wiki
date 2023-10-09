@@ -8,3 +8,8 @@ class WikiErrorResponse(BaseModel):
 
     error_code: WikiErrorCode
     message: str
+
+
+class BaseResponse(BaseModel):
+    status: str = "success"
+    msg: str = ""

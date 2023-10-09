@@ -1,5 +1,6 @@
 from enum import Enum
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic_settings import BaseSettings
 
@@ -48,10 +49,6 @@ class Settings(BaseSettings):
     AUTH_TOKEN_COOKIE_SAME_SITE: str = "lax"
 
     AUTH_ALGORITHM: str = "HS256"
-    AUTH_TOKEN_SEPARATOR: str = "_"
-    AUTH_VERIFY_TOKEN_PREFIX: str = "verify"
-    AUTH_ACCESS_TOKEN_PREFIX: str = "access"
-    AUTH_REFRESH_TOKEN_PREFIX: str = "refresh"
 
     AUTH_VERIFY_TOKEN_EXPIRE_MINUTES: int = 5
     AUTH_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
@@ -63,12 +60,15 @@ class Settings(BaseSettings):
     DB_DRIVER: str = "asyncpg"
     DB_HOST: str = "localhost"
     DB_PORT: str = "5432"
+    DB_SSL: str = "prefer"  # disable, allow, prefer, require, verify-ca, verify-full
     DB_USER: str = "postgres"
     DB_PASSWORD: str = "postgres"
     DB_NAME: str = "wiki"
 
     DB_POOL_SIZE: int = 75
     DB_MAX_OVERFLOW: int = 20
+
+    DB_METADATA_CREATE_ALL: bool = True
 
     BACKEND_CORS_ORIGINS: list[str] = ["*"]
 
@@ -82,11 +82,14 @@ class Settings(BaseSettings):
     EMAIL_USE_CREDENTIALS: bool = True
     EMAIL_VALIDATE_CERTS: bool = True
 
+    EMAIL_SENDING: bool = False  # If you don’t want letters sent to the email, set false.
+
     def get_db_url(self):
-        return f"{self.DB_SCHEMA}+{self.DB_DRIVER}://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+        return (f"{self.DB_SCHEMA}+{self.DB_DRIVER}://{self.DB_USER}:{self.DB_PASSWORD}@"
+                f"{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}?ssl={self.DB_SSL}")
 
     class Config:
-        env_file = "./backend/.env"
+        env_file = Path(__file__).resolve().parent.parent / ".env"
         env_file_encoding = "utf-8"
         case_sensitive = False
 

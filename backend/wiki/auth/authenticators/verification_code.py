@@ -72,6 +72,8 @@ class VerificationCodeAuthenticatorInterface(BaseTokenAuthenticatorInterface):
                 user = await self.user_repository.get_user_by_email(email)
                 api_client = await self.verify_api_client(user.wiki_api_client_id)
                 user, organization = await self.verify_user(api_client)
+                if not user.is_verified_email:
+                    user = await self.user_repository.update_user(user.id, is_verified_email=True)
 
                 return UserHandlerData(
                     id=user.id,

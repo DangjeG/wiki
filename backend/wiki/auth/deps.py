@@ -48,7 +48,7 @@ async def get_user(
                     http_status_code=status.HTTP_403_FORBIDDEN
                 )
         authenticator = WikiTokenAuthenticatorInterface(session)
-        return await authenticator.validate(access_token_cookie or access_token_bearer)
+        return await authenticator.validate(access_token_cookie or access_token_bearer.credentials)
 
     raise WikiException(message="Could not validate credentials.",
                         error_code=WikiErrorCode.AUTH_NOT_VALIDATE_CREDENTIALS,

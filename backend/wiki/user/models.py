@@ -19,6 +19,7 @@ class User(Base):
     position = Column(String, nullable=True)
 
     is_user_agreement_accepted = Column(Boolean, nullable=False, default=False)
+    is_verified_email = Column(Boolean, nullable=False, default=False)
     is_deleted = Column(Boolean, nullable=False, default=False)
 
     organization_id = Column(ForeignKey("organization.id"), nullable=True)
