@@ -1,7 +1,7 @@
-from enum import Enum
+from enum import IntEnum
 
 
-class ResponsibilityType(str, Enum):
-    VIEWER = "VIEWER",
-    EDITOR = "EDITOR",
-    ADMIN = "ADMIN"
+class ResponsibilityType(IntEnum):
+    VIEWER = 0,
+    EDITOR = 500,
+    ADMIN = 1000

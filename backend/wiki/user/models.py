@@ -3,10 +3,11 @@ from typing import Optional
 from sqlalchemy import Column, String, Uuid, Boolean, ForeignKey
 from uuid_extensions import uuid7
 
+from wiki.common.models import TimeStampMixin, EnabledDeletedMixin
 from wiki.database.core import Base
 
 
-class User(Base):
+class User(Base, EnabledDeletedMixin):
     id = Column(Uuid, default=uuid7, primary_key=True, nullable=False)
     email = Column(String, unique=True, nullable=False)
     username = Column(String, unique=True, nullable=True)
@@ -20,9 +21,8 @@ class User(Base):
 
     is_user_agreement_accepted = Column(Boolean, nullable=False, default=False)
     is_verified_email = Column(Boolean, nullable=False, default=False)
-    is_deleted = Column(Boolean, nullable=False, default=False)
 
-    organization_id = Column(ForeignKey("organization.id"), nullable=True)
+    organization_id = Column(ForeignKey("organization.id"), nullable=False)
     wiki_api_client_id = Column(ForeignKey("wiki_api_client.id"), nullable=True)
 
     def __init__(self,

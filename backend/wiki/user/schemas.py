@@ -15,4 +15,4 @@ class CreateUser(WikiBase):
     second_name: Optional[str] = None
     position: Optional[str] = None,
     is_user_agreement_accepted: bool = False
-    organization_id: Optional[UUID] = None
+    organization_id: UUID

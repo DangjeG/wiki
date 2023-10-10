@@ -7,8 +7,8 @@ from starlette import status
 
 from wiki.auth.authenticators.api_key import ApiKeyAuthenticatorInterface
 from wiki.auth.authenticators.wiki_token import WikiTokenAuthenticatorInterface
-from wiki.auth.schemas import UserHandlerData
 from wiki.common.exceptions import WikiException, WikiErrorCode
+from wiki.common.schemas import ExternalUserHandlerData, WikiUserHandlerData
 from wiki.config import settings
 from wiki.database.deps import get_db
 
@@ -30,12 +30,30 @@ wiki_access_token_bearer = HTTPBearer(scheme_name="WikiBearer", auto_error=False
 
 
 async def get_user(
+        is_allow_unauthorized: bool = False,
         api_key_query: Optional[str] = Security(wiki_api_key_query),
         api_key_header: Optional[str] = Security(wiki_api_key_header),
         access_token_cookie: Optional[str] = Security(wiki_access_token_cookie),
         access_token_bearer: Optional[HTTPAuthorizationCredentials] = Security(wiki_access_token_bearer),
         session: AsyncSession = Depends(get_db)
-) -> UserHandlerData:
+) -> ExternalUserHandlerData | WikiUserHandlerData:
+    if is_allow_unauthorized:
+        try:
+            user = _get_user(api_key_query, api_key_header, access_token_cookie, access_token_bearer, session)
+            return user or ExternalUserHandlerData()
+        except WikiException:
+            return ExternalUserHandlerData()
+    else:
+        user = _get_user(api_key_query, api_key_header, access_token_cookie, access_token_bearer, session)
+        if user is not None:
+            return user
+        else:
+            raise WikiException(message="Could not validate credentials.",
+                                error_code=WikiErrorCode.AUTH_NOT_VALIDATE_CREDENTIALS,
+                                http_status_code=status.HTTP_401_UNAUTHORIZED)
+
+
+async def _get_user(api_key_query, api_key_header, access_token_cookie, access_token_bearer, session):
     if api_key_query is not None or api_key_header is not None:
         authenticator = ApiKeyAuthenticatorInterface(session)
         return await authenticator.validate(api_key_query or api_key_header)
@@ -49,7 +67,3 @@ async def get_user(
                 )
         authenticator = WikiTokenAuthenticatorInterface(session)
         return await authenticator.validate(access_token_cookie or access_token_bearer.credentials)
-
-    raise WikiException(message="Could not validate credentials.",
-                        error_code=WikiErrorCode.AUTH_NOT_VALIDATE_CREDENTIALS,
-                        http_status_code=status.HTTP_401_UNAUTHORIZED)
