@@ -37,3 +37,23 @@ class OrganizationRepository(BaseRepository):
         )
         self.session.add(new_organization)
         return new_organization
+
+    @menage_db_commit_method(CommitMode.FLUSH)
+    async def update_organization(self,
+                                  organization_id: UUID,
+                                  *,
+                                  name: str,
+                                  description: str,
+                                  access: str) -> Organization:
+        organization: Organization = await self.get_organization_by_id(organization_id)
+
+        if name is not None:
+            organization.name = name
+        if description is not None:
+            organization.description = description
+        if access is not None:
+            organization.access = access
+
+        self.session.add(organization)
+
+        return organization

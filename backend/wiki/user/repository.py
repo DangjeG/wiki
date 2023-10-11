@@ -20,6 +20,7 @@ from wiki.database.utils import (
 )
 from wiki.user.models import User
 from wiki.user.schemas import CreateUser
+from wiki.wiki_api_client.enums import ResponsibilityType
 
 
 class UserRepository(BaseRepository):
@@ -93,7 +94,7 @@ class UserRepository(BaseRepository):
 
         return new_user
 
-    @menage_db_commit_method(CommitMode.COMMIT)
+    @menage_db_commit_method(CommitMode.FLUSH)
     async def update_user(self,
                           user_id: UUID,
                           *,
@@ -149,3 +150,4 @@ class UserRepository(BaseRepository):
         user.second_name = DELETED_USER_SECOND_NAME
 
         self.session.add(user)
+

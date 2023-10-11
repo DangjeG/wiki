@@ -3,12 +3,19 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from wiki.auth.enums import AuthorizationMode
-from wiki.common.schemas import WikiUserHandlerData, ExternalUserHandlerData
+from wiki.common.schemas import ExternalUserHandlerData
 from wiki.database.deps import get_db
 from wiki.organization.repository import OrganizationRepository
-from wiki.organization.schemas import OrganizationIdentifiers, OrganizationInfoResponse, CreateOrganization
 from wiki.permissions.base import BasePermission
 from wiki.wiki_api_client.enums import ResponsibilityType
+from wiki.common.exceptions import WikiException, WikiErrorCode
+from wiki.common.schemas import WikiUserHandlerData
+from wiki.organization.schemas import (
+    OrganizationIdentifiers,
+    OrganizationInfoResponse,
+    CreateOrganization,
+    UpdateOrganization,
+)
 
 
 organization_router = APIRouter()
@@ -26,13 +33,13 @@ async def get_organization(
         organization_get: OrganizationIdentifiers = Depends(),
         session: AsyncSession = Depends(get_db)
 ):
-    organization_repository: OrganizationRepository = OrganizationRepository(session)
-    organization = await organization_repository.get_organization_by_id(organization_get.id)
+    organization_repo: OrganizationRepository = OrganizationRepository(session)
+    org = await organization_repo.get_organization_by_id(organization_get.id)
 
     return OrganizationInfoResponse(
-        name=organization.name,
-        description=organization.description,
-        access=organization.access
+        name=org.name,
+        description=org.description,
+        access=org.access
     )
 
 
@@ -42,11 +49,9 @@ async def get_organization(
     status_code=status.HTTP_202_ACCEPTED,
     description="Create organization."
 )
-async def create_organization(
-        organization: CreateOrganization = Depends(),
-        user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.ADMIN)),
-        session: AsyncSession = Depends(get_db)
-):
+async def create_organization(user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.ADMIN)),
+                              organization: CreateOrganization = Depends(),
+                              session: AsyncSession = Depends(get_db)):
     organization_repository: OrganizationRepository = OrganizationRepository(session)
 
     organization = await organization_repository.create_organization(
@@ -92,3 +97,39 @@ async def get_organizations(
         )
 
     return result_organization
+
+
+@organization_router.put(
+    "/",
+    response_model=OrganizationInfoResponse,
+    status_code=status.HTTP_200_OK,
+    description="Update organization."
+)
+async def update_organizations(
+        user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.ADMIN)),
+        session: AsyncSession = Depends(get_db),
+        organization_identifiers: OrganizationIdentifiers = Depends(),
+        update_org: UpdateOrganization = Depends()):
+    organization_repository: OrganizationRepository = OrganizationRepository(session)
+
+    if organization_identifiers.id is not None:
+        organization = await organization_repository.get_organization_by_id(organization_identifiers.id)
+    else:
+        raise WikiException(
+            message="Organization not found.",
+            error_code=WikiErrorCode.ORGANIZATION_NOT_FOUND,
+            http_status_code=status.HTTP_404_NOT_FOUND
+        )
+
+    updated_organization = await organization_repository.update_organization(
+        organization_id=organization.id,
+        name=update_org.name,
+        description=update_org.description,
+        access=update_org.access
+    )
+
+    return OrganizationInfoResponse(
+        name=updated_organization.name,
+        description=updated_organization.description,
+        access=updated_organization.access
+    )

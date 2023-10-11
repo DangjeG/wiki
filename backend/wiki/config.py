@@ -42,6 +42,9 @@ class Settings(BaseSettings):
     AUTH_ACCESS_TOKEN_COOKIE_NAME: str = "wiki_access_token"
     AUTH_REFRESH_TOKEN_COOKIE_NAME: str = "wiki_refresh_token"
 
+    AUTH_API_KEY_LENGTH: int = 40
+    AUTH_API_KEY_PREFIX_LENGTH: int = 8
+
     AUTH_TOKEN_COOKIE_PATH: str = "/"
     AUTH_TOKEN_COOKIE_DOMAIN: str = "localhost"
     AUTH_TOKEN_COOKIE_SECURE: bool = False
@@ -49,6 +52,7 @@ class Settings(BaseSettings):
     AUTH_TOKEN_COOKIE_SAME_SITE: str = "lax"
 
     AUTH_ALGORITHM: str = "HS256"
+    AUTH_ALGORITHM_API_KEY: str = "SHA256"
 
     AUTH_VERIFY_TOKEN_EXPIRE_MINUTES: int = 5
     AUTH_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30

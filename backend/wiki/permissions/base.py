@@ -68,8 +68,8 @@ class BasePermission(_ResponsibilityPermission):
             access_token_bearer: Optional[HTTPAuthorizationCredentials] = Security(wiki_access_token_bearer),
             session: AsyncSession = Depends(get_db)
     ) -> ExternalUserHandlerData | WikiUserHandlerData:
-        return super().__call__(api_key_query,
-                                api_key_header,
-                                access_token_cookie,
-                                access_token_bearer,
-                                session)
+        return await super().__call__(api_key_query,
+                                      api_key_header,
+                                      access_token_cookie,
+                                      access_token_bearer,
+                                      session)

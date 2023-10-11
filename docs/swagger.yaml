@@ -170,6 +170,58 @@ components:
       - verify_token
       title: UserSignResponse
       type: object
+    UserUpdate:
+      properties:
+        display_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Display Name
+        email:
+          anyOf:
+          - format: email
+            type: string
+          - type: 'null'
+          title: Email
+        first_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: First Name
+        last_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Last Name
+        organization_id:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Organization Id
+        second_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Second Name
+        user_position:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: User Position
+        username:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+        wiki_api_client_id:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Wiki Api Client Id
+      title: UserUpdate
+      type: object
     ValidationError:
       properties:
         loc:
@@ -191,6 +243,46 @@ components:
       - type
       title: ValidationError
       type: object
+    WikiApiClientInfoResponse:
+      properties:
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        is_enabled:
+          default: true
+          title: Is Enabled
+          type: boolean
+        responsibility:
+          allOf:
+          - $ref: '#/components/schemas/ResponsibilityType'
+          default: 0
+      title: WikiApiClientInfoResponse
+      type: object
+    WikiApiKeyInfoResponse:
+      properties:
+        api_key:
+          title: Api Key
+          type: string
+        api_key_prefix:
+          title: Api Key Prefix
+          type: string
+        create_date:
+          format: date-time
+          title: Create Date
+          type: string
+        expires_date:
+          format: date-time
+          title: Expires Date
+          type: string
+      required:
+      - api_key
+      - expires_date
+      - create_date
+      - api_key_prefix
+      title: WikiApiKeyInfoResponse
+      type: object
   securitySchemes:
     WikiAccessToken:
       in: cookie
@@ -210,6 +302,157 @@ info:
   version: 0.0.1
 openapi: 3.1.0
 paths:
+  /api/v1/api_client/:
+    put:
+      operationId: update_wiki_api_client_api_v1_api_client__put
+      parameters:
+      - in: query
+        name: wiki_api_client_id
+        required: true
+        schema:
+          format: uuid
+          title: Wiki Api Client Id
+          type: string
+      - in: query
+        name: description
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      - in: query
+        name: responsibility
+        required: false
+        schema:
+          anyOf:
+          - $ref: '#/components/schemas/ResponsibilityType'
+          - type: 'null'
+          title: Responsibility
+      - in: query
+        name: is_enabled
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Enabled
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WikiApiClientInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Update wiki api client
+      tags:
+      - WikiApiClient
+  /api/v1/api_key/:
+    delete:
+      operationId: delete_wiki_api_key_api_v1_api_key__delete
+      parameters:
+      - in: query
+        name: api_key_id
+        required: true
+        schema:
+          format: uuid
+          title: Api Key Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Delete wiki api key
+      tags:
+      - WikiApiClient
+    post:
+      operationId: create_wiki_api_key_api_v1_api_key__post
+      parameters:
+      - in: query
+        name: expires_date
+        required: true
+        schema:
+          format: date-time
+          title: Expires Date
+          type: string
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WikiApiKeyInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Create wiki api key
+      tags:
+      - WikiApiClient
+  /api/v1/api_key/deactivate:
+    put:
+      operationId: deactivate_wiki_api_key_api_v1_api_key_deactivate_put
+      parameters:
+      - in: query
+        name: api_key_id
+        required: true
+        schema:
+          format: uuid
+          title: Api Key Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Deactivate wiki api key
+      tags:
+      - WikiApiClient
   /api/v1/auth/login:
     post:
       description: '## Logging in to a user account
@@ -348,6 +591,62 @@ paths:
       summary: Create Organization
       tags:
       - Organization
+    put:
+      description: Update organization.
+      operationId: update_organizations_api_v1_organization__put
+      parameters:
+      - in: query
+        name: id
+        required: true
+        schema:
+          format: uuid
+          title: Id
+          type: string
+      - in: query
+        name: name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      - in: query
+        name: description
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      - in: query
+        name: access
+        required: false
+        schema:
+          anyOf:
+          - $ref: '#/components/schemas/OrganizationAccessType'
+          - type: 'null'
+          title: Access
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Update Organizations
+      tags:
+      - Organization
   /api/v1/organization/all:
     get:
       description: Get all organizations.
@@ -452,6 +751,122 @@ paths:
       - WikiAccessToken: []
       - WikiBearer: []
       summary: Delete user
+      tags:
+      - User
+    put:
+      operationId: update_user_api_v1_user__put
+      parameters:
+      - in: query
+        name: user_id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: User Id
+      - in: query
+        name: user_name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: User Name
+      - in: query
+        name: email
+        required: false
+        schema:
+          anyOf:
+          - format: email
+            type: string
+          - type: 'null'
+          title: Email
+      - in: query
+        name: username
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+      - in: query
+        name: display_name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Display Name
+      - in: query
+        name: first_name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: First Name
+      - in: query
+        name: last_name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Last Name
+      - in: query
+        name: second_name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Second Name
+      - in: query
+        name: user_position
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: User Position
+      - in: query
+        name: organization_id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Organization Id
+      - in: query
+        name: wiki_api_client_id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Wiki Api Client Id
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserUpdate'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Update user
       tags:
       - User
   /api/v1/user/all:
@@ -568,5 +983,3 @@ servers:
   url: http://localhost:8000/
 - description: Demo server
   url: https://api.wiki.example.com/
-- description: Ngrok 1
-  url: https://2c89-176-59-215-45.ngrok-free.app/

@@ -42,7 +42,7 @@ class WikiApiClientRepository(BaseRepository):
 
     @menage_db_not_found_resul_method(NotFoundResultMode.EXCEPTION, ex=_api_key_not_found_exception)
     async def get_wiki_api_key_by_id(self, api_key_id: UUID) -> WikiApiKey:
-        api_key_query = await self.session.get(WikiApiClient, api_key_id)
+        api_key_query = await self.session.get(WikiApiKey, api_key_id)
         return api_key_query
 
     @menage_db_not_found_resul_method(NotFoundResultMode.EXCEPTION, ex=_api_key_hash_not_found_exception)
@@ -75,14 +75,14 @@ class WikiApiClientRepository(BaseRepository):
 
         return new_api_key
 
-    @menage_db_commit_method(CommitMode.COMMIT)
+    @menage_db_commit_method(CommitMode.FLUSH)
     async def deactivate_wiki_api_key(self, api_key_id: UUID) -> WikiApiKey:
         api_key: WikiApiKey = await self.get_wiki_api_key_by_id(api_key_id)
         api_key.is_enabled = False
 
         self.session.add(api_key)
 
-    @menage_db_commit_method(CommitMode.COMMIT)
+    @menage_db_commit_method(CommitMode.FLUSH)
     async def mark_wiki_api_key_deleted(self, api_key_id: UUID) -> None:
         api_key: WikiApiKey = await self.get_wiki_api_key_by_id(api_key_id)
         api_key.is_deleted = True
@@ -101,7 +101,7 @@ class WikiApiClientRepository(BaseRepository):
 
         return new_api_client
 
-    @menage_db_commit_method(CommitMode.COMMIT)
+    @menage_db_commit_method(CommitMode.FLUSH)
     async def update_wiki_api_client(self,
                                      api_client_id: UUID,
                                      *,

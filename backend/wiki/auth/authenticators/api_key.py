@@ -1,4 +1,6 @@
+import binascii
 import hmac
+import os
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -19,7 +21,13 @@ class ApiKeyAuthenticatorInterface(AuthenticatorInterface):
 
     @classmethod
     def get_api_key_hash(cls, api_key: str) -> str:
-        return hmac.new(settings.AUTH_SECRET_API_KEY, api_key, settings.AUTH_ALGORITHM).hexdigest()
+        return hmac.new(settings.AUTH_SECRET_API_KEY,
+                        api_key.encode(encoding="utf-8"),
+                        settings.AUTH_ALGORITHM_API_KEY).hexdigest()
+
+    @classmethod
+    def generate_api_key(cls):
+        return binascii.b2a_hex(os.urandom(settings.AUTH_API_KEY_LENGTH)).decode(encoding="utf-8")
 
     async def verify_api_key(self, api_key) -> UUID:
         generated_hash = self.get_api_key_hash(api_key)
