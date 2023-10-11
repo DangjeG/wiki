@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from enum import IntEnum
 from functools import wraps
 from typing import Optional
@@ -61,8 +62,8 @@ def menage_db_not_found_resul_method(
 ):
     def decorator(f):
         @wraps(f)
-        def wrapped_f(self, *args, **kwargs):
-            result = f(self, *args, **kwargs)
+        async def wrapped_f(self, *args, **kwargs):
+            result = await f(self, *args, **kwargs)
             match mode:
                 case NotFoundResultMode.NONE:
                     return result
@@ -82,3 +83,15 @@ def menage_db_not_found_resul_method(
         return wrapped_f
 
     return decorator
+
+
+def utcnow() -> datetime:
+    """Return the current utc date and time with tzinfo set to UTC."""
+    return datetime.now(timezone.utc)
+
+
+def unaware_to_utc(d: datetime | None) -> datetime:
+    """Set timezeno to UTC if datetime is unaware (tzinfo == None)."""
+    if d and d.tzinfo is None:
+        return d.replace(tzinfo=timezone.utc)
+    return d

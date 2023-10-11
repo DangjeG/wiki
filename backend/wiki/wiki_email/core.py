@@ -4,7 +4,8 @@ from starlette import status
 
 from wiki.common.exceptions import WikiException, WikiErrorCode
 from wiki.config import settings
-from wiki.emile.schemas import EmailSchema
+from wiki.wiki_email.schemas import EmailSchema
+from wiki.wiki_email.utils import menage_email_sending_method
 
 
 class EmailProvider:
@@ -23,6 +24,7 @@ class EmailProvider:
     def __init__(self):
         self.fm = FastMail(self.conf)
 
+    @menage_email_sending_method(settings.EMAIL_SENDING)
     async def send_mail(self, email: EmailSchema):
 
         html = f"<p>Code: {email.code}</p> "

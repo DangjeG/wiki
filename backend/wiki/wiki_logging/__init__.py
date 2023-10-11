@@ -93,12 +93,17 @@ class JSONLogFormatter(logging.Formatter):
             by_alias=True,
         )
 
+        if hasattr(record, "request_json_fields"):
+            json_log_object.update(record.request_json_fields)
+
         return json_log_object
 
 
-def handlers(env, to_file=False):
-    if env.lower() in ("dev", "local", "prod"):
-        handler = ["json"]
+def handlers(env,
+             *,
+             to_file: bool = False):
+    if env.lower() in ("dev", "local"):
+        handler = ["console"]
     else:
         handler = ["intercept"]
 
@@ -108,21 +113,30 @@ def handlers(env, to_file=False):
     return handler
 
 
-LOG_HANDLER = handlers(settings.ENVIRONMENT)
+LOG_HANDLER = handlers(settings.ENVIRONMENT,
+                       to_file=True)
 LOGGING_LEVEL = logging.DEBUG if settings.DEBUG else logging.INFO
 
 LOG_CONFIG = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
+        "simple": {
+            "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        },
+        "standard": {
+            "format": "%(asctime)s - [%(levelname)s] %(name)s: %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S"
+        },
         "json": {
             "()": JSONLogFormatter,
         },
     },
     "handlers": {
-        "json": {
-            "formatter": "json",
+        "console": {
             "class": "logging.StreamHandler",
+            "level": "INFO",
+            "formatter": "standard",
             "stream": sys.stdout,
         },
         "file_handler": {
@@ -133,9 +147,9 @@ LOG_CONFIG = {
         }
     },
     "loggers": {
-        "main": {
+        "root": {
             "handlers": LOG_HANDLER,
-            "level": LOGGING_LEVEL,
+            "level": "INFO",
             "propagate": False,
         },
         "uvicorn": {
