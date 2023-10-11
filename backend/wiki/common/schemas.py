@@ -1,7 +1,13 @@
+from typing import Optional
+from uuid import UUID
+
 from pydantic import BaseModel
 
+from wiki.auth.enums import AuthorizationMode
 from wiki.common.exceptions import WikiErrorCode
 from wiki.models import WikiBase
+from wiki.organization.models import Organization
+from wiki.wiki_api_client.models import WikiApiClient
 
 
 class WikiErrorResponse(BaseModel):
@@ -20,3 +26,22 @@ class HealthCheck(WikiBase):
     """Response model to validate and return when performing a health check."""
 
     status: str = "OK"
+
+
+class ExternalUserHandlerData(WikiBase):
+    authorisation_status: AuthorizationMode = AuthorizationMode.UNAUTHORIZED
+
+
+class WikiUserHandlerData(ExternalUserHandlerData):
+    authorisation_status: AuthorizationMode = AuthorizationMode.AUTHORIZED
+
+    id: UUID
+    email: str
+    username: Optional[str] = None
+    display_name: Optional[str] = None
+    first_name: str
+    last_name: str
+    second_name: Optional[str] = None
+    position: Optional[str] = None
+    organization: Optional[Organization] = None
+    wiki_api_client: WikiApiClient

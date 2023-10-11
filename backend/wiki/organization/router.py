@@ -1,17 +1,18 @@
-from typing import Optional
-
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from wiki.common.exceptions import WikiException, WikiErrorCode
+from wiki.common.schemas import WikiUserHandlerData
 from wiki.database.deps import get_db
-from wiki.organization.models import Organization
 from wiki.organization.repository import OrganizationRepository
 from wiki.organization.schemas import OrganizationIdentifiers, OrganizationInfoResponse, CreateOrganization, \
     UpdateOrganization
+from wiki.permissions.base import BasePermission
+from wiki.wiki_api_client.enums import ResponsibilityType
 
 organization_router = APIRouter()
+
 
 @organization_router.get(
     "/info",
@@ -23,8 +24,6 @@ async def get_organization(organization_get: OrganizationIdentifiers = Depends()
                            session: AsyncSession = Depends(get_db)):
 
     organization_repository: OrganizationRepository = OrganizationRepository(session)
-
-    organization: Optional[Organization] = None
 
     if organization_get.id is not None:
         organization = await organization_repository.get_organization_by_id(organization_get.id)
@@ -45,10 +44,11 @@ async def get_organization(organization_get: OrganizationIdentifiers = Depends()
 @organization_router.post(
     "/",
     response_model=OrganizationInfoResponse,
-    status_code=status.HTTP_200_OK,
+    status_code=status.HTTP_202_ACCEPTED,
     description="Create organization."
 )
-async def create_organization(organization: CreateOrganization = Depends(),
+async def create_organization(user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.ADMIN)),
+                              organization: CreateOrganization = Depends(),
                               session: AsyncSession = Depends(get_db)):
     organization_repository: OrganizationRepository = OrganizationRepository(session)
 
@@ -67,11 +67,12 @@ async def create_organization(organization: CreateOrganization = Depends(),
         access=organization.access
     )
 
+
 @organization_router.get(
-    "/",
+    "/all",
     response_model=list[OrganizationInfoResponse],
     status_code=status.HTTP_200_OK,
-    description="Get all organization."
+    description="Get all organizations."
 )
 async def get_organizations(session: AsyncSession = Depends(get_db)):
     organization_repository: OrganizationRepository = OrganizationRepository(session)
@@ -97,12 +98,11 @@ async def get_organizations(session: AsyncSession = Depends(get_db)):
     status_code=status.HTTP_200_OK,
     description="Update organization."
 )
-async def update_organizations(session: AsyncSession = Depends(get_db),
+async def update_organizations(user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.ADMIN)),
+                               session: AsyncSession = Depends(get_db),
                                organization_identifiers: OrganizationIdentifiers = Depends(),
                                update_organization: UpdateOrganization = Depends()):
     organization_repository: OrganizationRepository = OrganizationRepository(session)
-
-    organization: Optional[Organization] = None
 
     if organization_identifiers.id is not None:
         organization = await organization_repository.get_organization_by_id(organization_identifiers.id)
@@ -125,4 +125,3 @@ async def update_organizations(session: AsyncSession = Depends(get_db),
         description=update_organizations.description,
         access=update_organization.access
     )
-

@@ -4,9 +4,7 @@ from uuid import UUID
 from sqlalchemy import select
 from starlette import status
 
-from wiki.admins.permissions.domains.enums import DomainPermissionStatus
-from wiki.admins.permissions.domains.models import PermissionDomain
-from wiki.admins.permissions.domains.schemas import CreatePermissionDomain
+from wiki.permissions.domain.enums import DomainPermissionMode
 from wiki.common.exceptions import WikiException, WikiErrorCode
 from wiki.database.repository import BaseRepository
 from wiki.database.utils import (
@@ -15,6 +13,8 @@ from wiki.database.utils import (
     menage_db_not_found_resul_method,
     NotFoundResultMode
 )
+from wiki.permissions.domain.models import PermissionDomain
+from wiki.permissions.domain.schemas import CreatePermissionDomain
 
 
 class PermissionDomainRepository(BaseRepository):
@@ -34,13 +34,13 @@ class PermissionDomainRepository(BaseRepository):
         res = users_query.scalars().all()
         return res
 
-    async def get_domain_permission_status(self, domain: str) -> DomainPermissionStatus:
+    async def get_domain_permission_mode(self, domain: str) -> DomainPermissionMode:
         st = select(PermissionDomain).where(PermissionDomain.domain == domain)
         domain_query: PermissionDomain = (await self.session.execute(st)).scalar()
         if domain_query is not None:
             return domain_query.status
         else:
-            return DomainPermissionStatus.REFUSE
+            return DomainPermissionMode.REFUSE
 
     @menage_db_commit_method(CommitMode.COMMIT)
     async def create_permission_domain(self, create_domain: CreatePermissionDomain):
@@ -58,7 +58,7 @@ class PermissionDomainRepository(BaseRepository):
                                        domain_id: UUID,
                                        *,
                                        domain: Optional[str] = None,
-                                       domain_status: Optional[DomainPermissionStatus] = None) -> PermissionDomain:
+                                       domain_status: Optional[DomainPermissionMode] = None) -> PermissionDomain:
         permission_domain: PermissionDomain = await self.get_permission_domain_by_id(domain_id)
         if domain is not None:
             permission_domain.domain = domain

@@ -6,28 +6,22 @@ from starlette import status
 
 from wiki.auth.authenticators.verification_code import VerificationCodeAuthenticatorInterface
 from wiki.auth.authenticators.wiki_token import WikiTokenAuthenticatorInterface
-from wiki.auth.resolvers.email import EmailResolver
-from wiki.auth.resolvers.user_login import UserLoginResolver
 from wiki.auth.schemas import (
     FrontendUserLogin,
     UserSignResponse,
     VerifyTokenData,
     AccessTokenData,
     VerifyData,
-    UserHandlerData,
     VerificationType
 )
-from wiki.common.exceptions import WikiException, WikiErrorCode
-from wiki.common.schemas import BaseResponse
+from wiki.common.schemas import BaseResponse, WikiUserHandlerData
 from wiki.config import settings
 from wiki.database.deps import get_db
+from wiki.permissions.login import LoginPermission
+from wiki.permissions.signup import SignUpPermission
 from wiki.user.models import User
 from wiki.user.repository import UserRepository
 from wiki.user.schemas import CreateUser
-from wiki.wiki_api_client.enums import ResponsibilityType
-from wiki.wiki_api_client.models import WikiApiClient
-from wiki.wiki_api_client.repository import WikiApiClientRepository
-from wiki.wiki_api_client.schemas import CreateWikiApiClient
 from wiki.wiki_email.core import EmailProvider
 from wiki.wiki_email.deps import get_email_provider
 from wiki.wiki_email.schemas import EmailSchema
@@ -46,14 +40,13 @@ wiki_logger = logging.getLogger(__name__)
 async def login(user_in: FrontendUserLogin,
                 request: Request,
                 session: AsyncSession = Depends(get_db),
+                permission=Depends(LoginPermission()),
                 email_provider: EmailProvider = Depends(get_email_provider)):
     """
     ## Logging in to a user account
     The endpoint for sending an email or username and receiving a login confirmation token.
     A confirmation code will be sent to the specified email.
     """
-    user_login_resolver = UserLoginResolver(session)
-    await user_login_resolver.resolve(user_in)
     authenticator = VerificationCodeAuthenticatorInterface(session)
     code = authenticator.verification_code
     token = authenticator.create_verify_token(VerifyTokenData(
@@ -84,28 +77,13 @@ async def login(user_in: FrontendUserLogin,
 async def signup(user_signup: CreateUser,
                  request: Request,
                  session: AsyncSession = Depends(get_db),
+                 permission=Depends(SignUpPermission()),
                  email_provider: EmailProvider = Depends(get_email_provider)):
     """
     ## Registration - submitting an application
     Sending an application for registration in the system.
     """
     user_repository: UserRepository = UserRepository(session)
-    is_available: bool = await user_repository.check_user_identification_data_is_available(user_signup.email,
-                                                                                           user_signup.username)
-    if not is_available:
-        raise WikiException(
-            message="Your username or email is not available or you have already sent an application.",
-            error_code=WikiErrorCode.USER_NOT_SPECIFIED,
-            http_status_code=status.HTTP_409_CONFLICT
-        )
-    if not user_signup.is_user_agreement_accepted:
-        raise WikiException(
-            message="You must accept the user agreement.",
-            error_code=WikiErrorCode.USER_NOT_SPECIFIED,
-            http_status_code=status.HTTP_400_BAD_REQUEST
-        )
-    email_resolver = EmailResolver(session)
-    is_accept_now = await email_resolver.resolve(user_signup.email)
 
     authenticator = VerificationCodeAuthenticatorInterface(session)
     code = authenticator.verification_code
@@ -127,27 +105,11 @@ async def signup(user_signup: CreateUser,
         organization_id=user_signup.organization_id
     ))
 
-    if is_accept_now:
-        api_client_repository = WikiApiClientRepository(session)
-        new_api_client: WikiApiClient = await api_client_repository.create_wiki_api_client(CreateWikiApiClient(
-            description="Wiki Api client.",
-            responsibility=ResponsibilityType.VIEWER,
-            is_enabled=True
-        ))
-        await user_repository.update_user(user.id, wiki_api_client_id=new_api_client.id)
-
-        await email_provider.send_mail(EmailSchema(
-            email=[user_signup.email],
-            code=code,
-            subject="You automatically accessed the system. "
-                    "Your verification code to confirm your signup."
-        ))
-    else:
-        await email_provider.send_mail(EmailSchema(
-            email=[user_signup.email],
-            code=code,
-            subject="Your verification code to confirm your signup."
-        ))
+    await email_provider.send_mail(EmailSchema(
+        email=[user_signup.email],
+        code=code,
+        subject="Your verification code to confirm your signup."
+    ))
 
     wiki_logger.info(f"{user_signup.email}: {code}")
 
@@ -173,7 +135,7 @@ async def verify(response: Response,
     """
     authenticator = VerificationCodeAuthenticatorInterface(session, verification_code=data.verification_code)
     data = await authenticator.validate(data.token)
-    if isinstance(data, UserHandlerData):
+    if isinstance(data, WikiUserHandlerData):
         token = WikiTokenAuthenticatorInterface.create_access_token(AccessTokenData(
             email=data.email,
             api_client_id=str(data.wiki_api_client.id)

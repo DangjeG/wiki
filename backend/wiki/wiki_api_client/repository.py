@@ -78,7 +78,7 @@ class WikiApiClientRepository(BaseRepository):
     @menage_db_commit_method(CommitMode.COMMIT)
     async def deactivate_wiki_api_key(self, api_key_id: UUID) -> WikiApiKey:
         api_key: WikiApiKey = await self.get_wiki_api_key_by_id(api_key_id)
-        api_key.is_deactivated = True
+        api_key.is_enabled = False
 
         self.session.add(api_key)
 

@@ -2,9 +2,9 @@ from fastapi import APIRouter
 from starlette.responses import JSONResponse
 
 from wiki.auth.routers import auth_router
-from wiki.organization.routers import organization_router
-from wiki.user.routers import user_router
-from wiki.wiki_api_client.routers import wiki_api_client_router
+from wiki.wiki_api_client.router import wiki_api_client_router
+from wiki.organization.router import organization_router
+from wiki.user.router import user_router
 
 api_router = APIRouter(
     default_response_class=JSONResponse

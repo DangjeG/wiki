@@ -2,21 +2,19 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
-from sqlalchemy import Column, Uuid, String, DateTime, ForeignKey, Boolean
+from sqlalchemy import Column, Uuid, String, DateTime, ForeignKey, Boolean, SmallInteger
 from uuid_extensions import uuid7
 
+from wiki.common.models import TimeStampMixin, EnabledDeletedMixin
 from wiki.database.core import Base
 from wiki.database.utils import utcnow
 from wiki.wiki_api_client.enums import ResponsibilityType
 
 
-class WikiApiClient(Base):
+class WikiApiClient(Base, EnabledDeletedMixin):
     id = Column(Uuid, default=uuid7, primary_key=True, nullable=False)
     description = Column(String(256), nullable=True)
-    responsibility = Column(String, nullable=False, default=ResponsibilityType.VIEWER)
-    created_date = Column(DateTime(timezone=True), nullable=False, default=utcnow())
-    is_enabled = Column(Boolean, nullable=False, default=True)
-    is_deleted = Column(Boolean, nullable=False, default=False)
+    responsibility = Column(SmallInteger, nullable=False, default=ResponsibilityType.VIEWER)
 
     def __init__(self,
                  description: Optional[str] = None,
@@ -27,15 +25,11 @@ class WikiApiClient(Base):
         self.is_enabled = is_enabled
 
 
-class WikiApiKey(Base):
+class WikiApiKey(Base, EnabledDeletedMixin):
     id = Column(Uuid, default=uuid7, primary_key=True, nullable=False)
     api_key_hash = Column(String(512), nullable=False, index=True, unique=True)
     api_key_prefix = Column(String(8), nullable=False)
-    created_date = Column(DateTime(timezone=True), nullable=False, default=utcnow())
     expires_date = Column(DateTime(timezone=True), nullable=False)
-
-    is_deactivated = Column(Boolean, nullable=False, default=False)
-    is_deleted = Column(Boolean, nullable=False, default=False)
 
     owner_id = Column(ForeignKey("wiki_api_client.id"), nullable=False)
 

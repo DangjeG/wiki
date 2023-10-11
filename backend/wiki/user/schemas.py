@@ -16,12 +16,14 @@ class CreateUser(WikiBase):
     second_name: Optional[str] = None
     position: Optional[str] = None,
     is_user_agreement_accepted: bool = False
-    organization_id: Optional[UUID] = None
+    organization_id: UUID
+
 
 class UserIdentifiers(WikiBase):
     user_id: Optional[UUID] = None
     user_name: Optional[str] = None
     email: Optional[str] = None
+
 
 class UserInfoResponse(WikiBase):
     user_name: Optional[str] = None

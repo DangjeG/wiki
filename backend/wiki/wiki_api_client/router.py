@@ -8,8 +8,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from wiki.auth.authenticators.api_key import ApiKeyAuthenticatorInterface
-from wiki.common.schemas import BaseResponse
+from wiki.common.schemas import BaseResponse, WikiUserHandlerData
 from wiki.database.deps import get_db
+from wiki.permissions.base import BasePermission
+from wiki.wiki_api_client.enums import ResponsibilityType
 from wiki.wiki_api_client.repository import WikiApiClientRepository
 from wiki.wiki_api_client.schemas import WikiApiClientInfoResponse, UpdateWikiApiClient, WikiApiKeyInfoResponse, \
     CreateWikiApiKey
@@ -24,6 +26,7 @@ wiki_api_client_router = APIRouter()
     description="Update wiki client api."
 )
 async def update_wiki_client_api(wiki_api_client_id: UUID,
+                                 user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER)),
                                  update_wiki_api_client: UpdateWikiApiClient = Depends(),
                                  session: AsyncSession = Depends(get_db)):
     client_repository: WikiApiClientRepository = WikiApiClientRepository(session)
@@ -51,6 +54,7 @@ async def update_wiki_client_api(wiki_api_client_id: UUID,
     description="Create wiki api key."
 )
 async def create_wiki_api_key(expires_date: datetime,
+                              user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER)),
                               session: AsyncSession = Depends(get_db)):
     client_repository: WikiApiClientRepository = WikiApiClientRepository(session)
 
@@ -65,7 +69,7 @@ async def create_wiki_api_key(expires_date: datetime,
             api_key_hash=api_key_hash,
             api_key_prefix=api_key_prefix,
             expires_date=expires_date,
-            owner_id=""  # todo добавить owner
+            owner_id=user.wiki_api_client.id
         )
     )
 
@@ -83,6 +87,7 @@ async def create_wiki_api_key(expires_date: datetime,
     description="Delete wiki api key."
 )
 async def delete_wiki_api_key(api_key_id: UUID,
+                              user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER)),
                               session: AsyncSession = Depends(get_db)):
     client_repository: WikiApiClientRepository = WikiApiClientRepository(session)
 
@@ -99,6 +104,7 @@ async def delete_wiki_api_key(api_key_id: UUID,
     description="Deactivate wiki api key."
 )
 async def deactivate_wiki_api_key(api_key_id: UUID,
+                                  user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER)),
                                   session: AsyncSession = Depends(get_db)):
     client_repository: WikiApiClientRepository = WikiApiClientRepository(session)
 

@@ -5,8 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from wiki.auth.authenticators.base import AuthenticatorInterface, AuthenticatorType
-from wiki.auth.schemas import UserHandlerData
 from wiki.common.exceptions import WikiException, WikiErrorCode
+from wiki.common.schemas import WikiUserHandlerData
 from wiki.config import settings
 from wiki.database.utils import utcnow
 from wiki.wiki_api_client.models import WikiApiKey
@@ -24,7 +24,7 @@ class ApiKeyAuthenticatorInterface(AuthenticatorInterface):
     async def verify_api_key(self, api_key) -> UUID:
         generated_hash = self.get_api_key_hash(api_key)
         wiki_api_key: WikiApiKey = await self.api_client_repository.get_wiki_api_key_by_key_hash(generated_hash)
-        if wiki_api_key.is_deactivated or wiki_api_key.is_deleted or utcnow() > wiki_api_key.expires_date:
+        if wiki_api_key.is_enabled or wiki_api_key.is_deleted or utcnow() > wiki_api_key.expires_date:
             raise WikiException(
                 message="API key is not valid or expired.",
                 error_code=WikiErrorCode.AUTH_API_KEY_NOT_VALID_OR_EXPIRED,
@@ -33,12 +33,12 @@ class ApiKeyAuthenticatorInterface(AuthenticatorInterface):
 
         return wiki_api_key.owner_id
 
-    async def validate(self, credentials) -> UserHandlerData:
+    async def validate(self, credentials) -> WikiUserHandlerData:
         api_client_id = await self.verify_api_key(credentials)
         api_client = await self.verify_api_client(api_client_id)
         user, organization = await self.verify_user(api_client)
 
-        return UserHandlerData(
+        return WikiUserHandlerData(
             id=user.id,
             email=user.email,
             username=user.username,

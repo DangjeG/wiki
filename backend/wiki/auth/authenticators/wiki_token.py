@@ -5,8 +5,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from wiki.auth.authenticators.base import AuthenticatorType, BaseTokenAuthenticatorInterface
-from wiki.auth.schemas import UserHandlerData, AccessTokenData
+from wiki.auth.schemas import AccessTokenData
 from wiki.common.exceptions import WikiException, WikiErrorCode
+from wiki.common.schemas import WikiUserHandlerData
 from wiki.config import settings
 
 
@@ -38,12 +39,12 @@ class WikiTokenAuthenticatorInterface(BaseTokenAuthenticatorInterface):
                                  algorithm=settings.AUTH_ALGORITHM)
         return encoded_jwt
 
-    async def validate(self, credentials) -> UserHandlerData:
+    async def validate(self, credentials) -> WikiUserHandlerData:
         api_client_id = await self.verify_jwt_token(credentials)
         api_client = await self.verify_api_client(api_client_id)
         user, organization = await self.verify_user(api_client)
 
-        return UserHandlerData(
+        return WikiUserHandlerData(
             id=user.id,
             email=user.email,
             username=user.username,

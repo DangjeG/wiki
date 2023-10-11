@@ -10,7 +10,8 @@ class WikiErrorCode(IntEnum):
         Ranges:
                0-1000: general errors
             2000-2999: auth error
-            3000-3999: wiki_email error
+            3000-3500: wiki_email error
+            3501-3999: permission error
             4000-5000: user errors
             5001-6000: permission errors
         """
@@ -36,10 +37,15 @@ class WikiErrorCode(IntEnum):
     AUTH_USER_NOT_FOUND = 2005
     AUTH_API_CLIENT_NOT_FOUND = 2006
     AUTH_NOT_ACCESS = 2005
+    AUTH_NOT_EXECUTED = 2006
+    AUTH_INSUFFICIENTLY_RESPONSIBILITY = 2007
 
-    # 3000-3999: wiki_email error
+    # 3000-3500: wiki_email error
     EMAIL_SENDING_ERROR = 3000
     EMAIL_NOT_ALLOWED = 3001
+
+    # 3501-3999: permission error
+    PERMISSION_DOMAIN_ERROR = 3501
 
     # 4000-5000: user errors
     USER_NOT_SPECIFIED = 4000

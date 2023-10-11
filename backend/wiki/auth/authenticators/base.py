@@ -7,8 +7,8 @@ from jose import jwt, JWTError
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from wiki.auth.schemas import UserHandlerData
 from wiki.common.exceptions import WikiException, WikiErrorCode
+from wiki.common.schemas import WikiUserHandlerData
 from wiki.config import settings
 from wiki.database.utils import utcnow
 from wiki.organization.enums import OrganizationAccessType
@@ -78,7 +78,7 @@ class AuthenticatorInterface:
 
         return user, organization
 
-    async def validate(self, credentials) -> UserHandlerData:
+    async def validate(self, credentials) -> WikiUserHandlerData:
         pass
 
 
