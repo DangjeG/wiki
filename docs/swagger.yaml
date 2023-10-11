@@ -85,6 +85,16 @@ components:
           type: array
       title: HTTPValidationError
       type: object
+    HealthCheck:
+      description: Response model to validate and return when performing a health
+        check.
+      properties:
+        status:
+          default: OK
+          title: Status
+          type: string
+      title: HealthCheck
+      type: object
     UserSignResponse:
       properties:
         email_to:
@@ -124,18 +134,6 @@ components:
       - type
       title: ValidationError
       type: object
-  securitySchemes:
-    WikiAccessToken:
-      in: cookie
-      name: wiki_access_token
-      type: apiKey
-    WikiApiKey:
-      in: header
-      name: X-Wiki-API-Key
-      type: apiKey
-    WikiBearer:
-      scheme: bearer
-      type: http
 info:
   description: Welcome to Wiki's API documentation! Here you will able to discover
     all of the ways you can interact with the Wiki API.
@@ -145,8 +143,12 @@ openapi: 3.1.0
 paths:
   /api/v1/auth/login:
     post:
-      description: The endpoint for sending an email and receiving a login confirmation
-        token.A confirmation code will be sent to the specified email.
+      description: '## Logging in to a user account
+
+        The endpoint for sending an email or username and receiving a login confirmation
+        token.
+
+        A confirmation code will be sent to the specified email.'
       operationId: login_api_v1_auth_login_post
       requestBody:
         content:
@@ -160,19 +162,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserSignResponse'
-          description: Successful Response
+          description: Verification token data.
         '422':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
-      summary: Login
+      summary: Login by email or username
       tags:
       - Auth
   /api/v1/auth/signup:
     post:
-      description: Sending an application for registration in the system
+      description: '## Registration - submitting an application
+
+        Sending an application for registration in the system.'
       operationId: signup_api_v1_auth_signup_post
       requestBody:
         content:
@@ -186,38 +190,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserSignResponse'
-          description: Successful Response
+          description: Verification token data.
         '422':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
-      summary: Signup
-      tags:
-      - Auth
-  /api/v1/auth/test:
-    post:
-      description: Test endpoint to test the access token.
-      operationId: test_api_v1_auth_test_post
-      responses:
-        '200':
-          content:
-            application/json:
-              schema: {}
-          description: Successful Response
-      security:
-      - WikiApiKey: []
-      - WikiApiKey: []
-      - WikiAccessToken: []
-      - WikiBearer: []
-      summary: Test
+      summary: Signup with user data entry
       tags:
       - Auth
   /api/v1/auth/verify:
     get:
-      description: Endpoint for confirming the code received by mail, issuing access
-        token to perform authorized actions.
+      description: '## Verification on the sent code
+
+        Endpoint for confirming the code received by mail, issuing access token to
+        perform authorized actions.'
       operationId: verify_api_v1_auth_verify_get
       parameters:
       - in: query
@@ -238,16 +226,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BaseResponse'
-          description: Successful Response
+          description: Cookies are set. Success message.
         '422':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
-      summary: Verify
+      summary: Verification by token and code
       tags:
       - Auth
+  /health:
+    get:
+      description: "## Perform a Health Check\nEndpoint to perform a healthcheck on.\
+        \ This endpoint can primarily be used Docker\nto ensure a robust container\
+        \ orchestration and management is in place. Other\nservices which rely on\
+        \ proper functioning of the API service will not deploy if this\nendpoint\
+        \ returns any other HTTP status code except 200 (OK).\nReturns:\n    HealthCheck:\
+        \ Returns a JSON response with the health status"
+      operationId: get_health_health_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheck'
+          description: Return HTTP Status Code 200 (OK)
+      summary: Perform a Health Check
+      tags:
+      - HealthCheck
 servers:
 - description: Local server
   url: http://localhost:8000/
