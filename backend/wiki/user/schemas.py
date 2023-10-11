@@ -4,6 +4,7 @@ from uuid import UUID
 from pydantic import EmailStr
 
 from wiki.models import WikiBase
+from wiki.wiki_api_client.enums import ResponsibilityType
 
 
 class CreateUser(WikiBase):
@@ -16,3 +17,16 @@ class CreateUser(WikiBase):
     position: Optional[str] = None,
     is_user_agreement_accepted: bool = False
     organization_id: Optional[UUID] = None
+
+class UserIdentifiers(WikiBase):
+    user_id: Optional[UUID] = None
+    user_name: Optional[str] = None
+    email: Optional[str] = None
+
+class UserInfoResponse(WikiBase):
+    user_name: Optional[str] = None
+    email: str
+    first_name: str
+    last_name: str
+    second_name: Optional[str] = None
+    responsibility: ResponsibilityType
