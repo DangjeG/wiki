@@ -15,7 +15,6 @@ from wiki.auth.schemas import (
     VerificationType
 )
 from wiki.common.schemas import BaseResponse, WikiUserHandlerData
-from wiki.config import settings
 from wiki.database.deps import get_db
 from wiki.permissions.login import LoginPermission
 from wiki.permissions.signup import SignUpPermission
@@ -74,10 +73,9 @@ async def login(user_in: FrontendUserLogin,
     summary="Signup with user data entry",
     response_description="Verification token data."
 )
-async def signup(user_signup: CreateUser,
-                 request: Request,
+async def signup(request: Request,
                  session: AsyncSession = Depends(get_db),
-                 permission=Depends(SignUpPermission()),
+                 user_signup=Depends(SignUpPermission()),
                  email_provider: EmailProvider = Depends(get_email_provider)):
     """
     ## Registration - submitting an application
@@ -101,7 +99,7 @@ async def signup(user_signup: CreateUser,
         first_name=user_signup.first_name,
         last_name=user_signup.last_name,
         second_name=user_signup.second_name,
-        position=user_signup.position,
+        user_position=user_signup.user_position,
         organization_id=user_signup.organization_id
     ))
 
@@ -140,17 +138,18 @@ async def verify(response: Response,
             email=data.email,
             api_client_id=str(data.wiki_api_client.id)
         ))
-        response.set_cookie(settings.AUTH_ACCESS_TOKEN_COOKIE_NAME,
-                            token,
-                            settings.AUTH_ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-                            settings.AUTH_ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-                            settings.AUTH_TOKEN_COOKIE_PATH,
-                            settings.AUTH_TOKEN_COOKIE_DOMAIN,
-                            settings.AUTH_TOKEN_COOKIE_SECURE,
-                            settings.AUTH_TOKEN_COOKIE_HTTP_ONLY,
-                            settings.AUTH_TOKEN_COOKIE_SAME_SITE)
 
-        return BaseResponse(msg="Successful login.")
+        # response.set_cookie(settings.AUTH_ACCESS_TOKEN_COOKIE_NAME,
+        #                     token,
+        #                     settings.AUTH_ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        #                     settings.AUTH_ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        #                     # settings.AUTH_TOKEN_COOKIE_PATH,
+        #                     # settings.AUTH_TOKEN_COOKIE_DOMAIN,
+        #                     # settings.AUTH_TOKEN_COOKIE_SECURE,
+        #                     # settings.AUTH_TOKEN_COOKIE_HTTP_ONLY,
+        #                     settings.AUTH_TOKEN_COOKIE_SAME_SITE)
+
+        return BaseResponse(msg=token)
     else:
         email = data
         user_repository: UserRepository = UserRepository(session)

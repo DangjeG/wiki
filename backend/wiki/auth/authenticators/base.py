@@ -61,7 +61,7 @@ class AuthenticatorInterface:
             )
         organization = None
         if user.organization_id is not None:
-            organization: Organization = self.organization_repository.get_organization_by_id(user.organization_id)
+            organization: Organization = await self.organization_repository.get_organization_by_id(user.organization_id)
             if self.authenticator_type == AuthenticatorType.api_key:
                 if organization.access != OrganizationAccessType.FULL_ACCESS:
                     raise WikiException(

@@ -14,7 +14,7 @@ class CreateUser(WikiBase):
     first_name: str
     last_name: str
     second_name: Optional[str] = None
-    position: Optional[str] = None,
+    user_position: Optional[str] = None
     is_user_agreement_accepted: bool = False
     organization_id: UUID
 
@@ -22,7 +22,7 @@ class CreateUser(WikiBase):
 class UserIdentifiers(WikiBase):
     user_id: Optional[UUID] = None
     user_name: Optional[str] = None
-    email: Optional[str] = None
+    email: Optional[EmailStr] = None
 
 
 class UserInfoResponse(WikiBase):

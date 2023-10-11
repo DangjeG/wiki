@@ -1,4 +1,3 @@
-from typing import Optional
 from uuid import UUID
 
 from wiki.models import WikiBase
@@ -12,7 +11,8 @@ class CreateOrganization(WikiBase):
 
 
 class OrganizationIdentifiers(WikiBase):
-    id: Optional[UUID] = None
+    id: UUID
+
 
 class OrganizationInfoResponse(WikiBase):
     name: str

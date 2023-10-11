@@ -38,7 +38,7 @@ class PermissionDomainRepository(BaseRepository):
         st = select(PermissionDomain).where(PermissionDomain.domain == domain)
         domain_query: PermissionDomain = (await self.session.execute(st)).scalar()
         if domain_query is not None:
-            return domain_query.status
+            return domain_query.mode
         else:
             return DomainPermissionMode.REFUSE
 
@@ -46,7 +46,7 @@ class PermissionDomainRepository(BaseRepository):
     async def create_permission_domain(self, create_domain: CreatePermissionDomain):
         new_domain = PermissionDomain(
             domain=create_domain.domain,
-            status=create_domain.status
+            status=create_domain.mode
         )
 
         self.session.add(new_domain)
@@ -63,7 +63,7 @@ class PermissionDomainRepository(BaseRepository):
         if domain is not None:
             permission_domain.domain = domain
         if domain_status is not None:
-            permission_domain.status = domain_status
+            permission_domain.mode = domain_status
 
         self.session.add(permission_domain)
 

@@ -13,7 +13,7 @@ from wiki.organization.schemas import CreateOrganization
 
 class OrganizationRepository(BaseRepository):
     _organization_not_found_exception = WikiException(
-        message="User organization not found.",
+        message="Organization not found.",
         error_code=WikiErrorCode.ORGANIZATION_NOT_FOUND,
         http_status_code=status.HTTP_404_NOT_FOUND
     )
@@ -37,5 +37,3 @@ class OrganizationRepository(BaseRepository):
         )
         self.session.add(new_organization)
         return new_organization
-
-#удаление

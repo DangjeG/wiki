@@ -54,7 +54,7 @@ async def get_user(
     elif user_get.user_name is not None:
         user_db = await user_repository.get_user_by_username(user_get.user_name)
     elif user_get.email is not None:
-        user_db = await user_repository.get_user_by_email(user_get.email)
+        user_db = await user_repository.get_user_by_email(str(user_get.email))
     else:
         raise WikiException(
             message=f"User not found.",

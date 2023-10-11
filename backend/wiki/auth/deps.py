@@ -33,7 +33,7 @@ wiki_access_token_bearer = HTTPBearer(scheme_name="WikiBearer", auto_error=False
 class AuthUserDependency:
     authorisation_mode: AuthorizationMode
 
-    def __init__(self, authorisation_mode: AuthorizationMode = AuthorizationMode.AUTHORIZED, **kwargs):
+    def __init__(self, authorisation_mode: AuthorizationMode = AuthorizationMode.AUTHORIZED):
         self.authorisation_mode = authorisation_mode
 
     async def __call__(
@@ -42,7 +42,7 @@ class AuthUserDependency:
             api_key_header: Optional[str] = Security(wiki_api_key_header),
             access_token_cookie: Optional[str] = Security(wiki_access_token_cookie),
             access_token_bearer: Optional[HTTPAuthorizationCredentials] = Security(wiki_access_token_bearer),
-            session: AsyncSession = Depends(get_db)
+            session: AsyncSession = Depends(get_db),
     ) -> ExternalUserHandlerData | WikiUserHandlerData:
         if self.authorisation_mode == AuthorizationMode.UNAUTHORIZED:
             try:

@@ -21,7 +21,7 @@ class SignUpPermission(ABC):
         self.domain_permission = domain_permission or DomainPermission()
 
     async def __call__(self, create_user: CreateUser, session: AsyncSession = Depends(get_db)):
-        await self.domain_permission(create_user.email.split("@")[1])
+        await self.domain_permission(create_user.email.split("@")[1], session)
         if not create_user.is_user_agreement_accepted:
             raise WikiException(
                 message="You must accept the user agreement.",
@@ -37,5 +37,7 @@ class SignUpPermission(ABC):
                 error_code=WikiErrorCode.USER_NOT_SPECIFIED,
                 http_status_code=status.HTTP_409_CONFLICT
             )
-        organisation_repository: OrganizationRepository(session)
+        organisation_repository: OrganizationRepository = OrganizationRepository(session)
         organization: Organization = await organisation_repository.get_organization_by_id(create_user.organization_id)
+
+        return create_user

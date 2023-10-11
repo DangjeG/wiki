@@ -46,7 +46,7 @@ class UserRepository(BaseRepository):
 
     @menage_db_not_found_resul_method(NotFoundResultMode.EXCEPTION, ex=_user_not_valid_exception)
     async def get_user_by_email(self, email: str, is_only_existing: bool = True) -> User:
-        whereclause = [User.email == email]
+        whereclause = [User.email == email.lower()]
         if is_only_existing:
             whereclause.append(User.is_deleted == False)
         st = select(User).where(and_(*whereclause))
@@ -54,7 +54,7 @@ class UserRepository(BaseRepository):
         return user_query
 
     async def check_user_identification_data_is_available(self, email: Optional[str], username: Optional[str]) -> bool:
-        st = select(func.count(User.id)).where(or_(User.email == email, User.username == username))
+        st = select(func.count(User.id)).where(or_(User.email == email.lower(), User.username == username))
         count = (await self.session.execute(st)).scalar()
         return not count > 0
 
@@ -84,7 +84,7 @@ class UserRepository(BaseRepository):
             first_name=create_user.first_name,
             last_name=create_user.last_name,
             second_name=create_user.second_name,
-            position=create_user.position,
+            position=create_user.user_position,
             is_user_agreement_accepted=create_user.is_user_agreement_accepted,
             organization_id=create_user.organization_id
         )
@@ -110,7 +110,7 @@ class UserRepository(BaseRepository):
                           wiki_api_client_id: Optional[str] = None) -> User:
         user: User = await self.get_user_by_id(user_id)
         if email is not None:
-            user.email = email
+            user.email = email.lower()
         if username is not None:
             user.username = username
         if display_name is not None:

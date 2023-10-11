@@ -2,12 +2,11 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
-from sqlalchemy import Column, Uuid, String, DateTime, ForeignKey, Boolean, SmallInteger
+from sqlalchemy import Column, Uuid, String, DateTime, ForeignKey, SmallInteger
 from uuid_extensions import uuid7
 
-from wiki.common.models import TimeStampMixin, EnabledDeletedMixin
+from wiki.common.models import EnabledDeletedMixin
 from wiki.database.core import Base
-from wiki.database.utils import utcnow
 from wiki.wiki_api_client.enums import ResponsibilityType
 
 
