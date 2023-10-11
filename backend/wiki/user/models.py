@@ -1,4 +1,5 @@
 from typing import Optional
+from uuid import UUID
 
 from sqlalchemy import Column, String, Uuid, Boolean, ForeignKey
 from uuid_extensions import uuid7
@@ -34,8 +35,8 @@ class User(Base):
                  second_name: Optional[str] = None,
                  position: Optional[str] = None,
                  is_user_agreement_accepted: bool = False,
-                 organization_id: Optional[str] = None,
-                 wiki_api_client_id: Optional[str] = None):
+                 organization_id: Optional[UUID] = None,
+                 wiki_api_client_id: Optional[UUID] = None):
         self.email = email
         self.username = username
         self.display_name = display_name

@@ -8,7 +8,8 @@ from wiki.common.exceptions import WikiException, WikiErrorCode
 from wiki.database.deps import get_db
 from wiki.organization.models import Organization
 from wiki.organization.repository import OrganizationRepository
-from wiki.organization.schemas import OrganizationIdentifiers, OrganizationInfoResponse, CreateOrganization
+from wiki.organization.schemas import OrganizationIdentifiers, OrganizationInfoResponse, CreateOrganization, \
+    UpdateOrganization
 
 organization_router = APIRouter()
 
@@ -90,5 +91,38 @@ async def get_organizations(session: AsyncSession = Depends(get_db)):
 
     return result_organization
 
+@organization_router.post(
+    "/",
+    response_model=OrganizationInfoResponse,
+    status_code=status.HTTP_200_OK,
+    description="Update organization."
+)
+async def update_organizations(session: AsyncSession = Depends(get_db),
+                               organization_identifiers: OrganizationIdentifiers = Depends(),
+                               update_organization: UpdateOrganization = Depends()):
+    organization_repository: OrganizationRepository = OrganizationRepository(session)
 
-# удалять
+    organization: Optional[Organization] = None
+
+    if organization_identifiers.id is not None:
+        organization = await organization_repository.get_organization_by_id(organization_identifiers.id)
+    else:
+        raise WikiException(
+            message="Organization not found.",
+            error_code=WikiErrorCode.ORGANIZATION_NOT_FOUND,
+            http_status_code=status.HTTP_404_NOT_FOUND
+        )
+
+    await organization_repository.update_organization(
+        organization_id=organization.id,
+        name=update_organization.name,
+        description=update_organizations.description,
+        access=update_organization.access
+    )
+
+    return OrganizationInfoResponse(
+        name=update_organization.name,
+        description=update_organizations.description,
+        access=update_organization.access
+    )
+

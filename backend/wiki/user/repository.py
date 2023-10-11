@@ -20,6 +20,7 @@ from wiki.database.utils import (
 )
 from wiki.user.models import User
 from wiki.user.schemas import CreateUser
+from wiki.wiki_api_client.enums import ResponsibilityType
 
 
 class UserRepository(BaseRepository):
@@ -149,3 +150,4 @@ class UserRepository(BaseRepository):
         user.second_name = DELETED_USER_SECOND_NAME
 
         self.session.add(user)
+

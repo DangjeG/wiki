@@ -42,6 +42,9 @@ class Settings(BaseSettings):
     AUTH_ACCESS_TOKEN_COOKIE_NAME: str = "wiki_access_token"
     AUTH_REFRESH_TOKEN_COOKIE_NAME: str = "wiki_refresh_token"
 
+    AUTH_API_KEY_LENGTH: int = 30
+    AUTH_API_KEY_PREFIX_LENGTH: int = 8
+
     AUTH_TOKEN_COOKIE_PATH: str = "/"
     AUTH_TOKEN_COOKIE_DOMAIN: str = "localhost"
     AUTH_TOKEN_COOKIE_SECURE: bool = False
