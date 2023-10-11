@@ -5,8 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from wiki.auth.authenticators.base import AuthenticatorInterface, AuthenticatorType
-from wiki.auth.schemas import WikiUserHandlerData
 from wiki.common.exceptions import WikiException, WikiErrorCode
+from wiki.common.schemas import WikiUserHandlerData
 from wiki.config import settings
 from wiki.database.utils import utcnow
 from wiki.wiki_api_client.models import WikiApiKey

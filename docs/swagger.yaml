@@ -12,6 +12,17 @@ components:
           type: string
       title: BaseResponse
       type: object
+    Body_signup_api_v1_auth_signup_post:
+      properties:
+        create_user:
+          $ref: '#/components/schemas/CreateUser'
+        user_signup:
+          $ref: '#/components/schemas/CreateUser'
+      required:
+      - user_signup
+      - create_user
+      title: Body_signup_api_v1_auth_signup_post
+      type: object
     CreateUser:
       properties:
         display_name:
@@ -34,11 +45,9 @@ components:
           title: Last Name
           type: string
         organization_id:
-          anyOf:
-          - format: uuid
-            type: string
-          - type: 'null'
+          format: uuid
           title: Organization Id
+          type: string
         position:
           anyOf:
           - type: string
@@ -59,6 +68,7 @@ components:
       - username
       - first_name
       - last_name
+      - organization_id
       title: CreateUser
       type: object
     FrontendUserLogin:
@@ -94,6 +104,66 @@ components:
           title: Status
           type: string
       title: HealthCheck
+      type: object
+    OrganizationAccessType:
+      enum:
+      - FULL_ACCESS
+      - WEB_ONLY
+      - LOCKED
+      title: OrganizationAccessType
+      type: string
+    OrganizationInfoResponse:
+      properties:
+        access:
+          $ref: '#/components/schemas/OrganizationAccessType'
+        description:
+          title: Description
+          type: string
+        name:
+          title: Name
+          type: string
+      required:
+      - name
+      - description
+      - access
+      title: OrganizationInfoResponse
+      type: object
+    ResponsibilityType:
+      enum:
+      - 0
+      - 500
+      - 1000
+      title: ResponsibilityType
+      type: integer
+    UserInfoResponse:
+      properties:
+        email:
+          title: Email
+          type: string
+        first_name:
+          title: First Name
+          type: string
+        last_name:
+          title: Last Name
+          type: string
+        responsibility:
+          $ref: '#/components/schemas/ResponsibilityType'
+        second_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Second Name
+        user_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: User Name
+      required:
+      - email
+      - first_name
+      - last_name
+      - responsibility
+      title: UserInfoResponse
       type: object
     UserSignResponse:
       properties:
@@ -134,6 +204,18 @@ components:
       - type
       title: ValidationError
       type: object
+  securitySchemes:
+    WikiAccessToken:
+      in: cookie
+      name: wiki_access_token
+      type: apiKey
+    WikiApiKey:
+      in: header
+      name: X-Wiki-API-Key
+      type: apiKey
+    WikiBearer:
+      scheme: bearer
+      type: http
 info:
   description: Welcome to Wiki's API documentation! Here you will able to discover
     all of the ways you can interact with the Wiki API.
@@ -182,7 +264,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateUser'
+              $ref: '#/components/schemas/Body_signup_api_v1_auth_signup_post'
         required: true
       responses:
         '202':
@@ -236,6 +318,230 @@ paths:
       summary: Verification by token and code
       tags:
       - Auth
+  /api/v1/organization/:
+    post:
+      description: Create organization.
+      operationId: create_organization_api_v1_organization__post
+      parameters:
+      - in: query
+        name: name
+        required: true
+        schema:
+          title: Name
+          type: string
+      - in: query
+        name: description
+        required: true
+        schema:
+          title: Description
+          type: string
+      - in: query
+        name: access
+        required: true
+        schema:
+          $ref: '#/components/schemas/OrganizationAccessType'
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Create Organization
+      tags:
+      - Organization
+  /api/v1/organization/all:
+    get:
+      description: Get all organizations.
+      operationId: get_organizations_api_v1_organization_all_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/OrganizationInfoResponse'
+                title: Response Get Organizations Api V1 Organization All Get
+                type: array
+          description: Successful Response
+      summary: Get Organizations
+      tags:
+      - Organization
+  /api/v1/organization/info:
+    get:
+      description: Get organization by id.
+      operationId: get_organization_api_v1_organization_info_get
+      parameters:
+      - in: query
+        name: id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Id
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get Organization
+      tags:
+      - Organization
+  /api/v1/user/:
+    delete:
+      operationId: delete_user_api_v1_user__delete
+      parameters:
+      - in: query
+        name: user_id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: User Id
+      - in: query
+        name: user_name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: User Name
+      - in: query
+        name: email
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Email
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Delete user
+      tags:
+      - User
+  /api/v1/user/all:
+    get:
+      operationId: get_users_api_v1_user_all_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/UserInfoResponse'
+                title: Response Get Users Api V1 User All Get
+                type: array
+          description: Successful Response
+      security:
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all users
+      tags:
+      - User
+  /api/v1/user/info:
+    get:
+      operationId: get_user_api_v1_user_info_get
+      parameters:
+      - in: query
+        name: user_id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: User Id
+      - in: query
+        name: user_name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: User Name
+      - in: query
+        name: email
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Email
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get user by id or username or email
+      tags:
+      - User
+  /api/v1/user/me:
+    get:
+      operationId: get_me_api_v1_user_me_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoResponse'
+          description: Successful Response
+      security:
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get info about the current user
+      tags:
+      - User
   /health:
     get:
       description: "## Perform a Health Check\nEndpoint to perform a healthcheck on.\
