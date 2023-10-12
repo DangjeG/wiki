@@ -3,20 +3,18 @@ import {Button, Form} from "react-bootstrap";
 import "../Styles/Login.css"
 import {instance} from "../api.config";
 
+
 export default function Verify(){
 
-    const [code, setCode] = useState("");
+    const [code, setCode] = useState();
 
     async function handleFormSubmit(event) {
         event.preventDefault();
         try {
-             await instance.post(`/auth/verify`,
-                {
-                "token" : localStorage.getItem("verify"),
-                "code": code
-                }).then((resp)=>{
-                localStorage.setItem('token', resp.data.access_token);
-                window.location.href = '/';
+             await instance.get(`/auth/verify?token=${localStorage.getItem("verify")}&verification_code=${code}`)
+                 .then((resp)=>{
+                     localStorage.setItem("token", resp.data.msg);
+                     window.location.href = '/';
             })
         } catch (error) {
             console.error(error);
