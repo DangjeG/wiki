@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {Button, Form} from "react-bootstrap";
 import "../Styles/Login.css"
-import {instance} from "../api.config";
+import {api} from "../app.config";
 
 
 export default function Login(){
@@ -10,18 +10,16 @@ export default function Login(){
     async function handleFormSubmit(event) {
         event.preventDefault();
         try {
-            const response = await instance.post(`/auth/login`, {"email": email})
-            const token = response.data.verify_token;
-            localStorage.setItem('verify', token);
+            await api.login(email)
             window.location.href = '/verify';
         } catch (error) {
             console.error(error);
         }
     }
     return(
-        <div className="color-overlay d-flex justify-content-center align-content-center">
-            <Form className="login-form" onSubmit={handleFormSubmit}>
-                <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+        <div className="login-form">
+            <Form onSubmit={handleFormSubmit}>
+                <Form.Group className="mb-3">
                     <Form.Label>Email address</Form.Label>
                     <Form.Control
                         type="email"

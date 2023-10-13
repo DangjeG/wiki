@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {Button, Form} from "react-bootstrap";
 import "../Styles/Login.css"
-import {instance} from "../api.config";
+import {api} from "../app.config";
 
 export default function SignUp() {
 
@@ -15,19 +15,7 @@ export default function SignUp() {
     async function handleFormSubmit(event) {
         event.preventDefault();
         try {
-            const response = await instance.post(`/auth/signup`,
-                {
-                    "email" : email,
-                    "username" : username,
-                    "first_name" : first_name,
-                    "last_name" : last_name,
-                    "second_name" : second_name,
-                    "is_user_agreement_accepted" : is_user_agreement_accepted,
-                    "organization_id" : "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-
-                })
-            const token = response.data.verify_token;
-            localStorage.setItem('verify', token);
+            await api.signup(email, username, first_name, last_name, second_name, is_user_agreement_accepted)
             window.location.href = '/verify';
         } catch (error) {
             console.error(error);
@@ -35,9 +23,9 @@ export default function SignUp() {
     }
 
     return (
-        <div className="color-overlay d-flex justify-content-center align-content-center">
-            <Form className="login-form" onSubmit={handleFormSubmit}>
-                <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+        <div className="login-form">
+            <Form onSubmit={handleFormSubmit}>
+                <Form.Group className="mb-3">
                     <Form.Label>Email</Form.Label>
                     <Form.Control
                         type="email"
@@ -83,26 +71,22 @@ export default function SignUp() {
                         disabled={is_second_name_exist}
                     />
                 </Form.Group>
-                <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                <Form.Group className="mb-3">
                     <Form.Check
-                        variant="outline-primary"
                         inline
                         label="second name exist"
                         type="checkbox"
-                        isValid={is_second_name_exist}
                         onClick={()=>{
                             setExist(!is_second_name_exist);
                             setSecondName("");
-                        }}
-                    />
+                        }}/>
                     <Form.Check
-                        variant="outline-primary"
                         inline
-                        label=" accept user agreement"
+                        label="accept user agreement"
                         type="checkbox"
-                        isValid={is_user_agreement_accepted}
-                        onClick={()=>setAgreements(!is_user_agreement_accepted)}
-                    />
+                        onClick={()=> {
+                            setAgreements(!is_user_agreement_accepted)
+                        }}/>
                 </Form.Group>
                 <Button type="submit" variant="outline-primary"> Verify </Button>
             </Form>

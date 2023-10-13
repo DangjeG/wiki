@@ -1,19 +1,26 @@
-import {instance} from "../api.config";
+
 
 
 export default function Home(){
 
 
-    async function onc(event) {
-        event.preventDefault();
-        await instance.get(`/user/all`)
-    }
+    function onc() {
+       localStorage.setItem("token", "234")
+       /*api.emit("isLogin", true)*/
+   }
+     async function onc2() {
+         localStorage.setItem("token", "")
+         /*await api.logout()*/
+     }
 
     return(
         <div>
-            <form onSubmit={onc}>
-                <button type={"submit"}>
-                    ryjgrf
+            <form >
+                <button onClick={onc}>
+                    login
+                </button>
+                <button onClick={onc2}>
+                    logout
                 </button>
             </form>
         </div>

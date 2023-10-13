@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {Button, Form} from "react-bootstrap";
 import "../Styles/Login.css"
-import {instance} from "../api.config";
+import {api} from "../app.config";
 
 
 export default function Verify(){
@@ -11,14 +11,12 @@ export default function Verify(){
     async function handleFormSubmit(event) {
         event.preventDefault();
         try {
-             await instance.get(`/auth/verify?token=${localStorage.getItem("verify")}&verification_code=${code}`)
-                 .then((resp)=>{
-                     localStorage.setItem("token", resp.data.msg);
-                     window.location.href = '/';
-            })
-        } catch (error) {
-            console.error(error);
-        }
+             await api.verify(code);
+            window.location.href = '/';
+            }
+            catch (err){
+            console.log(err)
+            }
     }
 
     return(
