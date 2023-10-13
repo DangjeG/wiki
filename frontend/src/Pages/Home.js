@@ -1,26 +1,26 @@
-import {instance} from "../api.config";
+
 
 
 export default function Home(){
 
-    async function onc(event) {
 
-
-        event.preventDefault();
-        try {
-             await instance.post(`/auth/test`).then( resp =>{
-                 alert(resp.data)
-             })
-        } catch (error) {
-            console.error(error);
-        }
-    }
+    function onc() {
+       localStorage.setItem("token", "234")
+       /*api.emit("isLogin", true)*/
+   }
+     async function onc2() {
+         localStorage.setItem("token", "")
+         /*await api.logout()*/
+     }
 
     return(
         <div>
-            <form onSubmit={onc}>
-                <button type={"submit"}>
-                    ryjgrf
+            <form >
+                <button onClick={onc}>
+                    login
+                </button>
+                <button onClick={onc2}>
+                    logout
                 </button>
             </form>
         </div>
