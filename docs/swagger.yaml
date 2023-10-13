@@ -14,11 +14,6 @@ components:
       type: object
     CreateUser:
       properties:
-        display_name:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Display Name
         email:
           format: email
           title: Email
@@ -94,9 +89,9 @@ components:
       type: object
     OrganizationAccessType:
       enum:
-      - FULL_ACCESS
-      - WEB_ONLY
       - LOCKED
+      - WEB_ONLY
+      - FULL_ACCESS
       title: OrganizationAccessType
       type: string
     OrganizationInfoResponse:
@@ -104,12 +99,19 @@ components:
         access:
           $ref: '#/components/schemas/OrganizationAccessType'
         description:
+          anyOf:
+          - type: string
+          - type: 'null'
           title: Description
+        id:
+          format: uuid
+          title: Id
           type: string
         name:
           title: Name
           type: string
       required:
+      - id
       - name
       - description
       - access
@@ -117,11 +119,11 @@ components:
       type: object
     ResponsibilityType:
       enum:
-      - 0
-      - 500
-      - 1000
+      - VIEWER
+      - EDITOR
+      - ADMIN
       title: ResponsibilityType
-      type: integer
+      type: string
     UserInfoResponse:
       properties:
         email:
@@ -172,11 +174,6 @@ components:
       type: object
     UserUpdate:
       properties:
-        display_name:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Display Name
         email:
           anyOf:
           - format: email
@@ -257,7 +254,7 @@ components:
         responsibility:
           allOf:
           - $ref: '#/components/schemas/ResponsibilityType'
-          default: 0
+          default: VIEWER
       title: WikiApiClientInfoResponse
       type: object
     WikiApiKeyInfoResponse:
@@ -295,6 +292,15 @@ components:
     WikiBearer:
       scheme: bearer
       type: http
+    WikiRootApiKey:
+      description: 'Root key, allows you to perform actions as administrator, random
+        user data is generated.
+
+        **Limitation:** operations requiring an explicitly registered userare unavailable,
+        example.: `Create: POST /api_key/`.'
+      in: header
+      name: X-Wiki-ROOT-API-Key
+      type: apiKey
 info:
   description: Welcome to Wiki's API documentation! Here you will able to discover
     all of the ways you can interact with the Wiki API.
@@ -351,6 +357,7 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
       security:
+      - WikiRootApiKey: []
       - WikiApiKey: []
       - WikiApiKey: []
       - WikiAccessToken: []
@@ -383,6 +390,7 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
       security:
+      - WikiRootApiKey: []
       - WikiApiKey: []
       - WikiApiKey: []
       - WikiAccessToken: []
@@ -414,6 +422,7 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
       security:
+      - WikiRootApiKey: []
       - WikiApiKey: []
       - WikiApiKey: []
       - WikiAccessToken: []
@@ -446,6 +455,7 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
       security:
+      - WikiRootApiKey: []
       - WikiApiKey: []
       - WikiApiKey: []
       - WikiAccessToken: []
@@ -584,6 +594,7 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
       security:
+      - WikiRootApiKey: []
       - WikiApiKey: []
       - WikiApiKey: []
       - WikiAccessToken: []
@@ -640,6 +651,7 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
       security:
+      - WikiRootApiKey: []
       - WikiApiKey: []
       - WikiApiKey: []
       - WikiAccessToken: []
@@ -662,6 +674,7 @@ paths:
                 type: array
           description: Successful Response
       security:
+      - WikiRootApiKey: []
       - WikiApiKey: []
       - WikiApiKey: []
       - WikiAccessToken: []
@@ -675,11 +688,11 @@ paths:
       operationId: get_organization_api_v1_organization_info_get
       parameters:
       - in: query
-        name: id
+        name: organization_id
         required: true
         schema:
           format: uuid
-          title: Id
+          title: Organization Id
           type: string
       responses:
         '200':
@@ -695,6 +708,7 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
       security:
+      - WikiRootApiKey: []
       - WikiApiKey: []
       - WikiApiKey: []
       - WikiAccessToken: []
@@ -746,6 +760,7 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
       security:
+      - WikiRootApiKey: []
       - WikiApiKey: []
       - WikiApiKey: []
       - WikiAccessToken: []
@@ -790,14 +805,6 @@ paths:
           - type: string
           - type: 'null'
           title: Username
-      - in: query
-        name: display_name
-        required: false
-        schema:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Display Name
       - in: query
         name: first_name
         required: false
@@ -862,6 +869,7 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
       security:
+      - WikiRootApiKey: []
       - WikiApiKey: []
       - WikiApiKey: []
       - WikiAccessToken: []
@@ -883,6 +891,7 @@ paths:
                 type: array
           description: Successful Response
       security:
+      - WikiRootApiKey: []
       - WikiApiKey: []
       - WikiApiKey: []
       - WikiAccessToken: []
@@ -934,6 +943,7 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
       security:
+      - WikiRootApiKey: []
       - WikiApiKey: []
       - WikiApiKey: []
       - WikiAccessToken: []
@@ -952,6 +962,7 @@ paths:
                 $ref: '#/components/schemas/UserInfoResponse'
           description: Successful Response
       security:
+      - WikiRootApiKey: []
       - WikiApiKey: []
       - WikiApiKey: []
       - WikiAccessToken: []

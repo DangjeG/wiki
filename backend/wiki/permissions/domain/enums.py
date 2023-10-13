@@ -1,6 +1,6 @@
-from enum import IntEnum
+from wiki.common.enums import WikiBaseEnum
 
 
-class DomainPermissionMode(IntEnum):
-    REFUSE = 0
-    ACCEPT = 100
+class DomainPermissionMode(WikiBaseEnum):
+    REFUSE = "REFUSE"
+    ACCEPT = "ACCEPT"

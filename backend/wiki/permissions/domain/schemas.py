@@ -4,4 +4,4 @@ from wiki.models import WikiBase
 
 class CreatePermissionDomain(WikiBase):
     domain: str  # we need to add validation
-    status: DomainPermissionMode
+    mode: DomainPermissionMode

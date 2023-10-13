@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
-from sqlalchemy import Column, Uuid, String, DateTime, ForeignKey, SmallInteger
+from sqlalchemy import Column, Uuid, String, DateTime, ForeignKey
 from uuid_extensions import uuid7
 
 from wiki.common.models import EnabledDeletedMixin
@@ -13,7 +13,7 @@ from wiki.wiki_api_client.enums import ResponsibilityType
 class WikiApiClient(Base, EnabledDeletedMixin):
     id = Column(Uuid, default=uuid7, primary_key=True, nullable=False)
     description = Column(String(256), nullable=True)
-    responsibility = Column(SmallInteger, nullable=False, default=ResponsibilityType.VIEWER)
+    responsibility = Column(String, nullable=False, default=ResponsibilityType.VIEWER)
 
     def __init__(self,
                  description: Optional[str] = None,

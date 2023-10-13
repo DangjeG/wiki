@@ -171,7 +171,6 @@ async def update_user(user: WikiUserHandlerData = Depends(BasePermission(respons
         user.id,
         email=user_update.email,
         username=user_update.username,
-        display_name=user_update.display_name,
         first_name=user_update.first_name,
         last_name=user_update.last_name,
         second_name=user_update.second_name,

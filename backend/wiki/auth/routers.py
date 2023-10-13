@@ -95,7 +95,6 @@ async def signup(request: Request,
     user = await user_repository.create_user(CreateUser(
         email=user_signup.email,
         username=user_signup.username,
-        display_name=user_signup.display_name,
         first_name=user_signup.first_name,
         last_name=user_signup.last_name,
         second_name=user_signup.second_name,

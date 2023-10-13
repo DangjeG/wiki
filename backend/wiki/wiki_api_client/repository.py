@@ -6,8 +6,12 @@ from starlette import status
 
 from wiki.common.exceptions import WikiException, WikiErrorCode
 from wiki.database.repository import BaseRepository
-from wiki.database.utils import menage_db_not_found_resul_method, NotFoundResultMode, menage_db_commit_method, \
+from wiki.database.utils import (
+    menage_db_not_found_result_method,
+    NotFoundResultMode,
+    menage_db_commit_method,
     CommitMode
+)
 from wiki.wiki_api_client.enums import ResponsibilityType
 from wiki.wiki_api_client.models import WikiApiClient, WikiApiKey
 from wiki.wiki_api_client.schemas import CreateWikiApiClient, CreateWikiApiKey
@@ -30,7 +34,7 @@ class WikiApiClientRepository(BaseRepository):
         http_status_code=status.HTTP_403_FORBIDDEN
     )
 
-    @menage_db_not_found_resul_method(NotFoundResultMode.EXCEPTION, ex=_api_client_not_found_exception)
+    @menage_db_not_found_result_method(NotFoundResultMode.EXCEPTION, ex=_api_client_not_found_exception)
     async def get_wiki_api_client_by_id(self, api_client_id: UUID) -> WikiApiClient:
         api_client_query = await self.session.get(WikiApiClient, api_client_id)
         return api_client_query
@@ -40,12 +44,12 @@ class WikiApiClientRepository(BaseRepository):
         res = api_client_query.scalars().all()
         return res
 
-    @menage_db_not_found_resul_method(NotFoundResultMode.EXCEPTION, ex=_api_key_not_found_exception)
+    @menage_db_not_found_result_method(NotFoundResultMode.EXCEPTION, ex=_api_key_not_found_exception)
     async def get_wiki_api_key_by_id(self, api_key_id: UUID) -> WikiApiKey:
         api_key_query = await self.session.get(WikiApiKey, api_key_id)
         return api_key_query
 
-    @menage_db_not_found_resul_method(NotFoundResultMode.EXCEPTION, ex=_api_key_hash_not_found_exception)
+    @menage_db_not_found_result_method(NotFoundResultMode.EXCEPTION, ex=_api_key_hash_not_found_exception)
     async def get_wiki_api_key_by_key_hash(self, api_key_hash) -> WikiApiKey:
         st = select(WikiApiKey).where(WikiApiKey.api_key_hash == api_key_hash)
         res = (await self.session.execute(st)).scalar()
@@ -62,7 +66,7 @@ class WikiApiClientRepository(BaseRepository):
         res = (await self.session.execute(st)).scalars().all()
         return res
 
-    @menage_db_commit_method(CommitMode.COMMIT)
+    @menage_db_commit_method(CommitMode.FLUSH)
     async def create_wiki_api_key(self, create_wiki_api_key: CreateWikiApiKey) -> WikiApiKey:
         new_api_key = WikiApiKey(
             api_key_hash=create_wiki_api_key.api_key_hash,
@@ -89,11 +93,11 @@ class WikiApiClientRepository(BaseRepository):
 
         self.session.add(api_key)
 
-    @menage_db_commit_method(CommitMode.COMMIT)
+    @menage_db_commit_method(CommitMode.FLUSH)
     async def create_wiki_api_client(self, create_api_client: CreateWikiApiClient) -> WikiApiClient:
         new_api_client = WikiApiClient(
             description=create_api_client.description,
-            responsibility=create_api_client.responsibility,
+            responsibility=str(create_api_client.responsibility),
             is_enabled=create_api_client.is_enabled
         )
 
@@ -112,7 +116,7 @@ class WikiApiClientRepository(BaseRepository):
         if description is not None:
             api_client.description = description
         if responsibility is not None:
-            api_client.responsibility = responsibility
+            api_client.responsibility = str(responsibility)
         if is_enabled is not None:
             api_client.is_enabled = is_enabled
 
@@ -120,7 +124,7 @@ class WikiApiClientRepository(BaseRepository):
 
         return api_client
 
-    @menage_db_commit_method(CommitMode.COMMIT)
+    @menage_db_commit_method(CommitMode.FLUSH)
     async def mark_wiki_api_client_deleted(self, api_client_id: UUID) -> None:
         api_client: WikiApiClient = await self.get_wiki_api_client_by_id(api_client_id)
         api_client.is_deleted = True

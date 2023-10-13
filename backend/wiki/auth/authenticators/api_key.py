@@ -50,7 +50,6 @@ class ApiKeyAuthenticatorInterface(AuthenticatorInterface):
             id=user.id,
             email=user.email,
             username=user.username,
-            display_name=user.display_name,
             first_name=user.first_name,
             last_name=user.last_name,
             second_name=user.second_name,

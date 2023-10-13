@@ -10,7 +10,7 @@ from wiki.database.repository import BaseRepository
 from wiki.database.utils import (
     menage_db_commit_method,
     CommitMode,
-    menage_db_not_found_resul_method,
+    menage_db_not_found_result_method,
     NotFoundResultMode
 )
 from wiki.permissions.domain.models import PermissionDomain
@@ -24,7 +24,7 @@ class PermissionDomainRepository(BaseRepository):
         http_status_code=status.HTTP_404_NOT_FOUND
     )
 
-    @menage_db_not_found_resul_method(NotFoundResultMode.EXCEPTION, ex=_permission_domain_not_found_exception)
+    @menage_db_not_found_result_method(NotFoundResultMode.EXCEPTION, ex=_permission_domain_not_found_exception)
     async def get_permission_domain_by_id(self, user_id: UUID) -> PermissionDomain:
         domain_query = await self.session.get(PermissionDomain, user_id)
         return domain_query
@@ -38,22 +38,22 @@ class PermissionDomainRepository(BaseRepository):
         st = select(PermissionDomain).where(PermissionDomain.domain == domain)
         domain_query: PermissionDomain = (await self.session.execute(st)).scalar()
         if domain_query is not None:
-            return domain_query.mode
+            return DomainPermissionMode(domain_query.mode)
         else:
             return DomainPermissionMode.REFUSE
 
-    @menage_db_commit_method(CommitMode.COMMIT)
+    @menage_db_commit_method(CommitMode.FLUSH)
     async def create_permission_domain(self, create_domain: CreatePermissionDomain):
         new_domain = PermissionDomain(
             domain=create_domain.domain,
-            status=create_domain.mode
+            mode=str(create_domain.mode)
         )
 
         self.session.add(new_domain)
 
         return new_domain
 
-    @menage_db_commit_method(CommitMode.COMMIT)
+    @menage_db_commit_method(CommitMode.FLUSH)
     async def update_permission_domain(self,
                                        domain_id: UUID,
                                        *,
@@ -63,7 +63,7 @@ class PermissionDomainRepository(BaseRepository):
         if domain is not None:
             permission_domain.domain = domain
         if domain_status is not None:
-            permission_domain.mode = domain_status
+            permission_domain.mode = str(domain_status)
 
         self.session.add(permission_domain)
 

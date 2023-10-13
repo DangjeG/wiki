@@ -37,8 +37,11 @@ class Settings(BaseSettings):
     AUTH_SECRET_API_KEY: bytes = b"bf48fbdd0a692198d4f5d6f1210646fae139930e1c46aa7f29c60ca1c437d1b6"
     AUTH_SECRET_VERIFY: bytes = b"33b974fedccff8f671d3691e89bf52857cfcaed716b9b2c76449216fd251f534"
 
+    AUTH_ROOT_API_KEYS: list[str | bytes] = ["12345", b"e37bc241f2adebb5845f5efb1d3c0de11e98001dc485c79507652cce67ad62c6"]
+
     AUTH_API_KEY_QUERY_NAME: str = "wiki_api_key"
     AUTH_API_KEY_HEADER_NAME: str = "X-Wiki-API-Key"
+    AUTH_ROOT_API_KEY_HEADER_NAME: str = "X-Wiki-ROOT-API-Key"
     AUTH_ACCESS_TOKEN_COOKIE_NAME: str = "wiki_access_token"
     AUTH_REFRESH_TOKEN_COOKIE_NAME: str = "wiki_refresh_token"
 
@@ -57,8 +60,6 @@ class Settings(BaseSettings):
     AUTH_VERIFY_TOKEN_EXPIRE_MINUTES: int = 5
     AUTH_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     AUTH_REFRESH_TOKEN_EXPIRE_MINUTES: int = 10080  # 60 * 24 * 7
-
-    AUTH_ROOT_TOKENS: list[str] = ["12345"]
 
     DB_SCHEMA: str = "postgresql"
     DB_DRIVER: str = "asyncpg"

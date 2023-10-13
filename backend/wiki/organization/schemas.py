@@ -11,17 +11,15 @@ class CreateOrganization(WikiBase):
     access: OrganizationAccessType
 
 
-class OrganizationIdentifiers(WikiBase):
-    id: UUID
-
-
 class OrganizationInfoResponse(WikiBase):
+    id: UUID
     name: str
-    description: str
+    description: Optional[str]
     access: OrganizationAccessType
 
 
 class UpdateOrganization(WikiBase):
+    id: UUID
     name: Optional[str] = None
     description: Optional[str] = None
     access: Optional[OrganizationAccessType] = None

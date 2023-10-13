@@ -7,6 +7,7 @@ from starlette import status
 
 from wiki.auth.deps import (
     AuthUserDependency,
+    wiki_root_api_key_header,
     wiki_api_key_query,
     wiki_api_key_header,
     wiki_access_token_cookie,
@@ -29,6 +30,7 @@ class _ResponsibilityPermission(AuthUserDependency):
         self.responsibility = responsibility
 
     async def __call__(self,
+                       root_api_key_header=None,
                        api_key_query=None,
                        api_key_header=None,
                        access_token_cookie=None,
@@ -36,6 +38,7 @@ class _ResponsibilityPermission(AuthUserDependency):
                        session=None):
         # user: WikiUserHandlerData,
         user: ExternalUserHandlerData | WikiUserHandlerData = await super().__call__(
+            root_api_key_header,
             api_key_query,
             api_key_header,
             access_token_cookie,
@@ -44,7 +47,7 @@ class _ResponsibilityPermission(AuthUserDependency):
         )
 
         if self.authorisation_mode != AuthorizationMode.UNAUTHORIZED:
-            if not isinstance(user, WikiUserHandlerData) or self.responsibility > user.wiki_api_client.responsibility:
+            if not isinstance(user, WikiUserHandlerData) or self.responsibility > ResponsibilityType(user.wiki_api_client.responsibility):
                 raise WikiException(
                     message="You have insufficiently responsibility.",
                     error_code=WikiErrorCode.AUTH_INSUFFICIENTLY_RESPONSIBILITY,
@@ -62,13 +65,15 @@ class BasePermission(_ResponsibilityPermission):
 
     async def __call__(
             self,
+            root_api_key_header: Optional[str] = Security(wiki_root_api_key_header),
             api_key_query: Optional[str] = Security(wiki_api_key_query),
             api_key_header: Optional[str] = Security(wiki_api_key_header),
             access_token_cookie: Optional[str] = Security(wiki_access_token_cookie),
             access_token_bearer: Optional[HTTPAuthorizationCredentials] = Security(wiki_access_token_bearer),
             session: AsyncSession = Depends(get_db)
     ) -> ExternalUserHandlerData | WikiUserHandlerData:
-        return await super().__call__(api_key_query,
+        return await super().__call__(root_api_key_header,
+                                      api_key_query,
                                       api_key_header,
                                       access_token_cookie,
                                       access_token_bearer,

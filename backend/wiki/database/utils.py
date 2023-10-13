@@ -8,7 +8,6 @@ from starlette import status
 from wiki.common.exceptions import WikiException, WikiErrorCode
 
 
-DELETED_USER_DISPLAY_NAME = "Deleted User"
 DELETED_USER_EMAIL_HOST = "example.com"
 DELETED_USER_ID_PREFIX = "deleted_"
 DELETED_USER_FIRST_NAME = "Deleted first name"
@@ -56,7 +55,7 @@ class NotFoundResultMode(IntEnum):
     EXCEPTION = 1
 
 
-def menage_db_not_found_resul_method(
+def menage_db_not_found_result_method(
         mode: NotFoundResultMode = NotFoundResultMode.EXCEPTION,
         ex: Optional[WikiException] = None
 ):

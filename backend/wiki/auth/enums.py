@@ -1,11 +1,11 @@
-from enum import IntEnum, Enum
+from enum import StrEnum
 
 
-class AuthorizationMode(IntEnum):
-    UNAUTHORIZED = 0
-    AUTHORIZED = 10
+class AuthorizationMode(StrEnum):
+    UNAUTHORIZED = "UNAUTHORIZED"
+    AUTHORIZED = "AUTHORIZED"
 
 
-class VerificationType(str, Enum):
+class VerificationType(StrEnum):
     signup = "signup"
     login = "login"

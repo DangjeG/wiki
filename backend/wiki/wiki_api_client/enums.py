@@ -1,7 +1,7 @@
-from enum import IntEnum
+from wiki.common.enums import WikiBaseEnum
 
 
-class ResponsibilityType(IntEnum):
-    VIEWER = 0,
-    EDITOR = 500,
-    ADMIN = 1000
+class ResponsibilityType(WikiBaseEnum):
+    VIEWER = "VIEWER"
+    EDITOR = "EDITOR"
+    ADMIN = "ADMIN"

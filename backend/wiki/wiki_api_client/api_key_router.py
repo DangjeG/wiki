@@ -36,6 +36,8 @@ async def create_wiki_api_key(
     api_key_prefix = api_key[:8]
     api_key_hash = ApiKeyAuthenticatorInterface.get_api_key_hash(api_key)
 
+    api_client = await client_repository.get_wiki_api_client_by_id(user.wiki_api_client.id)
+
     await client_repository.create_wiki_api_key(
         CreateWikiApiKey(
             api_key_hash=api_key_hash,
