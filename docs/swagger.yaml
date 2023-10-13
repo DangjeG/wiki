@@ -53,6 +53,76 @@ components:
       - organization_id
       title: CreateUser
       type: object
+    CreateVerifiedUser:
+      properties:
+        email:
+          format: email
+          title: Email
+          type: string
+        first_name:
+          title: First Name
+          type: string
+        is_enabled:
+          default: true
+          title: Is Enabled
+          type: boolean
+        is_user_agreement_accepted:
+          default: true
+          title: Is User Agreement Accepted
+          type: boolean
+        is_verified_email:
+          default: true
+          title: Is Verified Email
+          type: boolean
+        last_name:
+          title: Last Name
+          type: string
+        organization_id:
+          format: uuid
+          title: Organization Id
+          type: string
+        position:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Position
+        second_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Second Name
+        username:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+        wiki_api_client:
+          $ref: '#/components/schemas/CreateWikiApiClient'
+      required:
+      - email
+      - first_name
+      - last_name
+      - organization_id
+      - wiki_api_client
+      title: CreateVerifiedUser
+      type: object
+    CreateWikiApiClient:
+      properties:
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        is_enabled:
+          default: true
+          title: Is Enabled
+          type: boolean
+        responsibility:
+          allOf:
+          - $ref: '#/components/schemas/ResponsibilityType'
+          default: VIEWER
+      title: CreateWikiApiClient
+      type: object
     FrontendUserLogin:
       properties:
         email:
@@ -124,34 +194,92 @@ components:
       - ADMIN
       title: ResponsibilityType
       type: string
+    UpdateOrganization:
+      properties:
+        access:
+          anyOf:
+          - $ref: '#/components/schemas/OrganizationAccessType'
+          - type: 'null'
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      title: UpdateOrganization
+      type: object
+    UpdateWikiApiClient:
+      properties:
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        is_enabled:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Enabled
+        responsibility:
+          anyOf:
+          - $ref: '#/components/schemas/ResponsibilityType'
+          - type: 'null'
+      title: UpdateWikiApiClient
+      type: object
     UserInfoResponse:
       properties:
         email:
+          format: email
           title: Email
           type: string
         first_name:
           title: First Name
           type: string
+        is_enabled:
+          title: Is Enabled
+          type: boolean
+        is_user_agreement_accepted:
+          title: Is User Agreement Accepted
+          type: boolean
+        is_verified_email:
+          title: Is Verified Email
+          type: boolean
         last_name:
           title: Last Name
           type: string
-        responsibility:
-          $ref: '#/components/schemas/ResponsibilityType'
+        organization:
+          $ref: '#/components/schemas/OrganizationInfoResponse'
+        position:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Position
         second_name:
           anyOf:
           - type: string
           - type: 'null'
           title: Second Name
-        user_name:
+        username:
           anyOf:
           - type: string
           - type: 'null'
-          title: User Name
+          title: Username
+        wiki_api_client:
+          anyOf:
+          - $ref: '#/components/schemas/WikiApiClientInfoResponse'
+          - type: 'null'
       required:
       - email
       - first_name
       - last_name
-      - responsibility
+      - is_user_agreement_accepted
+      - is_verified_email
+      - is_enabled
+      - organization
       title: UserInfoResponse
       type: object
     UserSignResponse:
@@ -185,6 +313,21 @@ components:
           - type: string
           - type: 'null'
           title: First Name
+        is_enabled:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Enabled
+        is_user_agreement_accepted:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is User Agreement Accepted
+        is_verified_email:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Verified Email
         last_name:
           anyOf:
           - type: string
@@ -196,16 +339,16 @@ components:
             type: string
           - type: 'null'
           title: Organization Id
+        position:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Position
         second_name:
           anyOf:
           - type: string
           - type: 'null'
           title: Second Name
-        user_position:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: User Position
         username:
           anyOf:
           - type: string
@@ -247,6 +390,10 @@ components:
           - type: string
           - type: 'null'
           title: Description
+        id:
+          format: uuid
+          title: Id
+          type: string
         is_enabled:
           default: true
           title: Is Enabled
@@ -255,6 +402,8 @@ components:
           allOf:
           - $ref: '#/components/schemas/ResponsibilityType'
           default: VIEWER
+      required:
+      - id
       title: WikiApiClientInfoResponse
       type: object
     WikiApiKeyInfoResponse:
@@ -319,30 +468,12 @@ paths:
           format: uuid
           title: Wiki Api Client Id
           type: string
-      - in: query
-        name: description
-        required: false
-        schema:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Description
-      - in: query
-        name: responsibility
-        required: false
-        schema:
-          anyOf:
-          - $ref: '#/components/schemas/ResponsibilityType'
-          - type: 'null'
-          title: Responsibility
-      - in: query
-        name: is_enabled
-        required: false
-        schema:
-          anyOf:
-          - type: boolean
-          - type: 'null'
-          title: Is Enabled
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWikiApiClient'
+        required: true
       responses:
         '200':
           content:
@@ -571,10 +702,12 @@ paths:
           type: string
       - in: query
         name: description
-        required: true
+        required: false
         schema:
+          anyOf:
+          - type: string
+          - type: 'null'
           title: Description
-          type: string
       - in: query
         name: access
         required: true
@@ -607,36 +740,18 @@ paths:
       operationId: update_organizations_api_v1_organization__put
       parameters:
       - in: query
-        name: id
+        name: organization_id
         required: true
         schema:
           format: uuid
-          title: Id
+          title: Organization Id
           type: string
-      - in: query
-        name: name
-        required: false
-        schema:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Name
-      - in: query
-        name: description
-        required: false
-        schema:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Description
-      - in: query
-        name: access
-        required: false
-        schema:
-          anyOf:
-          - $ref: '#/components/schemas/OrganizationAccessType'
-          - type: 'null'
-          title: Access
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOrganization'
+        required: true
       responses:
         '200':
           content:
@@ -730,13 +845,13 @@ paths:
           - type: 'null'
           title: User Id
       - in: query
-        name: user_name
+        name: username
         required: false
         schema:
           anyOf:
           - type: string
           - type: 'null'
-          title: User Name
+          title: Username
       - in: query
         name: email
         required: false
@@ -781,13 +896,13 @@ paths:
           - type: 'null'
           title: User Id
       - in: query
-        name: user_name
+        name: username
         required: false
         schema:
           anyOf:
           - type: string
           - type: 'null'
-          title: User Name
+          title: Username
       - in: query
         name: email
         required: false
@@ -797,70 +912,18 @@ paths:
             type: string
           - type: 'null'
           title: Email
-      - in: query
-        name: username
-        required: false
-        schema:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Username
-      - in: query
-        name: first_name
-        required: false
-        schema:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: First Name
-      - in: query
-        name: last_name
-        required: false
-        schema:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Last Name
-      - in: query
-        name: second_name
-        required: false
-        schema:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Second Name
-      - in: query
-        name: user_position
-        required: false
-        schema:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: User Position
-      - in: query
-        name: organization_id
-        required: false
-        schema:
-          anyOf:
-          - format: uuid
-            type: string
-          - type: 'null'
-          title: Organization Id
-      - in: query
-        name: wiki_api_client_id
-        required: false
-        schema:
-          anyOf:
-          - format: uuid
-            type: string
-          - type: 'null'
-          title: Wiki Api Client Id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+        required: true
       responses:
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserUpdate'
+                $ref: '#/components/schemas/UserInfoResponse'
           description: Successful Response
         '422':
           content:
@@ -913,13 +976,13 @@ paths:
           - type: 'null'
           title: User Id
       - in: query
-        name: user_name
+        name: username
         required: false
         schema:
           anyOf:
           - type: string
           - type: 'null'
-          title: User Name
+          title: Username
       - in: query
         name: email
         required: false
@@ -968,6 +1031,37 @@ paths:
       - WikiAccessToken: []
       - WikiBearer: []
       summary: Get info about the current user
+      tags:
+      - User
+  /api/v1/user/verified:
+    post:
+      operationId: create_verified_user_api_v1_user_verified_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVerifiedUser'
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Create a verified user (has access to the system)
       tags:
       - User
   /health:

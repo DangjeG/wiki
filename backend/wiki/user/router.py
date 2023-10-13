@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
@@ -5,16 +7,53 @@ from starlette import status
 from wiki.common.exceptions import WikiException, WikiErrorCode
 from wiki.common.schemas import BaseResponse, WikiUserHandlerData
 from wiki.database.deps import get_db
+from wiki.organization.models import Organization
+from wiki.organization.repository import OrganizationRepository
+from wiki.organization.schemas import OrganizationInfoResponse
 from wiki.permissions.base import BasePermission
 from wiki.user.models import User
 from wiki.user.repository import UserRepository
-from wiki.user.schemas import UserInfoResponse, UserIdentifiers, UserUpdate
+from wiki.user.schemas import UserInfoResponse, UserIdentifiers, UserUpdate, CreateVerifiedUser, CreateUser
 from wiki.wiki_api_client.enums import ResponsibilityType
 from wiki.wiki_api_client.models import WikiApiClient
 from wiki.wiki_api_client.repository import WikiApiClientRepository
-
+from wiki.wiki_api_client.schemas import WikiApiClientInfoResponse, CreateWikiApiClient
 
 user_router = APIRouter()
+
+
+@user_router.post(
+    "/verified",
+    response_model=UserInfoResponse,
+    status_code=status.HTTP_202_ACCEPTED,
+    summary="Create a verified user (has access to the system)"
+)
+async def create_verified_user(
+        create_user: CreateVerifiedUser,
+        user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.ADMIN)),
+        session: AsyncSession = Depends(get_db)
+):
+    user_repository: UserRepository = UserRepository(session)
+    api_client_repository: WikiApiClientRepository = WikiApiClientRepository(session)
+    user_db = await user_repository.create_user(CreateUser(
+        email=create_user.email,
+        username=create_user.username,
+        first_name=create_user.first_name,
+        last_name=create_user.last_name,
+        second_name=create_user.second_name,
+        position=create_user.position,
+        is_user_agreement_accepted=create_user.is_user_agreement_accepted,
+        organization_id=create_user.organization_id))
+    api_client_db: WikiApiClient = await api_client_repository.create_wiki_api_client(CreateWikiApiClient(
+        description=create_user.wiki_api_client.description,
+        responsibility=create_user.wiki_api_client.responsibility,
+        is_enabled=create_user.wiki_api_client.is_enabled
+    ))
+    updated_user: user = await user_repository.update_user(user_db.id,
+                                                           is_verified_email=create_user.is_verified_email,
+                                                           is_enabled=create_user.is_enabled,
+                                                           wiki_api_client_id=api_client_db.id)
+    return _get_user_info(updated_user, session)
 
 
 @user_router.get(
@@ -25,13 +64,48 @@ user_router = APIRouter()
 )
 async def get_me(
         user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER)),
+        session: AsyncSession = Depends(get_db)
 ):
+    user_repository: UserRepository = UserRepository(session)
+    user_db: User = await user_repository.get_user_by_id(user.id)
+    return await _get_user_info(user_db, session)
+
+
+async def _get_user_info(user: User, session: AsyncSession) -> UserInfoResponse:
+    wiki_api_client_response: Optional[WikiApiClientRepository] = None
+    if user.wiki_api_client_id is not None:
+        wiki_api_client_repository: WikiApiClientRepository = WikiApiClientRepository(session)
+        wiki_api_client: WikiApiClient = await wiki_api_client_repository.get_wiki_api_client_by_id(user.wiki_api_client_id)
+        wiki_api_client_response = WikiApiClientInfoResponse(
+            id=wiki_api_client.id,
+            description=wiki_api_client.description,
+            responsibility=wiki_api_client.responsibility,
+            is_enabled=wiki_api_client.is_enabled
+        )
+
+    organization_response: Optional[OrganizationInfoResponse] = None
+    if user.organization_id is not None:
+        organization_repository: OrganizationRepository = OrganizationRepository(session)
+        organization: Organization = await organization_repository.get_organization_by_id(user.organization_id)
+        organization_response = OrganizationInfoResponse(
+            id=organization.id,
+            name=organization.name,
+            description=organization.description,
+            access=organization.access
+        )
+
     return UserInfoResponse(
-        user_name=user.username,
         email=user.email,
-        last_name=user.last_name,
+        user_name=user.username,
         first_name=user.first_name,
-        responsibility=user.wiki_api_client.responsibility
+        last_name=user.last_name,
+        second_name=user.second_name,
+        position=user.position,
+        is_user_agreement_accepted=user.is_user_agreement_accepted,
+        is_verified_email=user.is_verified_email,
+        is_enabled=user.is_enabled,
+        organization=organization_response,
+        wiki_api_client=wiki_api_client_response
     )
 
 
@@ -46,13 +120,12 @@ async def get_user(
         session: AsyncSession = Depends(get_db),
         user_get: UserIdentifiers = Depends()
 ):
-    wiki_api_client_repository: WikiApiClientRepository = WikiApiClientRepository(session)
     user_repository: UserRepository = UserRepository(session)
 
     if user_get.user_id is not None:
         user_db = await user_repository.get_user_by_id(user_get.user_id)
-    elif user_get.user_name is not None:
-        user_db = await user_repository.get_user_by_username(user_get.user_name)
+    elif user_get.username is not None:
+        user_db = await user_repository.get_user_by_username(user_get.username)
     elif user_get.email is not None:
         user_db = await user_repository.get_user_by_email(str(user_get.email))
     else:
@@ -62,15 +135,7 @@ async def get_user(
             http_status_code=status.HTTP_404_NOT_FOUND
         )
 
-    wiki_api_client_by_id = await wiki_api_client_repository.get_wiki_api_client_by_id(user_db.wiki_api_client_id)
-
-    return UserInfoResponse(
-        user_name=user_db.username,
-        email=user_db.email,
-        last_name=user_db.last_name,
-        first_name=user_db.first_name,
-        responsibility=wiki_api_client_by_id.responsibility
-    )
+    return await _get_user_info(user_db, session)
 
 
 @user_router.get(
@@ -83,27 +148,13 @@ async def get_users(
         user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.ADMIN)),
         session: AsyncSession = Depends(get_db)
 ):
-    client_repository: WikiApiClientRepository = WikiApiClientRepository(session)
     user_repository: UserRepository = UserRepository(session)
-
     users: list[User] = await user_repository.get_all_users()
 
-    client_users: list[WikiApiClient] = await client_repository.get_all_wiki_api_clients()
-
     result_users: list[UserInfoResponse] = []
-
     for us in users:
-        for client in client_users:
-            if client.id == us.wiki_api_client_id:
-                append_user = UserInfoResponse(
-                    user_name=us.username,
-                    email=us.email,
-                    first_name=us.first_name,
-                    last_name=us.last_name,
-                    second_name=us.second_name,
-                    responsibility=client.responsibility)
-                result_users.append(append_user)
-                break
+        append_user = await _get_user_info(us, session)
+        result_users.append(append_user)
 
     return result_users
 
@@ -123,8 +174,8 @@ async def delete_user(
 
     if user_identifiers.user_id is not None:
         user_db = await user_repository.get_user_by_id(user_identifiers.user_id)
-    elif user_identifiers.user_name is not None:
-        user_db = await user_repository.get_user_by_username(user_identifiers.user_name)
+    elif user_identifiers.username is not None:
+        user_db = await user_repository.get_user_by_username(user_identifiers.username)
     elif user_identifiers.email is not None:
         user_db = await user_repository.get_user_by_email(user_identifiers.email)
     else:
@@ -144,20 +195,20 @@ async def delete_user(
 
 @user_router.put(
     "/",
-    response_model=UserUpdate,
+    response_model=UserInfoResponse,
     status_code=status.HTTP_200_OK,
     summary="Update user"
 )
-async def update_user(user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.ADMIN)),
+async def update_user(user_update: UserUpdate,
+                      user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.ADMIN)),
                       session: AsyncSession = Depends(get_db),
-                      user_identifiers: UserIdentifiers = Depends(),
-                      user_update: UserUpdate = Depends()):
+                      user_identifiers: UserIdentifiers = Depends()):
     user_repository: UserRepository = UserRepository(session)
 
     if user_identifiers.user_id is not None:
         user = await user_repository.get_user_by_id(user_identifiers.user_id)
-    elif user_identifiers.user_name is not None:
-        user = await user_repository.get_user_by_username(user_identifiers.user_name)
+    elif user_identifiers.username is not None:
+        user = await user_repository.get_user_by_username(user_identifiers.username)
     elif user_identifiers.email is not None:
         user = await user_repository.get_user_by_email(user_identifiers.email)
     else:
@@ -167,16 +218,19 @@ async def update_user(user: WikiUserHandlerData = Depends(BasePermission(respons
             http_status_code=status.HTTP_404_NOT_FOUND
         )
 
-    updated_user = await user_repository.update_user(
+    updated_user: User = await user_repository.update_user(
         user.id,
         email=user_update.email,
         username=user_update.username,
         first_name=user_update.first_name,
         last_name=user_update.last_name,
         second_name=user_update.second_name,
-        position=user_update.user_position,
+        position=user_update.position,
         organization_id=user_update.organization_id,
+        is_enabled=user_update.is_enabled,
+        is_user_agreement_accepted=user_update.is_user_agreement_accepted,
+        is_verified_email=user_update.is_verified_email,
         wiki_api_client_id=user_update.wiki_api_client_id
     )
 
-    return updated_user
+    return await _get_user_info(updated_user, session)

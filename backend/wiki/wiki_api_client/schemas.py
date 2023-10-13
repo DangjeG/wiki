@@ -13,6 +13,7 @@ class CreateWikiApiClient(WikiBase):
 
 
 class WikiApiClientInfoResponse(WikiBase):
+    id: UUID
     description: Optional[str] = None
     responsibility: ResponsibilityType = ResponsibilityType.VIEWER
     is_enabled: bool = True

@@ -102,6 +102,7 @@ class UserRepository(BaseRepository):
                           second_name: Optional[str] = None,
                           position: Optional[str] = None,
                           organization_id: Optional[UUID] = None,
+                          is_enabled: Optional[bool] = None,
                           is_user_agreement_accepted: Optional[bool] = None,
                           is_verified_email: Optional[bool] = None,
                           wiki_api_client_id: Optional[str] = None) -> User:
@@ -120,6 +121,8 @@ class UserRepository(BaseRepository):
             user.position = position
         if organization_id is not None:
             user.organization_id = organization_id
+        if is_enabled is not None:
+            user.is_enabled = is_enabled
         if is_user_agreement_accepted is not None:
             user.is_user_agreement_accepted = is_user_agreement_accepted
         if is_verified_email is not None:

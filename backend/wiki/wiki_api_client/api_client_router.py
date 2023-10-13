@@ -23,8 +23,8 @@ wiki_api_client_router = APIRouter()
 )
 async def update_wiki_api_client(
         wiki_api_client_id: UUID,
+        upd_wiki_api_client: UpdateWikiApiClient,
         user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.ADMIN)),
-        upd_wiki_api_client: UpdateWikiApiClient = Depends(),
         session: AsyncSession = Depends(get_db)
 ):
     client_repository: WikiApiClientRepository = WikiApiClientRepository(session)
@@ -40,6 +40,7 @@ async def update_wiki_api_client(
         await client_repository.get_wiki_api_client_by_id(wiki_api_client_id)
 
     return WikiApiClientInfoResponse(
+        id=wiki_api_client_info_response.id,
         description=wiki_api_client_info_response.description,
         responsibility=wiki_api_client_info_response.responsibility,
         is_enabled=wiki_api_client_info_response.is_enabled

@@ -7,7 +7,7 @@ from wiki.organization.enums import OrganizationAccessType
 
 class CreateOrganization(WikiBase):
     name: str
-    description: str
+    description: Optional[str] = None
     access: OrganizationAccessType
 
 
@@ -19,7 +19,6 @@ class OrganizationInfoResponse(WikiBase):
 
 
 class UpdateOrganization(WikiBase):
-    id: UUID
     name: Optional[str] = None
     description: Optional[str] = None
     access: Optional[OrganizationAccessType] = None

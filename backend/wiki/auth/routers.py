@@ -98,7 +98,7 @@ async def signup(request: Request,
         first_name=user_signup.first_name,
         last_name=user_signup.last_name,
         second_name=user_signup.second_name,
-        user_position=user_signup.user_position,
+        position=user_signup.position,
         organization_id=user_signup.organization_id
     ))
 

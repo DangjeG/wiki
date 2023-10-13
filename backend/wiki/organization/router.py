@@ -110,15 +110,14 @@ async def get_organizations(
     description="Update organization."
 )
 async def update_organizations(
+        organization_id: UUID,
+        update_org: UpdateOrganization,
         user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.ADMIN)),
-        session: AsyncSession = Depends(get_db),
-        update_org: UpdateOrganization = Depends()):
+        session: AsyncSession = Depends(get_db)):
     organization_repository: OrganizationRepository = OrganizationRepository(session)
 
-    organization = await organization_repository.get_organization_by_id(update_org.id)
-
     updated_organization: Organization = await organization_repository.update_organization(
-        organization_id=organization.id,
+        organization_id=organization_id,
         name=update_org.name,
         description=update_org.description,
         access=update_org.access

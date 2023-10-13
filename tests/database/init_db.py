@@ -71,7 +71,7 @@ async def _gen_random_user(permission_domain_repo: PermissionDomainRepository,
         first_name="gen first name",
         last_name="gen last name",
         second_name="gen second name",
-        user_position="gen position",
+        position="gen position",
         is_user_agreement_accepted=True,
         organization_id=random.choice(organizations).id
     ))
@@ -141,6 +141,6 @@ async def init_test_db():
 
 
 if __name__ == "__main__":
-    print(f"Start generation -{utcnow()}")
+    print(f"Start generation - {utcnow()}")
     asyncio.run(init_test_db())
     print(f"Generation complete!")
