@@ -18,15 +18,21 @@ from wiki.permissions.domain.schemas import CreatePermissionDomain
 
 
 class PermissionDomainRepository(BaseRepository):
-    _permission_domain_not_found_exception = WikiException(
+    permission_domain_not_found_exception = WikiException(
         message="Permission domain not found.",
         error_code=WikiErrorCode.PERMISSION_DOMAIN_NOT_FOUND,
         http_status_code=status.HTTP_404_NOT_FOUND
     )
 
-    @menage_db_not_found_result_method(NotFoundResultMode.EXCEPTION, ex=_permission_domain_not_found_exception)
+    @menage_db_not_found_result_method(NotFoundResultMode.EXCEPTION, ex=permission_domain_not_found_exception)
     async def get_permission_domain_by_id(self, user_id: UUID) -> PermissionDomain:
         domain_query = await self.session.get(PermissionDomain, user_id)
+        return domain_query
+
+    @menage_db_not_found_result_method(NotFoundResultMode.NONE)
+    async def get_permission_domain_by_domain_name(self, domain: str) -> Optional[PermissionDomain]:
+        st = select(PermissionDomain).where(PermissionDomain.domain == domain.lower())
+        domain_query = (await self.session.execute(st)).scalar()
         return domain_query
 
     async def get_all_permission_domains(self) -> list[PermissionDomain]:
@@ -35,7 +41,7 @@ class PermissionDomainRepository(BaseRepository):
         return res
 
     async def get_domain_permission_mode(self, domain: str) -> DomainPermissionMode:
-        st = select(PermissionDomain).where(PermissionDomain.domain == domain)
+        st = select(PermissionDomain).where(PermissionDomain.domain == domain.lower())
         domain_query: PermissionDomain = (await self.session.execute(st)).scalar()
         if domain_query is not None:
             return DomainPermissionMode(domain_query.mode)
@@ -45,7 +51,7 @@ class PermissionDomainRepository(BaseRepository):
     @menage_db_commit_method(CommitMode.FLUSH)
     async def create_permission_domain(self, create_domain: CreatePermissionDomain):
         new_domain = PermissionDomain(
-            domain=create_domain.domain,
+            domain=create_domain.domain.lower(),
             mode=str(create_domain.mode)
         )
 
@@ -58,12 +64,12 @@ class PermissionDomainRepository(BaseRepository):
                                        domain_id: UUID,
                                        *,
                                        domain: Optional[str] = None,
-                                       domain_status: Optional[DomainPermissionMode] = None) -> PermissionDomain:
+                                       domain_mode: Optional[DomainPermissionMode] = None) -> PermissionDomain:
         permission_domain: PermissionDomain = await self.get_permission_domain_by_id(domain_id)
         if domain is not None:
-            permission_domain.domain = domain
-        if domain_status is not None:
-            permission_domain.mode = str(domain_status)
+            permission_domain.domain = domain.lower()
+        if domain_mode is not None:
+            permission_domain.mode = str(domain_mode)
 
         self.session.add(permission_domain)
 

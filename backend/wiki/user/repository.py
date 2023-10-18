@@ -69,20 +69,23 @@ class UserRepository(BaseRepository):
         user_query = (await self.session.execute(st)).scalar()
         return user_query
 
-    async def get_all_users(self) -> list[User]:
-        users_query = await self.session.execute(select(User))
+    async def get_all_users(self, is_only_existing: bool = True) -> list[User]:
+        st = select(User)
+        if is_only_existing:
+            st = st.where(User.is_deleted == False)
+        users_query = await self.session.execute(st)
         res = users_query.scalars().all()
         return res
 
     @menage_db_commit_method(CommitMode.FLUSH)
     async def create_user(self, create_user: CreateUser) -> User:
         new_user = User(
-            email=create_user.email,
+            email=create_user.email.lower(),
             username=create_user.username,
             first_name=create_user.first_name,
             last_name=create_user.last_name,
             second_name=create_user.second_name,
-            position=create_user.user_position,
+            position=create_user.position,
             is_user_agreement_accepted=create_user.is_user_agreement_accepted,
             organization_id=create_user.organization_id
         )

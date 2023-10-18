@@ -59,6 +59,7 @@ class WikiErrorCode(IntEnum):
 
     # 5001-6000: permission errors
     PERMISSION_DOMAIN_NOT_FOUND = 5001
+    PERMISSION_DOMAIN_NOT_SPECIFIED = 5001
 
 
 class WikiException(Exception):

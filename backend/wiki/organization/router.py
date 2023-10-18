@@ -51,19 +51,12 @@ async def get_organization(
     status_code=status.HTTP_202_ACCEPTED,
     description="Create organization."
 )
-async def create_organization(user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.ADMIN)),
-                              organization: CreateOrganization = Depends(),
+async def create_organization(new_organization: CreateOrganization,
+                              user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.ADMIN)),
                               session: AsyncSession = Depends(get_db)):
     organization_repository: OrganizationRepository = OrganizationRepository(session)
 
-    organization = await organization_repository.create_organization(
-        CreateOrganization(
-            id=organization.id,
-            name=organization.name,
-            description=organization.description,
-            access=organization.access
-        )
-    )
+    organization = await organization_repository.create_organization(new_organization)
 
     return OrganizationInfoResponse(
         id=organization.id,
