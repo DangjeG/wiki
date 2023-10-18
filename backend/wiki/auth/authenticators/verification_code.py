@@ -62,7 +62,7 @@ class VerificationCodeAuthenticatorInterface(BaseTokenAuthenticatorInterface):
                                  algorithm=settings.AUTH_ALGORITHM)
         return encoded_jwt
 
-    async def validate(self, credentials) -> WikiUserHandlerData | str:
+    async def validate(self, credentials, is_available_disapproved_user: bool) -> WikiUserHandlerData | str:
         email, appointment = await self.verify_verification_token(credentials, self.verification_code)
 
         appointment: VerificationType
@@ -71,8 +71,13 @@ class VerificationCodeAuthenticatorInterface(BaseTokenAuthenticatorInterface):
                 return email
             case VerificationType.login:
                 user = await self.user_repository.get_user_by_email(email)
-                api_client = await self.verify_api_client(user.wiki_api_client_id)
-                user, organization = await self.verify_user(api_client)
+                api_client = None
+                # if not is_available_disapproved_user:
+                if user.wiki_api_client_id is not None:
+                    api_client = await self.verify_api_client(user.wiki_api_client_id)
+                    user, organization = await self.verify_user(api_client=api_client)
+                else:
+                    user, organization = await self.verify_user(user_email=email)
                 if not user.is_verified_email:
                     user = await self.user_repository.update_user(user.id, is_verified_email=True)
 

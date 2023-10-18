@@ -50,4 +50,4 @@ class WikiUserHandlerData(ExternalUserHandlerData):
     second_name: Optional[str] = None
     position: Optional[str] = None
     organization: Optional[Organization] = None
-    wiki_api_client: WikiApiClient | FakeWikiApiClient
+    wiki_api_client: Optional[WikiApiClient | FakeWikiApiClient]

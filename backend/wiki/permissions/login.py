@@ -16,7 +16,7 @@ from wiki.wiki_api_client.repository import WikiApiClientRepository
 class LoginPermission(ABC):
     async def __call__(self, user_in: FrontendUserLogin, session: AsyncSession = Depends(get_db)):
         user_repository = UserRepository(session)
-        api_client_repository = WikiApiClientRepository(session)
+        # api_client_repository = WikiApiClientRepository(session)
 
         if user_in.email is not None:
             user: User = await user_repository.get_user_by_email(user_in.email)
@@ -29,14 +29,15 @@ class LoginPermission(ABC):
                 http_status_code=status.HTTP_401_UNAUTHORIZED
             )
 
-        api_client_id = user.wiki_api_client_id
-        if api_client_id is not None:
-            api_client: WikiApiClient = await api_client_repository.get_wiki_api_client_by_id(api_client_id)
-            if not api_client.is_deleted and api_client.is_enabled:
-                return True
-
-        raise WikiException(
-            message="You do not have access or have not been approved.",
-            error_code=WikiErrorCode.AUTH_NOT_ACCESS,
-            http_status_code=status.HTTP_403_FORBIDDEN
-        )
+        return True
+        # api_client_id = user.wiki_api_client_id
+        # if api_client_id is not None:
+        #     api_client: WikiApiClient = await api_client_repository.get_wiki_api_client_by_id(api_client_id)
+        #     if not api_client.is_deleted and api_client.is_enabled:
+        #         return True
+        #
+        # raise WikiException(
+        #     message="You do not have access or have not been approved.",
+        #     error_code=WikiErrorCode.AUTH_NOT_ACCESS,
+        #     http_status_code=status.HTTP_403_FORBIDDEN
+        # )

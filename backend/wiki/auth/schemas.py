@@ -17,7 +17,7 @@ class BaseTokenData(WikiBase):
 
 
 class AccessTokenData(BaseTokenData):
-    api_client_id: str
+    api_client_id: Optional[str]
 
 
 class VerifyTokenData(BaseTokenData):

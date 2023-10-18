@@ -35,6 +35,8 @@ async def create_verified_user(
 ):
     user_repository: UserRepository = UserRepository(session)
     api_client_repository: WikiApiClientRepository = WikiApiClientRepository(session)
+    organization_repository: OrganizationRepository = OrganizationRepository(session)
+    organization = await organization_repository.get_organization_by_id(create_user.organization_id)
     user_db = await user_repository.create_user(CreateUser(
         email=create_user.email,
         username=create_user.username,
@@ -53,7 +55,7 @@ async def create_verified_user(
                                                            is_verified_email=create_user.is_verified_email,
                                                            is_enabled=create_user.is_enabled,
                                                            wiki_api_client_id=api_client_db.id)
-    return _get_user_info(updated_user, session)
+    return await _get_user_info(updated_user, session)
 
 
 @user_router.get(
@@ -63,7 +65,8 @@ async def create_verified_user(
     summary="Get info about the current user",
 )
 async def get_me(
-        user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER)),
+        user: WikiUserHandlerData = Depends(BasePermission(is_available_disapproved_user=True,
+                                                           responsibility=ResponsibilityType.VIEWER)),
         session: AsyncSession = Depends(get_db)
 ):
     user_repository: UserRepository = UserRepository(session)
@@ -96,7 +99,7 @@ async def _get_user_info(user: User, session: AsyncSession) -> UserInfoResponse:
 
     return UserInfoResponse(
         email=user.email,
-        user_name=user.username,
+        username=user.username,
         first_name=user.first_name,
         last_name=user.last_name,
         second_name=user.second_name,

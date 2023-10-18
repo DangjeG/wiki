@@ -25,8 +25,9 @@ class _ResponsibilityPermission(AuthUserDependency):
 
     def __init__(self,
                  authorisation_mode: AuthorizationMode = AuthorizationMode.AUTHORIZED,
+                 is_available_disapproved_user: bool = False,
                  responsibility: ResponsibilityType = ResponsibilityType.ADMIN):
-        super().__init__(authorisation_mode)
+        super().__init__(authorisation_mode, is_available_disapproved_user)
         self.responsibility = responsibility
 
     async def __call__(self,
@@ -46,7 +47,7 @@ class _ResponsibilityPermission(AuthUserDependency):
             session
         )
 
-        if self.authorisation_mode != AuthorizationMode.UNAUTHORIZED:
+        if self.authorisation_mode != AuthorizationMode.UNAUTHORIZED and not self.is_available_disapproved_user:
             if not isinstance(user, WikiUserHandlerData) or self.responsibility > ResponsibilityType(user.wiki_api_client.responsibility):
                 raise WikiException(
                     message="You have insufficiently responsibility.",
