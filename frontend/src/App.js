@@ -15,16 +15,18 @@ import Admin from "./Pages/Admin";
 export default function App() {
 
         return (
-        <BrowserRouter>
-            <AppNavbar isLogin ={api.isLogin()}/>
-            <Routes>
-                <Route path={"/"} element={<Home/>}/>
-                <Route path={"/login"} element={<Login/>}/>
-                <Route path={"/verify"} element={<Verify/>}/>
-                <Route path={"/signup"} element={<SignUp/>}/>
-                <Route path={"/logout"} element={<Logout/>}/>
-                <Route path={"/admin"} element={<Admin/>}/>
-            </Routes>
-        </BrowserRouter>
+            <>
+                <BrowserRouter>
+                    <AppNavbar isLogin ={api.isLogin()}/>
+                    <Routes>
+                        <Route path={"/"} element={<Home/>}/>
+                        <Route path={"/login"} element={<Login/>}/>
+                        <Route path={"/verify"} element={<Verify/>}/>
+                        <Route path={"/signup"} element={<SignUp/>}/>
+                        <Route path={"/logout"} element={<Logout/>}/>
+                        <Route path={"/admin"} element={<Admin/>}/>
+                    </Routes>
+                </BrowserRouter>
+            </>
     );
 }

@@ -1,8 +1,27 @@
 import {Nav, Navbar, Dropdown, Button} from "react-bootstrap";
+import {useEffect, useState} from "react";
+import {api} from "../app.config";
+import {User} from "../Models/User";
 
 
 export default function AppNavbar(props){
+
+    const [user, setUser] = useState(new User())
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await api.getMe();
+                setUser(response);
+            } catch (error) {
+                console.log(error)
+            }
+        };
+        fetchData();
+    }, []);
+
     function getRightPanel(){
+
         if (!props.isLogin){
             return(
                 <Nav>
@@ -16,11 +35,11 @@ export default function AppNavbar(props){
                 <Nav>
                     <Dropdown>
                         <Dropdown.Toggle variant="dark" id="dropdown-basic">
-                            Username
+                            {user.username}
                         </Dropdown.Toggle>
                         <Dropdown.Menu variant="dark" >
                             <Dropdown.Item href="/profile">Profile</Dropdown.Item>
-                            <Dropdown.Item href="/admin">Admin tools</Dropdown.Item>
+                            {addAdmin()}
                             <Dropdown.Divider/>
                             <Dropdown.Item href="/logout">Logout</Dropdown.Item>
                         </Dropdown.Menu>
@@ -30,10 +49,13 @@ export default function AppNavbar(props){
         }
     }
 
+    function addAdmin(){
+        if (user.responsibility === "ADMIN") return(<Dropdown.Item href="/admin">Admin Tools</Dropdown.Item>)
+    }
 
     return (
         <>
-            <Navbar collapseOnSelect expand="lg" style={{"padding-right": "50px", "padding-left": "50px"}} bg="dark" variant="dark">
+            <Navbar collapseOnSelect expand="lg" style={{"paddingRight": "50px", "paddingLeft": "50px"}} bg="dark" variant="dark">
                 <Navbar.Brand href="/">Home</Navbar.Brand>
 
                 <Navbar.Collapse id="responsetive-navbar-nav">

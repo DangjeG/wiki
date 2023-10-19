@@ -1,6 +1,12 @@
 
 
 export class User{
+    email;
+    username;
+    first_name;
+    last_name;
+    second_name;
+    responsibility;
     constructor(email, username, first_name, last_name, second_name, responsibility) {
         this.email = email;
         this.username = username;
