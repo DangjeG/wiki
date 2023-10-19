@@ -1,6 +1,7 @@
 import time
 from datetime import timedelta
 from enum import Enum
+from typing import Optional
 from uuid import UUID
 
 from jose import jwt, JWTError
@@ -27,6 +28,12 @@ class AuthenticatorType(str, Enum):
 
 
 class AuthenticatorInterface:
+    _credentials_not_valid_or_expired_exception = WikiException(
+        message="User credentials is not valid or expired.",
+        error_code=WikiErrorCode.AUTH_USER_NOT_FOUND,
+        http_status_code=status.HTTP_403_FORBIDDEN
+    )
+
     authenticator_type: AuthenticatorType
 
     session: AsyncSession
@@ -51,14 +58,17 @@ class AuthenticatorInterface:
 
         return wiki_api_client
 
-    async def verify_user(self, api_client: WikiApiClient) -> User:
-        user: User = await self.user_repository.get_user_by_wiki_api_client_id(api_client.id)
+    async def verify_user(self,
+                          api_client: Optional[WikiApiClient] = None,
+                          user_email: Optional[str] = None) -> User:
+        if api_client is not None:
+            user: User = await self.user_repository.get_user_by_wiki_api_client_id(api_client.id)
+        elif user_email is not None:
+            user: User = await self.user_repository.get_user_by_email(user_email)
+        else:
+            raise self._credentials_not_valid_or_expired_exception
         if user.is_deleted:
-            raise WikiException(
-                message="User credentials is not valid or expired.",
-                error_code=WikiErrorCode.AUTH_USER_NOT_FOUND,
-                http_status_code=status.HTTP_403_FORBIDDEN
-            )
+            raise self._credentials_not_valid_or_expired_exception
         organization = None
         if user.organization_id is not None:
             organization: Organization = await self.organization_repository.get_organization_by_id(user.organization_id)
@@ -78,7 +88,7 @@ class AuthenticatorInterface:
 
         return user, organization
 
-    async def validate(self, credentials) -> WikiUserHandlerData:
+    async def validate(self, credentials, is_available_disapproved_user: bool) -> WikiUserHandlerData:
         pass
 
 

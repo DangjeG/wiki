@@ -131,11 +131,11 @@ async def verify(response: Response,
     Endpoint for confirming the code received by mail, issuing access token to perform authorized actions.
     """
     authenticator = VerificationCodeAuthenticatorInterface(session, verification_code=data.verification_code)
-    data = await authenticator.validate(data.token)
+    data = await authenticator.validate(data.token, True)
     if isinstance(data, WikiUserHandlerData):
         token = WikiTokenAuthenticatorInterface.create_access_token(AccessTokenData(
             email=data.email,
-            api_client_id=str(data.wiki_api_client.id)
+            api_client_id=str(data.wiki_api_client.id) if data.wiki_api_client is not None else None
         ))
 
         # response.set_cookie(settings.AUTH_ACCESS_TOKEN_COOKIE_NAME,
@@ -150,8 +150,13 @@ async def verify(response: Response,
 
         return BaseResponse(msg=token)
     else:
+        token = WikiTokenAuthenticatorInterface.create_access_token(AccessTokenData(
+            email=data,
+            api_client_id=None
+        ))
+
         email = data
         user_repository: UserRepository = UserRepository(session)
         user: User = await user_repository.get_user_by_email(email)
         user = await user_repository.update_user(user.id, is_verified_email=True)
-        return BaseResponse(msg="Successful email verification.")
+        return BaseResponse(msg=token)

@@ -41,7 +41,7 @@ class ApiKeyAuthenticatorInterface(AuthenticatorInterface):
 
         return wiki_api_key.owner_id
 
-    async def validate(self, credentials) -> WikiUserHandlerData:
+    async def validate(self, credentials, is_available_disapproved_user: bool) -> WikiUserHandlerData:
         api_client_id = await self.verify_api_key(credentials)
         api_client = await self.verify_api_client(api_client_id)
         user, organization = await self.verify_user(api_client)

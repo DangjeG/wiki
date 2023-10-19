@@ -39,9 +39,13 @@ wiki_access_token_bearer = HTTPBearer(scheme_name="WikiBearer", auto_error=False
 
 class AuthUserDependency:
     authorisation_mode: AuthorizationMode
+    is_available_disapproved_user: bool
 
-    def __init__(self, authorisation_mode: AuthorizationMode = AuthorizationMode.AUTHORIZED):
+    def __init__(self,
+                 authorisation_mode: AuthorizationMode = AuthorizationMode.AUTHORIZED,
+                 is_available_disapproved_user: bool = False):
         self.authorisation_mode = authorisation_mode
+        self.is_available_disapproved_user = is_available_disapproved_user
 
     async def __call__(
             self,
@@ -57,12 +61,22 @@ class AuthUserDependency:
                 return get_fake_admin_user_handler_data()
         if self.authorisation_mode == AuthorizationMode.UNAUTHORIZED:
             try:
-                user = await self._get_user(api_key_query, api_key_header, access_token_cookie, access_token_bearer, session)
+                user = await self._get_user(api_key_query,
+                                            api_key_header,
+                                            access_token_cookie,
+                                            access_token_bearer,
+                                            session,
+                                            self.is_available_disapproved_user)
                 return user or ExternalUserHandlerData()
             except WikiException:
                 return ExternalUserHandlerData()
         else:
-            user = await self._get_user(api_key_query, api_key_header, access_token_cookie, access_token_bearer, session)
+            user = await self._get_user(api_key_query,
+                                        api_key_header,
+                                        access_token_cookie,
+                                        access_token_bearer,
+                                        session,
+                                        self.is_available_disapproved_user)
             if user is not None:
                 return user
             else:
@@ -71,10 +85,17 @@ class AuthUserDependency:
                                     http_status_code=status.HTTP_401_UNAUTHORIZED)
 
     @classmethod
-    async def _get_user(cls, api_key_query, api_key_header, access_token_cookie, access_token_bearer, session):
+    async def _get_user(cls,
+                        api_key_query,
+                        api_key_header,
+                        access_token_cookie,
+                        access_token_bearer,
+                        session,
+                        is_available_disapproved_user):
         if api_key_query is not None or api_key_header is not None:
             authenticator = ApiKeyAuthenticatorInterface(session)
-            return await authenticator.validate(api_key_query or api_key_header)
+            return await authenticator.validate(api_key_query or api_key_header,
+                                                is_available_disapproved_user)
         if access_token_cookie is not None or access_token_bearer is not None:
             if access_token_bearer is not None:
                 if not access_token_bearer.scheme == "Bearer":
@@ -84,4 +105,5 @@ class AuthUserDependency:
                         http_status_code=status.HTTP_403_FORBIDDEN
                     )
             authenticator = WikiTokenAuthenticatorInterface(session)
-            return await authenticator.validate(access_token_cookie or access_token_bearer.credentials)
+            return await authenticator.validate(access_token_cookie or access_token_bearer.credentials,
+                                                is_available_disapproved_user)

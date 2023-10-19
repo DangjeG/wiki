@@ -1,5 +1,23 @@
 components:
   schemas:
+    ApproveUser:
+      properties:
+        api_client_description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Api Client Description
+        responsibility:
+          $ref: '#/components/schemas/ResponsibilityType'
+        user_id:
+          format: uuid
+          title: User Id
+          type: string
+      required:
+      - user_id
+      - responsibility
+      title: ApproveUser
+      type: object
     BaseResponse:
       properties:
         msg:
@@ -11,6 +29,35 @@ components:
           title: Status
           type: string
       title: BaseResponse
+      type: object
+    CreateOrganization:
+      properties:
+        access:
+          $ref: '#/components/schemas/OrganizationAccessType'
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        name:
+          title: Name
+          type: string
+      required:
+      - name
+      - access
+      title: CreateOrganization
+      type: object
+    CreatePermissionDomain:
+      properties:
+        domain:
+          title: Domain
+          type: string
+        mode:
+          $ref: '#/components/schemas/DomainPermissionMode'
+      required:
+      - domain
+      - mode
+      title: CreatePermissionDomain
       type: object
     CreateUser:
       properties:
@@ -32,16 +79,16 @@ components:
           format: uuid
           title: Organization Id
           type: string
+        position:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Position
         second_name:
           anyOf:
           - type: string
           - type: 'null'
           title: Second Name
-        user_position:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: User Position
         username:
           title: Username
           type: string
@@ -123,6 +170,12 @@ components:
           default: VIEWER
       title: CreateWikiApiClient
       type: object
+    DomainPermissionMode:
+      enum:
+      - REFUSE
+      - ACCEPT
+      title: DomainPermissionMode
+      type: string
     FrontendUserLogin:
       properties:
         email:
@@ -187,6 +240,32 @@ components:
       - access
       title: OrganizationInfoResponse
       type: object
+    PermissionDomainInfoResponse:
+      properties:
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        domain:
+          title: Domain
+          type: string
+        id:
+          format: uuid
+          title: Id
+          type: string
+        is_enabled:
+          title: Is Enabled
+          type: boolean
+        mode:
+          $ref: '#/components/schemas/DomainPermissionMode'
+      required:
+      - id
+      - domain
+      - mode
+      - is_enabled
+      - created_at
+      title: PermissionDomainInfoResponse
+      type: object
     ResponsibilityType:
       enum:
       - VIEWER
@@ -211,6 +290,19 @@ components:
           - type: 'null'
           title: Name
       title: UpdateOrganization
+      type: object
+    UpdatePermissionDomain:
+      properties:
+        domain:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Domain
+        mode:
+          anyOf:
+          - $ref: '#/components/schemas/DomainPermissionMode'
+          - type: 'null'
+      title: UpdatePermissionDomain
       type: object
     UpdateWikiApiClient:
       properties:
@@ -457,6 +549,37 @@ info:
   version: 0.0.1
 openapi: 3.1.0
 paths:
+  /api/v1/admins/approve_user:
+    post:
+      operationId: approve_user_api_v1_admins_approve_user_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApproveUser'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Approve the user for access to the system
+      tags:
+      - Admins
   /api/v1/api_client/:
     put:
       operationId: update_wiki_api_client_api_v1_api_client__put
@@ -693,26 +816,12 @@ paths:
     post:
       description: Create organization.
       operationId: create_organization_api_v1_organization__post
-      parameters:
-      - in: query
-        name: name
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrganization'
         required: true
-        schema:
-          title: Name
-          type: string
-      - in: query
-        name: description
-        required: false
-        schema:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Description
-      - in: query
-        name: access
-        required: true
-        schema:
-          $ref: '#/components/schemas/OrganizationAccessType'
       responses:
         '202':
           content:
@@ -831,6 +940,151 @@ paths:
       summary: Get Organization
       tags:
       - Organization
+  /api/v1/permission/domain/:
+    post:
+      operationId: create_permission_domain_api_v1_permission_domain__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePermissionDomain'
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionDomainInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Create a new domain permission for signup
+      tags:
+      - Permissions
+    put:
+      operationId: update_permission_domain_api_v1_permission_domain__put
+      parameters:
+      - in: query
+        name: id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Id
+      - in: query
+        name: domain
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Domain
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePermissionDomain'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionDomainInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Update permission domain by id or domain name
+      tags:
+      - Permissions
+  /api/v1/permission/domain/all:
+    get:
+      operationId: get_permission_domains_api_v1_permission_domain_all_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/PermissionDomainInfoResponse'
+                title: Response Get Permission Domains Api V1 Permission Domain All
+                  Get
+                type: array
+          description: Successful Response
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all permission domain
+      tags:
+      - Permissions
+  /api/v1/permission/domain/info:
+    get:
+      operationId: get_permission_domain_info_api_v1_permission_domain_info_get
+      parameters:
+      - in: query
+        name: id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Id
+      - in: query
+        name: domain
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Domain
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionDomainInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get permission domain by id or domain name
+      tags:
+      - Permissions
   /api/v1/user/:
     delete:
       operationId: delete_user_api_v1_user__delete
@@ -1088,3 +1342,5 @@ servers:
   url: http://localhost:8000/
 - description: Demo server
   url: https://api.wiki.example.com/
+- description: Ngrok
+  url: https://2fdc-176-59-193-145.ngrok-free.app/

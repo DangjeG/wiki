@@ -1,3 +1,4 @@
+from typing import Optional
 from uuid import UUID
 
 from jose import jwt
@@ -12,25 +13,25 @@ from wiki.config import settings
 
 
 class WikiTokenAuthenticatorInterface(BaseTokenAuthenticatorInterface):
+    _token_no_valid_or_expire_exception = WikiException(
+        message="Token is not valid or expired.",
+        error_code=WikiErrorCode.AUTH_TOKEN_NOT_VALID_OR_EXPIRED,
+        http_status_code=status.HTTP_403_FORBIDDEN
+    )
+
     def __init__(self, session: AsyncSession):
         super().__init__(session)
         self.authenticator_type = AuthenticatorType.token
 
     @classmethod
-    async def verify_jwt_token(cls, token: str) -> UUID:
+    async def verify_jwt_token(cls, token: str) -> (Optional[UUID], Optional[str]):
         payload = cls.decode_jwt_token(token, settings.AUTH_SECRET_MAIN)
-        ex = WikiException(
-            message="Token is not valid or expired.",
-            error_code=WikiErrorCode.AUTH_TOKEN_NOT_VALID_OR_EXPIRED,
-            http_status_code=status.HTTP_403_FORBIDDEN
-        )
         if payload is None:
-            raise ex
+            raise cls._token_no_valid_or_expire_exception
         api_client_id = payload.get("api_client_id")
-        if api_client_id is None:
-            raise ex
+        email = payload.get("email")
 
-        return api_client_id
+        return api_client_id, email
 
     @classmethod
     def create_access_token(cls, data: AccessTokenData) -> str:
@@ -39,10 +40,16 @@ class WikiTokenAuthenticatorInterface(BaseTokenAuthenticatorInterface):
                                  algorithm=settings.AUTH_ALGORITHM)
         return encoded_jwt
 
-    async def validate(self, credentials) -> WikiUserHandlerData:
-        api_client_id = await self.verify_jwt_token(credentials)
-        api_client = await self.verify_api_client(api_client_id)
-        user, organization = await self.verify_user(api_client)
+    async def validate(self, credentials, is_available_disapproved_user: bool) -> WikiUserHandlerData:
+        api_client_id, user_email = await self.verify_jwt_token(credentials)
+        if api_client_id is None and not is_available_disapproved_user:
+            raise self._token_no_valid_or_expire_exception
+        api_client = None
+        if not is_available_disapproved_user:
+            api_client = await self.verify_api_client(api_client_id)
+            user, organization = await self.verify_user(api_client=api_client)
+        else:
+            user, organization = await self.verify_user(user_email=user_email)
 
         return WikiUserHandlerData(
             id=user.id,
