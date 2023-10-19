@@ -20,8 +20,8 @@ export default function Verify(){
     }
 
     return(
-        <div className="color-overlay d-flex justify-content-center align-content-center">
-            <Form className="login-form" onSubmit={handleFormSubmit}>
+        <div className="login-form">
+            <Form onSubmit={handleFormSubmit}>
                 <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                     <Form.Label>Code from email</Form.Label>
                     <Form.Control

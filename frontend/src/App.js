@@ -10,6 +10,7 @@ import SignUp from "./Pages/SignUp";
 import {api} from "./app.config";
 import Logout from "./Pages/Logout";
 import Admin from "./Pages/Admin";
+import Profile from "./Pages/Profile";
 
 
 export default function App() {
@@ -25,6 +26,7 @@ export default function App() {
                         <Route path={"/signup"} element={<SignUp/>}/>
                         <Route path={"/logout"} element={<Logout/>}/>
                         <Route path={"/admin"} element={<Admin/>}/>
+                        <Route path={"/profile"} element={<Profile/>}/>
                     </Routes>
                 </BrowserRouter>
             </>
