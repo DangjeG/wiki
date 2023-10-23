@@ -89,6 +89,14 @@ class Settings(BaseSettings):
 
     EMAIL_SENDING: bool = False  # If you don’t want letters sent to the email, set false.
 
+    LAKECTL_SERVER_ENDPOINT_URL: str = "http://localhost:8001"
+    LAKEFS_STORAGE_NAMESPACE_ROOT: str = "local://wiki_storage/"
+    LAKEFS_DEFAULT_BRANCH: str = "main"
+    LAKEFS_AUTH_ENCRYPT_SECRET_KEY: str = "12345"
+    LAKEFS_INSTALLATION_USER_NAME: str = "wiki-admin"
+    LAKEFS_INSTALLATION_ACCESS_KEY_ID: str = "12345"
+    LAKEFS_INSTALLATION_SECRET_ACCESS_KEY: str = "12345"
+
     def get_db_url(self):
         return (f"{self.DB_SCHEMA}+{self.DB_DRIVER}://{self.DB_USER}:{self.DB_PASSWORD}@"
                 f"{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}?ssl={self.DB_SSL}")
