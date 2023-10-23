@@ -1,0 +1,53 @@
+version: "3.8"
+
+services:
+  wiki_db:
+    container_name: "wiki_db"
+    image: postgres:15.3-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=wiki
+      - POSTGRES_HOST=localhost
+      - POSTGRES_PORT=5432
+#    healthcheck:
+#      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+#      interval: 2s
+#      timeout: 2s
+#      retries: 10
+    volumes:
+      - ./wiki_db_data:/var/lib/postgresql/data
+      - ./wiki_db_log:/var/log/postgresql
+    ports:
+      - "5432:5432"
+    networks:
+      - wiki
+  wiki_lake_fs_storage:
+    container_name: "wiki_lake_fs_storage"
+    image: treeverse/lakefs:1.0.0
+    restart: always
+    volumes:
+      - ./wiki_lake_fs_storage_data:/home/lakefs/lakefs
+    ports:
+      - "8001:8000"
+    environment:
+      - LAKEFS_DATABASE_TYPE=local
+      - LAKEFS_AUTH_ENCRYPT_SECRET_KEY=AUTH_ENCRYPT_SECRET_KEY
+      - LAKEFS_LOGGING_LEVEL=INFO
+      - LAKEFS_STATS_ENABLED=${LAKEFS_STATS_ENABLED:-1}
+      - LAKEFS_INSTALLATION_USER_NAME=wiki-admin
+      - LAKEFS_INSTALLATION_ACCESS_KEY_ID=ACCESS_KEY_ID
+      - LAKEFS_INSTALLATION_SECRET_ACCESS_KEY=SECRET_ACCESS_KEY
+      - LAKECTL_CREDENTIALS_ACCESS_KEY_ID=${LAKEFS_INSTALLATION_ACCESS_KEY_ID:-1}
+      - LAKECTL_CREDENTIALS_SECRET_ACCESS_KEY=${LAKEFS_INSTALLATION_SECRET_ACCESS_KEY:-1}
+      - LAKECTL_SERVER_ENDPOINT_URL=http://localhost:8001
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - lakefs run --local-settings
+    networks:
+      - wiki
+
+networks:
+  wiki:
+    driver: bridge
