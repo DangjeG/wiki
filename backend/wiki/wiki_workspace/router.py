@@ -1,37 +1,51 @@
 from fastapi import APIRouter, Depends
+from lakefs_client.client import LakeFSClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from wiki.database.deps import get_db
-from wiki.wiki_api_client.models import WikiApiClient
+from wiki.user.models import User
+from wiki.user.repository import UserRepository
+from wiki.user.utils import get_user_info
 from wiki.wiki_api_client.repository import WikiApiClientRepository
+from wiki.wiki_storage.deps import get_storage_client
+from wiki.wiki_storage.services.base import BaseWikiStorageService
+from wiki.wiki_workspace.model import Workspace
 from wiki.wiki_workspace.repository import WorkspaceRepository
-from wiki.wiki_workspace.schemas import WorkspaceResponse, CreateWorkspace, WorkspaceInfo
+from wiki.wiki_workspace.schemas import CreateWorkspace, WorkspaceInfoResponse
 
 workspace_router = APIRouter()
 
+
 @workspace_router.post(
-    "/workspace",
-    response_model=WorkspaceResponse,
+    "/",
+    response_model=WorkspaceInfoResponse,
     status_code=status.HTTP_202_ACCEPTED,
     summary="Create workspace"
 )
 async def create_workspace(
-        workspace: CreateWorkspace,
-        wiki_api_client: WikiApiClient,
-        session: AsyncSession = Depends(get_db)
+        workspace_create: CreateWorkspace,
+        session: AsyncSession = Depends(get_db),
+        storage_client: LakeFSClient = Depends(get_storage_client)
 ):
     workspace_repository: WorkspaceRepository = WorkspaceRepository(session)
-    workspace.owner = wiki_api_client
-    await workspace_repository.create_workspace(workspace)
+    user_repository: UserRepository = UserRepository(session)
+    user: User = await user_repository.get_user_by_email(workspace_create.owner_user_email)
+    workspace: Workspace = await workspace_repository.create_workspace(workspace_create.title, user.id)
 
-    return WorkspaceResponse(
-        title=workspace.title
+    storage_service: BaseWikiStorageService = BaseWikiStorageService(storage_client)
+    storage_service.create_workspace_storage(workspace.id)
+
+    return WorkspaceInfoResponse(
+        id=workspace.id,
+        title=workspace.title,
+        owner_user=get_user_info(user, session)
     )
 
+
 @workspace_router.get(
-    "/workspace",
-    response_model=list[WorkspaceInfo],
+    "/",
+    response_model=list[WorkspaceInfoResponse],
     status_code=status.HTTP_202_ACCEPTED,
     summary="Get all workspace"
 )
@@ -43,9 +57,9 @@ async def get_workspaces(
 
     workspaces = await workspace_repository.get_all_workspace()
 
-    result_workspace: list[WorkspaceInfo] = []
+    result_workspace: list[WorkspaceInfoResponse] = []
     for ws in workspaces:
-        append_workspace = WorkspaceInfo(
+        append_workspace = WorkspaceInfoResponse(
             id=ws.id,
             title=ws.title,
             owner=await wiki_api_client_repository.get_wiki_api_client_by_id(ws.id)

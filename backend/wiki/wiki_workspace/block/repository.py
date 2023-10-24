@@ -11,7 +11,6 @@ class BlockRepository(BaseRepository):
     async def create_block(self, create_block: CreateBlock) -> Block:
         new_block = Block(
             document_id=create_block.document_id,
-            workspace_id=create_block.workspace_id,
             type_block=create_block.type_block
         )
 

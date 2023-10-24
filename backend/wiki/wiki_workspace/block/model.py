@@ -20,13 +20,10 @@ class Block(Base, EnabledDeletedMixin):
 
     type_block = Column(String, nullable=False, default=TypeBlock.TEXT)
 
-    workspace_id = Column(ForeignKey("workspace.id"), unique=True, nullable=False)
-    document_id = Column(ForeignKey("document.id"), unique=True, nullable=False)
+    document_id = Column(ForeignKey("document.id"), nullable=False)
 
     def __init__(self,
                  document_id: UUID,
-                 workspace_id: UUID,
                  type_block: TypeBlock):
         self.document_id = document_id
-        self.workspace_id = workspace_id
         self.type_block = type_block

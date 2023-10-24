@@ -1,8 +1,12 @@
-from uuid_extensions import uuid7
+from io import StringIO, BufferedReader
 
 from wiki.wiki_storage.deps import get_storage_client
-from wiki.wiki_storage.services.creation import CreationWikiStorageService
+from wiki.wiki_storage.services.base import BaseWikiStorageService
 
 if __name__ == "__main__":
-    service = CreationWikiStorageService(get_storage_client())
-    service.create_workspace_storage(uuid7())
+    service = BaseWikiStorageService(get_storage_client())
+    res = service.upload_document_block_in_workspace_storage(content=StringIO("content"),
+                                                             unique_workspace_name="repo",
+                                                             unique_names_parents_documents=["document", "child_document"],
+                                                             unique_block_name="block")
+    print(res)

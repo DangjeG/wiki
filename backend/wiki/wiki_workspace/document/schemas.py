@@ -2,20 +2,18 @@ from typing import Optional
 from uuid import UUID
 
 from wiki.models import WikiBase
-from wiki.wiki_api_client.models import WikiApiClient
+from wiki.user.schemas import UserInfoResponse
 
 
 class CreateDocument(WikiBase):
     title: str
     workspace_id: UUID
-    creator: WikiApiClient
     parent_document_id: Optional[UUID] = None
 
-class DocumentResponse(WikiBase):
-    title: str
 
-class DocumentInfo(WikiBase):
+class DocumentInfoResponse(WikiBase):
+    id: UUID
     title: str
     workspace_id: UUID
-    creator: WikiApiClient
+    creator_user: UserInfoResponse
     parent_document_id: Optional[UUID] = None
