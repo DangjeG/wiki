@@ -1,3 +1,4 @@
+from typing import Optional
 from uuid import UUID
 
 from sqlalchemy import select
@@ -30,7 +31,7 @@ class DocumentRepository(BaseRepository):
                               title: str,
                               workspace_id: UUID,
                               creator_user_id: UUID,
-                              parent_document_id: UUID) -> Document:
+                              parent_document_id: Optional[UUID] = None) -> Document:
         new_document = Document(
             title=title,
             workspace_id=workspace_id,

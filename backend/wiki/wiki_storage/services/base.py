@@ -1,4 +1,4 @@
-from io import IOBase
+from io import StringIO
 
 from lakefs_client.client import LakeFSClient
 from lakefs_client.model.repository_creation import RepositoryCreation
@@ -22,7 +22,7 @@ class BaseWikiStorageService:
             'id': unique_workspace_name,
             'storage_namespace': 'local://wiki_storage/{unique_workspace_name}'}
         """
-        repo = RepositoryCreation(name=unique_workspace_name,
+        repo = RepositoryCreation(name=str(unique_workspace_name),
                                   storage_namespace=f"{settings.LAKEFS_STORAGE_NAMESPACE_ROOT}{unique_workspace_name}",
                                   default_branch=settings.LAKEFS_DEFAULT_BRANCH)
         thread = self.client.repositories_api.create_repository(repo, async_req=True)
@@ -31,7 +31,7 @@ class BaseWikiStorageService:
         return result
 
     def upload_document_block_in_workspace_storage(self,
-                                                   content: IOBase,
+                                                   content: StringIO,
                                                    unique_workspace_name: str,
                                                    unique_names_parents_documents: list[str],
                                                    unique_block_name: str) -> dict:
@@ -46,8 +46,8 @@ class BaseWikiStorageService:
                   'size_bytes': ...}
         """
         api_instance = self.client.objects_api
-        path = forming_document_storage_path(unique_names_parents_documents, unique_block_name)
-        thread = api_instance.upload_object(repository=unique_workspace_name,
+        path = forming_document_storage_path(unique_names_parents_documents, str(unique_block_name))
+        thread = api_instance.upload_object(repository=str(unique_workspace_name),
                                             branch=settings.LAKEFS_DEFAULT_BRANCH,
                                             path=path,
                                             content=content,
@@ -59,8 +59,8 @@ class BaseWikiStorageService:
                                                         unique_names_parents_documents: list[str],
                                                         unique_block_name: str) -> str:
         api_instance = self.client.objects_api
-        path = forming_document_storage_path(unique_names_parents_documents, unique_block_name)
-        thread = api_instance.get_object(repository=unique_workspace_name,
+        path = forming_document_storage_path(unique_names_parents_documents, str(unique_block_name))
+        thread = api_instance.get_object(repository=str(unique_workspace_name),
                                          ref=settings.LAKEFS_DEFAULT_BRANCH,
                                          path=path,
                                          async_req=True)

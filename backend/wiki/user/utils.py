@@ -53,7 +53,7 @@ async def get_user_info(user: User, session: AsyncSession) -> UserInfoResponse:
     )
 
 
-async def get_user_info_by_handler_data(cls, user: WikiUserHandlerData, session: AsyncSession) -> UserInfoResponse:
+async def get_user_info_by_handler_data(user: WikiUserHandlerData, session: AsyncSession) -> UserInfoResponse:
     user_repository: UserRepository = UserRepository(session)
     user_db = await user_repository.get_user_by_id(user.id)
-    return await cls.get_user_info(user_db, session)
+    return await get_user_info(user_db, session)

@@ -1444,7 +1444,7 @@ paths:
     get:
       operationId: get_workspaces_api_v1_workspace__get
       responses:
-        '202':
+        '200':
           content:
             application/json:
               schema:
@@ -1453,6 +1453,12 @@ paths:
                 title: Response Get Workspaces Api V1 Workspace  Get
                 type: array
           description: Successful Response
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
       summary: Get all workspace
       tags:
       - Workspace
@@ -1477,6 +1483,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
       summary: Create workspace
       tags:
       - Workspace
@@ -1492,7 +1504,7 @@ paths:
           title: Document Id
           type: string
       responses:
-        '202':
+        '200':
           content:
             application/json:
               schema:
@@ -1507,7 +1519,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
-      summary: Get all block by id document.
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all data blocks by id document.
       tags:
       - Workspace
       - Workspace
@@ -1524,7 +1542,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BaseResponse'
+                $ref: '#/components/schemas/BlockDataResponse'
           description: Successful Response
         '422':
           content:
@@ -1532,7 +1550,52 @@ paths:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
-      summary: Create block.
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Create block
+      tags:
+      - Workspace
+      - Workspace
+    put:
+      operationId: update_block_api_v1_workspace_block__put
+      parameters:
+      - in: query
+        name: block_id
+        required: true
+        schema:
+          format: uuid
+          title: Block Id
+          type: string
+      - in: query
+        name: content
+        required: true
+        schema:
+          title: Content
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockDataResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Update data document block
       tags:
       - Workspace
       - Workspace
@@ -1548,7 +1611,7 @@ paths:
           title: Workspace Id
           type: string
       responses:
-        '202':
+        '200':
           content:
             application/json:
               schema:

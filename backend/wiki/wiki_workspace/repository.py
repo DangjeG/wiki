@@ -12,7 +12,7 @@ from wiki.wiki_workspace.model import Workspace
 
 class WorkspaceRepository(BaseRepository):
     _workspace_not_found_exception = WikiException(
-        message="Document not found.",
+        message="Workspace not found.",
         error_code=WikiErrorCode.WORKSPACE_NOT_FOUND,
         http_status_code=status.HTTP_404_NOT_FOUND
     )

@@ -8,7 +8,6 @@ from wiki.common.exceptions import WikiException, WikiErrorCode
 from wiki.common.schemas import WikiUserHandlerData
 from wiki.database.deps import get_db
 from wiki.permissions.base import BasePermission
-from wiki.user.schemas import UserInfoResponse
 from wiki.user.utils import get_user_info_by_handler_data
 from wiki.wiki_api_client.enums import ResponsibilityType
 from wiki.wiki_api_client.repository import WikiApiClientRepository
@@ -33,13 +32,14 @@ async def create_document(
         user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER))
 ):
     document_repository: DocumentRepository = DocumentRepository(session)
-    parent_document: Document = await document_repository.get_document_by_id(new_document.parent_document_id)
-    if parent_document.workspace_id != new_document.workspace_id:
-        raise WikiException(
-            message="Document not specified.",
-            error_code=WikiErrorCode.WORKSPACE_NOT_SPECIFIED,
-            http_status_code=status.HTTP_400_BAD_REQUEST
-        )
+    if new_document.parent_document_id is not None:
+        parent_document: Document = await document_repository.get_document_by_id(new_document.parent_document_id)
+        if parent_document.workspace_id != new_document.workspace_id:
+            raise WikiException(
+                message="Document not specified.",
+                error_code=WikiErrorCode.WORKSPACE_NOT_SPECIFIED,
+                http_status_code=status.HTTP_400_BAD_REQUEST
+            )
     workspace_repository: WorkspaceRepository = WorkspaceRepository(session)
     workspace: Workspace = await workspace_repository.get_workspace_by_id(new_document.workspace_id)
     document = await document_repository.create_document(new_document.title,
@@ -59,7 +59,7 @@ async def create_document(
 @document_router.get(
     "/",
     response_model=list[DocumentInfoResponse],
-    status_code=status.HTTP_202_ACCEPTED,
+    status_code=status.HTTP_200_OK,
     summary="Get all document by workspace id"
 )
 async def get_documents_by_workspace_id(

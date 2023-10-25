@@ -3,10 +3,13 @@ from lakefs_client.client import LakeFSClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
+from wiki.common.schemas import WikiUserHandlerData
 from wiki.database.deps import get_db
+from wiki.permissions.base import BasePermission
 from wiki.user.models import User
 from wiki.user.repository import UserRepository
 from wiki.user.utils import get_user_info
+from wiki.wiki_api_client.enums import ResponsibilityType
 from wiki.wiki_api_client.repository import WikiApiClientRepository
 from wiki.wiki_storage.deps import get_storage_client
 from wiki.wiki_storage.services.base import BaseWikiStorageService
@@ -26,7 +29,8 @@ workspace_router = APIRouter()
 async def create_workspace(
         workspace_create: CreateWorkspace,
         session: AsyncSession = Depends(get_db),
-        storage_client: LakeFSClient = Depends(get_storage_client)
+        storage_client: LakeFSClient = Depends(get_storage_client),
+        user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER))
 ):
     workspace_repository: WorkspaceRepository = WorkspaceRepository(session)
     user_repository: UserRepository = UserRepository(session)
@@ -39,18 +43,19 @@ async def create_workspace(
     return WorkspaceInfoResponse(
         id=workspace.id,
         title=workspace.title,
-        owner_user=get_user_info(user, session)
+        owner_user=await get_user_info(user, session)
     )
 
 
 @workspace_router.get(
     "/",
     response_model=list[WorkspaceInfoResponse],
-    status_code=status.HTTP_202_ACCEPTED,
+    status_code=status.HTTP_200_OK,
     summary="Get all workspace"
 )
 async def get_workspaces(
-        session: AsyncSession = Depends(get_db)
+        session: AsyncSession = Depends(get_db),
+        user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER))
 ):
     workspace_repository: WorkspaceRepository = WorkspaceRepository(session)
     wiki_api_client_repository: WikiApiClientRepository = WikiApiClientRepository(session)
