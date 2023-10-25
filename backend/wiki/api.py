@@ -24,6 +24,6 @@ api_router.include_router(organization_router, prefix="/organization", tags=["Or
 api_router.include_router(wiki_api_key_router, prefix="/api_key", tags=["WikiApiClient"])
 api_router.include_router(wiki_api_client_router, prefix="/api_client", tags=["WikiApiClient"])
 
-workspace_router.include_router(document_router, prefix="/document", tags=["Workspace"])
-workspace_router.include_router(block_router, prefix="/block", tags=["Workspace"])
 api_router.include_router(workspace_router, prefix="/workspace", tags=["Workspace"])
+api_router.include_router(document_router, prefix="/document", tags=["WorkspaceDocument"])
+api_router.include_router(block_router, prefix="/block", tags=["WorkspaceBlock"])

@@ -9,12 +9,7 @@ components:
           title: Api Client Description
         responsibility:
           $ref: '#/components/schemas/ResponsibilityType'
-        user_id:
-          format: uuid
-          title: User Id
-          type: string
       required:
-      - user_id
       - responsibility
       title: ApproveUser
       type: object
@@ -257,22 +252,17 @@ components:
       type: object
     CreateWorkspace:
       properties:
-        owner_user_email:
-          format: email
-          title: Owner User Email
-          type: string
         title:
           title: Title
           type: string
       required:
       - title
-      - owner_user_email
       title: CreateWorkspace
       type: object
     DocumentInfoResponse:
       properties:
         creator_user:
-          $ref: '#/components/schemas/UserInfoResponse'
+          $ref: '#/components/schemas/UserBaseInfoResponse'
         id:
           format: uuid
           title: Id
@@ -296,6 +286,26 @@ components:
       - workspace_id
       - creator_user
       title: DocumentInfoResponse
+      type: object
+    DocumentNodeInfoResponse:
+      properties:
+        children:
+          anyOf:
+          - items: {}
+            type: array
+          - type: 'null'
+          title: Children
+        id:
+          format: uuid
+          title: Id
+          type: string
+        title:
+          title: Title
+          type: string
+      required:
+      - id
+      - title
+      title: DocumentNodeInfoResponse
       type: object
     DomainPermissionMode:
       enum:
@@ -491,7 +501,47 @@ components:
           - type: 'null'
       title: UpdateWikiApiClient
       type: object
-    UserInfoResponse:
+    UserBaseInfoResponse:
+      properties:
+        email:
+          format: email
+          title: Email
+          type: string
+        first_name:
+          title: First Name
+          type: string
+        last_name:
+          title: Last Name
+          type: string
+        organization:
+          $ref: '#/components/schemas/OrganizationInfoResponse'
+        position:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Position
+        second_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Second Name
+        username:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+        wiki_api_client:
+          anyOf:
+          - $ref: '#/components/schemas/WikiApiClientInfoResponse'
+          - type: 'null'
+      required:
+      - email
+      - first_name
+      - last_name
+      - organization
+      title: UserBaseInfoResponse
+      type: object
+    UserFullInfoResponse:
       properties:
         email:
           format: email
@@ -537,11 +587,11 @@ components:
       - email
       - first_name
       - last_name
+      - organization
       - is_user_agreement_accepted
       - is_verified_email
       - is_enabled
-      - organization
-      title: UserInfoResponse
+      title: UserFullInfoResponse
       type: object
     UserSignResponse:
       properties:
@@ -697,7 +747,7 @@ components:
           title: Id
           type: string
         owner_user:
-          $ref: '#/components/schemas/UserInfoResponse'
+          $ref: '#/components/schemas/UserBaseInfoResponse'
         title:
           title: Title
           type: string
@@ -738,6 +788,33 @@ paths:
   /api/v1/admins/approve_user:
     post:
       operationId: approve_user_api_v1_admins_approve_user_post
+      parameters:
+      - in: query
+        name: user_id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: User Id
+      - in: query
+        name: username
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+      - in: query
+        name: email
+        required: false
+        schema:
+          anyOf:
+          - format: email
+            type: string
+          - type: 'null'
+          title: Email
       requestBody:
         content:
           application/json:
@@ -749,7 +826,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserInfoResponse'
+                $ref: '#/components/schemas/UserFullInfoResponse'
           description: Successful Response
         '422':
           content:
@@ -998,6 +1075,305 @@ paths:
       summary: Verification by token and code
       tags:
       - Auth
+  /api/v1/block/:
+    delete:
+      operationId: delete_block_api_v1_block__delete
+      parameters:
+      - in: query
+        name: block_id
+        required: true
+        schema:
+          format: uuid
+          title: Block Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Delete a block from a document
+      tags:
+      - WorkspaceBlock
+    post:
+      operationId: create_block_api_v1_block__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBlock'
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockDataResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Create block
+      tags:
+      - WorkspaceBlock
+  /api/v1/block/data:
+    get:
+      operationId: get_blocks_api_v1_block_data_get
+      parameters:
+      - in: query
+        name: document_id
+        required: true
+        schema:
+          format: uuid
+          title: Document Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/BlockDataResponse'
+                title: Response Get Blocks Api V1 Block Data Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all data blocks by id document
+      tags:
+      - WorkspaceBlock
+    put:
+      operationId: update_block_data_api_v1_block_data_put
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBlockData'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockDataResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Update data document block
+      tags:
+      - WorkspaceBlock
+  /api/v1/block/info:
+    put:
+      operationId: update_block_info_api_v1_block_info_put
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBlockInfo'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Update info document block
+      tags:
+      - WorkspaceBlock
+  /api/v1/document/:
+    post:
+      operationId: create_document_api_v1_document__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDocument'
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Create document if parent_document_id=None then document is in the
+        root.
+      tags:
+      - WorkspaceDocument
+  /api/v1/document/all:
+    get:
+      operationId: get_documents_by_workspace_id_api_v1_document_all_get
+      parameters:
+      - in: query
+        name: workspace_id
+        required: true
+        schema:
+          format: uuid
+          title: Workspace Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/DocumentInfoResponse'
+                title: Response Get Documents By Workspace Id Api V1 Document All
+                  Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all document by workspace id
+      tags:
+      - WorkspaceDocument
+  /api/v1/document/info:
+    get:
+      operationId: get_document_info_by_id_api_v1_document_info_get
+      parameters:
+      - in: query
+        name: document_id
+        required: true
+        schema:
+          format: uuid
+          title: Document Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get document info by id
+      tags:
+      - WorkspaceDocument
+  /api/v1/document/tree:
+    get:
+      operationId: get_tree_documents_by_workspace_id_api_v1_document_tree_get
+      parameters:
+      - in: query
+        name: workspace_id
+        required: true
+        schema:
+          format: uuid
+          title: Workspace Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/DocumentNodeInfoResponse'
+                title: Response Get Tree Documents By Workspace Id Api V1 Document
+                  Tree Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all tree document by workspace id
+      tags:
+      - WorkspaceDocument
   /api/v1/organization/:
     post:
       description: Create organization.
@@ -1363,7 +1739,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserInfoResponse'
+                $ref: '#/components/schemas/UserFullInfoResponse'
           description: Successful Response
         '422':
           content:
@@ -1389,7 +1765,7 @@ paths:
             application/json:
               schema:
                 items:
-                  $ref: '#/components/schemas/UserInfoResponse'
+                  $ref: '#/components/schemas/UserFullInfoResponse'
                 title: Response Get Users Api V1 User All Get
                 type: array
           description: Successful Response
@@ -1437,7 +1813,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserInfoResponse'
+                $ref: '#/components/schemas/UserFullInfoResponse'
           description: Successful Response
         '422':
           content:
@@ -1462,7 +1838,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserInfoResponse'
+                $ref: '#/components/schemas/UserFullInfoResponse'
           description: Successful Response
       security:
       - WikiRootApiKey: []
@@ -1487,7 +1863,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserInfoResponse'
+                $ref: '#/components/schemas/UserFullInfoResponse'
           description: Successful Response
         '422':
           content:
@@ -1505,27 +1881,6 @@ paths:
       tags:
       - User
   /api/v1/workspace/:
-    get:
-      operationId: get_workspaces_api_v1_workspace__get
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/WorkspaceInfoResponse'
-                title: Response Get Workspaces Api V1 Workspace  Get
-                type: array
-          description: Successful Response
-      security:
-      - WikiRootApiKey: []
-      - WikiApiKey: []
-      - WikiApiKey: []
-      - WikiAccessToken: []
-      - WikiBearer: []
-      summary: Get all workspace
-      tags:
-      - Workspace
     post:
       operationId: create_workspace_api_v1_workspace__post
       requestBody:
@@ -1556,174 +1911,31 @@ paths:
       summary: Create workspace
       tags:
       - Workspace
-  /api/v1/workspace/block/:
-    delete:
-      operationId: delete_block_api_v1_workspace_block__delete
-      parameters:
-      - in: query
-        name: block_id
-        required: true
-        schema:
-          format: uuid
-          title: Block Id
-          type: string
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BaseResponse'
-          description: Successful Response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-          description: Validation Error
-      security:
-      - WikiRootApiKey: []
-      - WikiApiKey: []
-      - WikiApiKey: []
-      - WikiAccessToken: []
-      - WikiBearer: []
-      summary: Delete a block from a document
-      tags:
-      - Workspace
-      - Workspace
-    post:
-      operationId: create_block_api_v1_workspace_block__post
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateBlock'
-        required: true
-      responses:
-        '202':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BlockDataResponse'
-          description: Successful Response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-          description: Validation Error
-      security:
-      - WikiRootApiKey: []
-      - WikiApiKey: []
-      - WikiApiKey: []
-      - WikiAccessToken: []
-      - WikiBearer: []
-      summary: Create block
-      tags:
-      - Workspace
-      - Workspace
-  /api/v1/workspace/block/data:
+  /api/v1/workspace/all:
     get:
-      operationId: get_blocks_api_v1_workspace_block_data_get
-      parameters:
-      - in: query
-        name: document_id
-        required: true
-        schema:
-          format: uuid
-          title: Document Id
-          type: string
+      operationId: get_workspaces_api_v1_workspace_all_get
       responses:
         '200':
           content:
             application/json:
               schema:
                 items:
-                  $ref: '#/components/schemas/BlockDataResponse'
-                title: Response Get Blocks Api V1 Workspace Block Data Get
+                  $ref: '#/components/schemas/WorkspaceInfoResponse'
+                title: Response Get Workspaces Api V1 Workspace All Get
                 type: array
           description: Successful Response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-          description: Validation Error
       security:
       - WikiRootApiKey: []
       - WikiApiKey: []
       - WikiApiKey: []
       - WikiAccessToken: []
       - WikiBearer: []
-      summary: Get all data blocks by id document
+      summary: Get all workspace
       tags:
       - Workspace
-      - Workspace
-    put:
-      operationId: update_block_data_api_v1_workspace_block_data_put
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateBlockData'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BlockDataResponse'
-          description: Successful Response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-          description: Validation Error
-      security:
-      - WikiRootApiKey: []
-      - WikiApiKey: []
-      - WikiApiKey: []
-      - WikiAccessToken: []
-      - WikiBearer: []
-      summary: Update data document block
-      tags:
-      - Workspace
-      - Workspace
-  /api/v1/workspace/block/info:
-    put:
-      operationId: update_block_info_api_v1_workspace_block_info_put
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateBlockInfo'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BlockInfoResponse'
-          description: Successful Response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-          description: Validation Error
-      security:
-      - WikiRootApiKey: []
-      - WikiApiKey: []
-      - WikiApiKey: []
-      - WikiAccessToken: []
-      - WikiBearer: []
-      summary: Update info document block
-      tags:
-      - Workspace
-      - Workspace
-  /api/v1/workspace/document/:
+  /api/v1/workspace/info:
     get:
-      operationId: get_documents_by_workspace_id_api_v1_workspace_document__get
+      operationId: get_workspace_info_api_v1_workspace_info_get
       parameters:
       - in: query
         name: workspace_id
@@ -1737,10 +1949,7 @@ paths:
           content:
             application/json:
               schema:
-                items:
-                  $ref: '#/components/schemas/DocumentInfoResponse'
-                title: Response Get Documents By Workspace Id Api V1 Workspace Document  Get
-                type: array
+                $ref: '#/components/schemas/WorkspaceInfoResponse'
           description: Successful Response
         '422':
           content:
@@ -1754,41 +1963,8 @@ paths:
       - WikiApiKey: []
       - WikiAccessToken: []
       - WikiBearer: []
-      summary: Get all document by workspace id
+      summary: Get workspace info
       tags:
-      - Workspace
-      - Workspace
-    post:
-      operationId: create_document_api_v1_workspace_document__post
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateDocument'
-        required: true
-      responses:
-        '202':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DocumentInfoResponse'
-          description: Successful Response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-          description: Validation Error
-      security:
-      - WikiRootApiKey: []
-      - WikiApiKey: []
-      - WikiApiKey: []
-      - WikiAccessToken: []
-      - WikiBearer: []
-      summary: Create document if parent_document_id=None then document is in the
-        root.
-      tags:
-      - Workspace
       - Workspace
   /health:
     get:
@@ -1814,3 +1990,5 @@ servers:
   url: http://localhost:8000/
 - description: Demo server
   url: https://api.wiki.example.com/
+- description: Ngrok
+  url: https://0240-176-59-209-217.ngrok-free.app/

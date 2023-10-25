@@ -9,7 +9,7 @@ from wiki.organization.repository import OrganizationRepository
 from wiki.permissions.base import BasePermission
 from wiki.user.models import User
 from wiki.user.repository import UserRepository
-from wiki.user.schemas import UserInfoResponse, UserIdentifiers, UserUpdate, CreateVerifiedUser, CreateUser
+from wiki.user.schemas import UserFullInfoResponse, UserIdentifiers, UserUpdate, CreateVerifiedUser, CreateUser
 from wiki.user.utils import get_user_info
 from wiki.wiki_api_client.enums import ResponsibilityType
 from wiki.wiki_api_client.models import WikiApiClient
@@ -21,7 +21,7 @@ user_router = APIRouter()
 
 @user_router.post(
     "/verified",
-    response_model=UserInfoResponse,
+    response_model=UserFullInfoResponse,
     status_code=status.HTTP_202_ACCEPTED,
     summary="Create a verified user (has access to the system)"
 )
@@ -57,7 +57,7 @@ async def create_verified_user(
 
 @user_router.get(
     "/me",
-    response_model=UserInfoResponse,
+    response_model=UserFullInfoResponse,
     status_code=status.HTTP_200_OK,
     summary="Get info about the current user",
 )
@@ -73,7 +73,7 @@ async def get_me(
 
 @user_router.get(
     "/info",
-    response_model=UserInfoResponse,
+    response_model=UserFullInfoResponse,
     status_code=status.HTTP_200_OK,
     summary="Get user by id or username or email"
 )
@@ -102,7 +102,7 @@ async def get_user(
 
 @user_router.get(
     "/all",
-    response_model=list[UserInfoResponse],
+    response_model=list[UserFullInfoResponse],
     status_code=status.HTTP_200_OK,
     summary="Get all users"
 )
@@ -113,7 +113,7 @@ async def get_users(
     user_repository: UserRepository = UserRepository(session)
     users: list[User] = await user_repository.get_all_users()
 
-    result_users: list[UserInfoResponse] = []
+    result_users: list[UserFullInfoResponse] = []
     for us in users:
         append_user = await get_user_info(us, session)
         result_users.append(append_user)
@@ -157,7 +157,7 @@ async def delete_user(
 
 @user_router.put(
     "/",
-    response_model=UserInfoResponse,
+    response_model=UserFullInfoResponse,
     status_code=status.HTTP_200_OK,
     summary="Update user"
 )

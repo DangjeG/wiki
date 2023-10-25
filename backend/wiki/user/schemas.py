@@ -45,19 +45,21 @@ class UserIdentifiers(WikiBase):
     email: Optional[EmailStr] = None
 
 
-class UserInfoResponse(WikiBase):
+class UserBaseInfoResponse(WikiBase):
     email: EmailStr
     username: Optional[str] = None
     first_name: str
     last_name: str
     second_name: Optional[str] = None
     position: Optional[str] = None
+    organization: OrganizationInfoResponse
+    wiki_api_client: Optional[WikiApiClientInfoResponse] = None
+
+
+class UserFullInfoResponse(UserBaseInfoResponse):
     is_user_agreement_accepted: bool
     is_verified_email: bool
     is_enabled: bool
-
-    organization: OrganizationInfoResponse
-    wiki_api_client: Optional[WikiApiClientInfoResponse] = None
 
 
 class UserUpdate(WikiBase):

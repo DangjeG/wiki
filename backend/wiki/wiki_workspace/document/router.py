@@ -4,17 +4,20 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from wiki.auth.enums import AuthorizationMode
 from wiki.common.exceptions import WikiException, WikiErrorCode
 from wiki.common.schemas import WikiUserHandlerData
 from wiki.database.deps import get_db
 from wiki.permissions.base import BasePermission
-from wiki.user.utils import get_user_info_by_handler_data
+from wiki.user.repository import UserRepository
+from wiki.user.utils import get_user_info
 from wiki.wiki_api_client.enums import ResponsibilityType
-from wiki.wiki_api_client.repository import WikiApiClientRepository
 from wiki.wiki_workspace.document.model import Document
 from wiki.wiki_workspace.document.repository import DocumentRepository
-from wiki.wiki_workspace.document.schemas import CreateDocument, DocumentInfoResponse, DocumentNodeInfoResponse
+from wiki.wiki_workspace.document.schemas import (
+    CreateDocument,
+    DocumentInfoResponse,
+    DocumentNodeInfoResponse
+)
 from wiki.wiki_workspace.model import Workspace
 from wiki.wiki_workspace.repository import WorkspaceRepository
 
@@ -52,13 +55,13 @@ async def create_document(
         id=document.id,
         title=document.title,
         workspace_id=document.workspace_id,
-        creator_user=await get_user_info_by_handler_data(user, session),
+        creator_user=await get_user_info(user, session, is_full=False),
         parent_document_id=document.parent_document_id
     )
 
 
 @document_router.get(
-    "/",
+    "/all",
     response_model=list[DocumentInfoResponse],
     status_code=status.HTTP_200_OK,
     summary="Get all document by workspace id"
@@ -69,22 +72,63 @@ async def get_documents_by_workspace_id(
         user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER))
 ):
     document_repository: DocumentRepository = DocumentRepository(session)
-    wiki_api_client_repository: WikiApiClientRepository = WikiApiClientRepository(session)
-
     documents = await document_repository.get_all_document_by_workspace_id(workspace_id=workspace_id)
+    user_repository: UserRepository = UserRepository(session)
 
     result_documents: list[DocumentInfoResponse] = []
     for doc in documents:
+        user_db = await user_repository.get_user_by_id(doc.creator_user_id)
         append_document = DocumentInfoResponse(
             id=doc.id,
             title=doc.title,
             workspace_id=doc.workspace_id,
-            creator=await wiki_api_client_repository.get_wiki_api_client_by_id(doc.id),
+            creator_user=await get_user_info(user_db, session, is_full=False),
             parent_document_id=doc.parent_document_id
         )
         result_documents.append(append_document)
 
     return result_documents
+
+
+@document_router.get(
+    "/info",
+    response_model=DocumentInfoResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get document info by id"
+)
+async def get_document_info_by_id(
+        document_id: UUID,
+        session: AsyncSession = Depends(get_db),
+        user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER))
+):
+    document_repository: DocumentRepository = DocumentRepository(session)
+    document = await document_repository.get_document_by_id(document_id)
+
+    return DocumentInfoResponse(
+        id=document.id,
+        title=document.title,
+        workspace_id=document.workspace_id,
+        creator_user=await get_user_info(document.creator_user_id, session, False),
+        parent_document_id=document.parent_document_id
+    )
+
+
+@document_router.get(
+    "/tree",
+    response_model=list[DocumentNodeInfoResponse],
+    status_code=status.HTTP_200_OK,
+    summary="Get all tree document by workspace id"
+)
+async def get_tree_documents_by_workspace_id(
+        workspace_id: UUID,
+        session: AsyncSession = Depends(get_db),
+        user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER))
+):
+    document_repository: DocumentRepository = DocumentRepository(session)
+    documents = await document_repository.get_all_document_by_workspace_id(workspace_id)
+    result_docs: list[DocumentNodeInfoResponse] = get_children_document(documents)
+
+    return result_docs
 
 
 def get_children_document(documents: list[Document], document_id: UUID = None) -> list[DocumentNodeInfoResponse]:
@@ -99,25 +143,5 @@ def get_children_document(documents: list[Document], document_id: UUID = None) -
             children = get_children_document(documents, doc.id)
             if len(children) > 0:
                 new_doc.children = children
-
-    return result_docs
-
-
-@document_router.get(
-    "/tree",
-    response_model=list[DocumentNodeInfoResponse],
-    status_code=status.HTTP_200_OK,
-    summary="Get all tree document by workspace id"
-)
-async def get_tree_documents_by_workspace_id(
-        workspace_id: UUID,
-        session: AsyncSession = Depends(get_db),
-        user: WikiUserHandlerData = Depends(BasePermission(authorisation_mode=AuthorizationMode.UNAUTHORIZED))# todo
-):
-    document_repository: DocumentRepository = DocumentRepository(session)
-
-    documents = await document_repository.get_all_document_by_workspace_id(workspace_id)
-
-    result_docs: list[DocumentNodeInfoResponse] = get_children_document(documents)
 
     return result_docs

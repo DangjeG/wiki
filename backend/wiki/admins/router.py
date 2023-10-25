@@ -13,7 +13,7 @@ from wiki.organization.schemas import OrganizationInfoResponse
 from wiki.permissions.base import BasePermission
 from wiki.user.models import User
 from wiki.user.repository import UserRepository
-from wiki.user.schemas import UserInfoResponse, ApproveUser, UserIdentifiers
+from wiki.user.schemas import UserFullInfoResponse, ApproveUser, UserIdentifiers
 from wiki.wiki_api_client.enums import ResponsibilityType
 from wiki.wiki_api_client.models import WikiApiClient
 from wiki.wiki_api_client.repository import WikiApiClientRepository
@@ -24,7 +24,7 @@ admins_router = APIRouter()
 
 @admins_router.post(
     "/approve_user",
-    response_model=UserInfoResponse,
+    response_model=UserFullInfoResponse,
     status_code=status.HTTP_200_OK,
     summary="Approve the user for access to the system"
 )
@@ -69,7 +69,7 @@ async def approve_user(
                                                            wiki_api_client_id=new_api_client_db.id)
 
     organization_response: Optional[OrganizationInfoResponse] = None
-    if user.organization_id is not None:
+    if updated_user.organization_id is not None:
         organization_repository: OrganizationRepository = OrganizationRepository(session)
         organization: Organization = await organization_repository.get_organization_by_id(user_db.organization_id)
         organization_response = OrganizationInfoResponse(
@@ -86,7 +86,7 @@ async def approve_user(
         is_enabled=new_api_client_db.is_enabled
     )
 
-    return UserInfoResponse(
+    return UserFullInfoResponse(
         email=user_db.email,
         username=user_db.username,
         first_name=user_db.first_name,
