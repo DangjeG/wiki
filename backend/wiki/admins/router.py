@@ -13,7 +13,7 @@ from wiki.organization.schemas import OrganizationInfoResponse
 from wiki.permissions.base import BasePermission
 from wiki.user.models import User
 from wiki.user.repository import UserRepository
-from wiki.user.schemas import UserInfoResponse, ApproveUser
+from wiki.user.schemas import UserInfoResponse, ApproveUser, UserIdentifiers
 from wiki.wiki_api_client.enums import ResponsibilityType
 from wiki.wiki_api_client.models import WikiApiClient
 from wiki.wiki_api_client.repository import WikiApiClientRepository
@@ -30,12 +30,26 @@ admins_router = APIRouter()
 )
 async def approve_user(
         approval_user: ApproveUser,
+        identifiers: UserIdentifiers = Depends(),
         user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.ADMIN)),
         session: AsyncSession = Depends(get_db)
 ):
     user_repository: UserRepository = UserRepository(session)
     api_client_repository: WikiApiClientRepository = WikiApiClientRepository(session)
-    user_db: User = await user_repository.get_user_by_id(approval_user.user_id)
+
+    if identifiers.user_id is not None:
+        user_db = await user_repository.get_user_by_id(identifiers.user_id)
+    elif identifiers.username is not None:
+        user_db = await user_repository.get_user_by_username(identifiers.username)
+    elif identifiers.email is not None:
+        user_db = await user_repository.get_user_by_email(str(identifiers.email))
+    else:
+        raise WikiException(
+            message=f"User not found.",
+            error_code=WikiErrorCode.USER_NOT_FOUND,
+            http_status_code=status.HTTP_404_NOT_FOUND
+        )
+
     if user_db.wiki_api_client_id is not None:
         api_client: WikiApiClient = await api_client_repository.get_wiki_api_client_by_id(user_db.wiki_api_client_id)
         raise WikiException(

@@ -58,16 +58,16 @@ async def get_workspaces(
         user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER))
 ):
     workspace_repository: WorkspaceRepository = WorkspaceRepository(session)
-    wiki_api_client_repository: WikiApiClientRepository = WikiApiClientRepository(session)
-
+    user_repository: UserRepository = UserRepository(session)
     workspaces = await workspace_repository.get_all_workspace()
 
     result_workspace: list[WorkspaceInfoResponse] = []
     for ws in workspaces:
+        user = await user_repository.get_user_by_id(ws.owner_user_id)
         append_workspace = WorkspaceInfoResponse(
             id=ws.id,
             title=ws.title,
-            owner=await wiki_api_client_repository.get_wiki_api_client_by_id(ws.id)
+            owner_user=await get_user_info(user, session)
         )
         result_workspace.append(append_workspace)
 

@@ -18,7 +18,8 @@ class DocumentInfoResponse(WikiBase):
     creator_user: UserInfoResponse
     parent_document_id: Optional[UUID] = None
 
+
 class DocumentNodeInfoResponse(WikiBase):
     id: UUID
     title: str
-    children: list["DocumentNodeInfoResponse"]
+    children: Optional[list] = None

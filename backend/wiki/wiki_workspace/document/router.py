@@ -86,23 +86,27 @@ async def get_documents_by_workspace_id(
 
     return result_documents
 
-def get_children_document(documents: list[Document], document_id: UUID = None):
+
+def get_children_document(documents: list[Document], document_id: UUID = None) -> list[DocumentNodeInfoResponse]:
     result_docs: list[DocumentNodeInfoResponse] = []
     for doc in documents:
         if doc.parent_document_id == document_id:
-            new_doc = DocumentNodeInfoResponse()
-            new_doc.id = doc.id
-            new_doc.title = doc.title
-            new_doc.children = []
+            new_doc = DocumentNodeInfoResponse(
+                id=doc.id,
+                title=doc.title
+            )
             result_docs.append(new_doc)
-            new_doc.children.append(get_children_document(documents, doc.id))
+            children = get_children_document(documents, doc.id)
+            if len(children) > 0:
+                new_doc.children = children
 
     return result_docs
+
 
 @document_router.get(
     "/tree",
     response_model=list[DocumentNodeInfoResponse],
-    status_code=status.HTTP_202_ACCEPTED,
+    status_code=status.HTTP_200_OK,
     summary="Get all tree document by workspace id"
 )
 async def get_tree_documents_by_workspace_id(

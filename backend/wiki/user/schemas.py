@@ -35,7 +35,6 @@ class CreateVerifiedUser(WikiBase):
 
 
 class ApproveUser(WikiBase):
-    user_id: UUID
     responsibility: ResponsibilityType
     api_client_description: Optional[str] = None
 
