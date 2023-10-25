@@ -43,14 +43,40 @@ components:
           format: uuid
           title: Id
           type: string
+        position:
+          title: Position
+          type: integer
         type_block:
           $ref: '#/components/schemas/TypeBlock'
       required:
       - id
       - document_id
+      - position
       - type_block
       - content
       title: BlockDataResponse
+      type: object
+    BlockInfoResponse:
+      properties:
+        document_id:
+          format: uuid
+          title: Document Id
+          type: string
+        id:
+          format: uuid
+          title: Id
+          type: string
+        position:
+          title: Position
+          type: integer
+        type_block:
+          $ref: '#/components/schemas/TypeBlock'
+      required:
+      - id
+      - document_id
+      - position
+      - type_block
+      title: BlockInfoResponse
       type: object
     CreateBlock:
       properties:
@@ -58,10 +84,14 @@ components:
           format: uuid
           title: Document Id
           type: string
+        position:
+          title: Position
+          type: integer
         type_block:
           $ref: '#/components/schemas/TypeBlock'
       required:
       - document_id
+      - position
       - type_block
       title: CreateBlock
       type: object
@@ -378,6 +408,40 @@ components:
       - VIDEO
       title: TypeBlock
       type: string
+    UpdateBlockData:
+      properties:
+        block_id:
+          format: uuid
+          title: Block Id
+          type: string
+        content:
+          title: Content
+          type: string
+        position:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Position
+      required:
+      - block_id
+      - content
+      title: UpdateBlockData
+      type: object
+    UpdateBlockInfo:
+      properties:
+        block_id:
+          format: uuid
+          title: Block Id
+          type: string
+        position:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Position
+      required:
+      - block_id
+      title: UpdateBlockInfo
+      type: object
     UpdateOrganization:
       properties:
         access:
@@ -1493,25 +1557,22 @@ paths:
       tags:
       - Workspace
   /api/v1/workspace/block/:
-    get:
-      operationId: get_blocks_api_v1_workspace_block__get
+    delete:
+      operationId: delete_block_api_v1_workspace_block__delete
       parameters:
       - in: query
-        name: document_id
+        name: block_id
         required: true
         schema:
           format: uuid
-          title: Document Id
+          title: Block Id
           type: string
       responses:
         '200':
           content:
             application/json:
               schema:
-                items:
-                  $ref: '#/components/schemas/BlockDataResponse'
-                title: Response Get Blocks Api V1 Workspace Block  Get
-                type: array
+                $ref: '#/components/schemas/BaseResponse'
           description: Successful Response
         '422':
           content:
@@ -1525,7 +1586,7 @@ paths:
       - WikiApiKey: []
       - WikiAccessToken: []
       - WikiBearer: []
-      summary: Get all data blocks by id document.
+      summary: Delete a block from a document
       tags:
       - Workspace
       - Workspace
@@ -1560,22 +1621,51 @@ paths:
       tags:
       - Workspace
       - Workspace
-    put:
-      operationId: update_block_api_v1_workspace_block__put
+  /api/v1/workspace/block/data:
+    get:
+      operationId: get_blocks_api_v1_workspace_block_data_get
       parameters:
       - in: query
-        name: block_id
+        name: document_id
         required: true
         schema:
           format: uuid
-          title: Block Id
+          title: Document Id
           type: string
-      - in: query
-        name: content
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/BlockDataResponse'
+                title: Response Get Blocks Api V1 Workspace Block Data Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all data blocks by id document
+      tags:
+      - Workspace
+      - Workspace
+    put:
+      operationId: update_block_data_api_v1_workspace_block_data_put
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBlockData'
         required: true
-        schema:
-          title: Content
-          type: string
       responses:
         '200':
           content:
@@ -1596,6 +1686,38 @@ paths:
       - WikiAccessToken: []
       - WikiBearer: []
       summary: Update data document block
+      tags:
+      - Workspace
+      - Workspace
+  /api/v1/workspace/block/info:
+    put:
+      operationId: update_block_info_api_v1_workspace_block_info_put
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBlockInfo'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Update info document block
       tags:
       - Workspace
       - Workspace

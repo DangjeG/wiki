@@ -149,4 +149,3 @@ class UserRepository(BaseRepository):
         user.second_name = DELETED_USER_SECOND_NAME
 
         self.session.add(user)
-
