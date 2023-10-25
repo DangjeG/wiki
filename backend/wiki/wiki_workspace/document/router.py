@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
+from wiki.auth.enums import AuthorizationMode
 from wiki.common.exceptions import WikiException, WikiErrorCode
 from wiki.common.schemas import WikiUserHandlerData
 from wiki.database.deps import get_db
@@ -13,7 +14,7 @@ from wiki.wiki_api_client.enums import ResponsibilityType
 from wiki.wiki_api_client.repository import WikiApiClientRepository
 from wiki.wiki_workspace.document.model import Document
 from wiki.wiki_workspace.document.repository import DocumentRepository
-from wiki.wiki_workspace.document.schemas import CreateDocument, DocumentInfoResponse
+from wiki.wiki_workspace.document.schemas import CreateDocument, DocumentInfoResponse, DocumentNodeInfoResponse
 from wiki.wiki_workspace.model import Workspace
 from wiki.wiki_workspace.repository import WorkspaceRepository
 
@@ -84,3 +85,35 @@ async def get_documents_by_workspace_id(
         result_documents.append(append_document)
 
     return result_documents
+
+def get_children_document(documents: list[Document], document_id: UUID = None):
+    result_docs: list[DocumentNodeInfoResponse] = []
+    for doc in documents:
+        if doc.parent_document_id == document_id:
+            new_doc = DocumentNodeInfoResponse()
+            new_doc.id = doc.id
+            new_doc.title = doc.title
+            new_doc.children = []
+            result_docs.append(new_doc)
+            new_doc.children.append(get_children_document(documents, doc.id))
+
+    return result_docs
+
+@document_router.get(
+    "/tree",
+    response_model=list[DocumentNodeInfoResponse],
+    status_code=status.HTTP_202_ACCEPTED,
+    summary="Get all tree document by workspace id"
+)
+async def get_tree_documents_by_workspace_id(
+        workspace_id: UUID,
+        session: AsyncSession = Depends(get_db),
+        user: WikiUserHandlerData = Depends(BasePermission(authorisation_mode=AuthorizationMode.UNAUTHORIZED))# todo
+):
+    document_repository: DocumentRepository = DocumentRepository(session)
+
+    documents = await document_repository.get_all_document_by_workspace_id(workspace_id)
+
+    result_docs: list[DocumentNodeInfoResponse] = get_children_document(documents)
+
+    return result_docs
