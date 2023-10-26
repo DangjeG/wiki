@@ -24,6 +24,10 @@ class Settings(BaseSettings):
         {
             "url": "https://api.wiki.example.com",
             "description": "Demo server"
+        },
+        {
+            "url": "https://poorly-ideal-cobra.ngrok-free.app",
+            "description": "Ngrok free server"
         }
     ]
 
@@ -58,7 +62,7 @@ class Settings(BaseSettings):
     AUTH_ALGORITHM_API_KEY: str = "SHA256"
 
     AUTH_VERIFY_TOKEN_EXPIRE_MINUTES: int = 5
-    AUTH_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    AUTH_ACCESS_TOKEN_EXPIRE_MINUTES: int = 180
     AUTH_REFRESH_TOKEN_EXPIRE_MINUTES: int = 10080  # 60 * 24 * 7
 
     DB_SCHEMA: str = "postgresql"
