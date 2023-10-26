@@ -18,7 +18,7 @@ from wiki.database.utils import (
     DELETED_USER_SECOND_NAME
 )
 from wiki.user.models import User
-from wiki.user.schemas import CreateUser
+from wiki.user.schemas import CreateUser, UserFilter
 
 
 class UserRepository(BaseRepository):
@@ -68,6 +68,22 @@ class UserRepository(BaseRepository):
         st = select(User).where(User.username == username)
         user_query = (await self.session.execute(st)).scalar()
         return user_query
+
+    async def get_all_users_filter(self, filter_user: UserFilter) -> list[User]:
+        filters = []
+        if filter_user.username is not None:
+            filters.append(select(User.username.ilike(f'%{filter_user.username}%')))
+        if filter_user.last_name is not None:
+            filters.append(select(User.last_name.ilike(f'%{filter_user.last_name}%')))
+        if filter_user.first_name is not None:
+            filters.append(select(User.first_name.ilike(f'%{filter_user.first_name}%')))
+        if filter_user.second_name is not None:
+            filters.append(select(User.last_name.ilike(f'%{filter_user.second_name}%')))
+
+        result = await self.session.execute(select(User).where(and_(*filters)))
+
+        return result.scalars().all()
+
 
     async def get_all_users(self, is_only_existing: bool = True) -> list[User]:
         st = select(User)

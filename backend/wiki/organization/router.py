@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
+from fastapi_pagination import Page, paginate
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
@@ -15,7 +16,7 @@ from wiki.common.schemas import WikiUserHandlerData
 from wiki.organization.schemas import (
     OrganizationInfoResponse,
     CreateOrganization,
-    UpdateOrganization,
+    UpdateOrganization, OrganizationFilter
 )
 
 
@@ -30,8 +31,7 @@ organization_router = APIRouter()
 )
 async def get_organization(
         organization_id: UUID,
-        user: ExternalUserHandlerData | WikiUserHandlerData =
-        Depends(BasePermission(authorisation_mode=AuthorizationMode.UNAUTHORIZED)),
+        user: ExternalUserHandlerData | WikiUserHandlerData = Depends(BasePermission(authorisation_mode=AuthorizationMode.UNAUTHORIZED)),
         session: AsyncSession = Depends(get_db)
 ):
     organization_repo: OrganizationRepository = OrganizationRepository(session)
@@ -68,18 +68,18 @@ async def create_organization(new_organization: CreateOrganization,
 
 @organization_router.get(
     "/all",
-    response_model=list[OrganizationInfoResponse],
+    response_model=Page[OrganizationInfoResponse],
     status_code=status.HTTP_200_OK,
     description="Get all organizations.",
 )
 async def get_organizations(
-        user: ExternalUserHandlerData | WikiUserHandlerData =
-        Depends(BasePermission(authorisation_mode=AuthorizationMode.UNAUTHORIZED)),
+        organization_filter: OrganizationFilter = Depends(OrganizationFilter),
+        user: ExternalUserHandlerData | WikiUserHandlerData = Depends(BasePermission(authorisation_mode=AuthorizationMode.UNAUTHORIZED)),
         session: AsyncSession = Depends(get_db)
 ):
     organization_repository: OrganizationRepository = OrganizationRepository(session)
 
-    organizations: list[OrganizationInfoResponse] = await organization_repository.get_all_organization()
+    organizations: list[OrganizationInfoResponse] = await organization_repository.get_all_organization_filter(organization_filter)
 
     result_organization: list[OrganizationInfoResponse] = []
 
@@ -93,7 +93,7 @@ async def get_organizations(
             )
         )
 
-    return result_organization
+    return paginate(result_organization)
 
 
 @organization_router.put(

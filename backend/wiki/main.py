@@ -3,6 +3,7 @@ import logging
 import uvicorn
 import yaml
 from fastapi import FastAPI, Request
+from fastapi_pagination import add_pagination
 from starlette import status
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
@@ -28,6 +29,7 @@ api = FastAPI(
     servers=settings.API_SERVERS
 )
 
+add_pagination(api)
 
 @api.exception_handler(WikiException)
 async def wiki_exception_handler(request: Request, exc: WikiException):
@@ -110,7 +112,6 @@ async def shutdown():
 
 # frontend = FastAPI()
 api.include_router(api_router, prefix=settings.API_V1_STR)
-
 
 if __name__ == "__main__":
     setup_logging()

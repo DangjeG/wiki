@@ -74,3 +74,9 @@ class UserUpdate(WikiBase):
     is_user_agreement_accepted: Optional[bool] = None
     is_verified_email: Optional[bool] = None
     wiki_api_client_id: Optional[UUID] = None
+
+class UserFilter(WikiBase):
+    username: Optional[str] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    second_name: Optional[str] = None

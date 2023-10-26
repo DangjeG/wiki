@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from fastapi_pagination import Page, paginate
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
@@ -9,7 +10,8 @@ from wiki.organization.repository import OrganizationRepository
 from wiki.permissions.base import BasePermission
 from wiki.user.models import User
 from wiki.user.repository import UserRepository
-from wiki.user.schemas import UserFullInfoResponse, UserIdentifiers, UserUpdate, CreateVerifiedUser, CreateUser
+from wiki.user.schemas import UserFullInfoResponse, UserIdentifiers, UserUpdate, CreateVerifiedUser, CreateUser, \
+    UserFilter
 from wiki.user.utils import get_user_info
 from wiki.wiki_api_client.enums import ResponsibilityType
 from wiki.wiki_api_client.models import WikiApiClient
@@ -102,23 +104,24 @@ async def get_user(
 
 @user_router.get(
     "/all",
-    response_model=list[UserFullInfoResponse],
+    response_model=Page[UserFullInfoResponse],
     status_code=status.HTTP_200_OK,
     summary="Get all users"
 )
 async def get_users(
+        filter_user: UserFilter = Depends(UserFilter),
         user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.ADMIN)),
         session: AsyncSession = Depends(get_db)
 ):
     user_repository: UserRepository = UserRepository(session)
-    users: list[User] = await user_repository.get_all_users()
+    users: list[User] = await user_repository.get_all_users_filter(filter_user)
 
     result_users: list[UserFullInfoResponse] = []
     for us in users:
         append_user = await get_user_info(us, session)
         result_users.append(append_user)
 
-    return result_users
+    return paginate(result_users)
 
 
 @user_router.delete(

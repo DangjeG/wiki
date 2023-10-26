@@ -1,7 +1,7 @@
 from typing import Optional
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import select, and_
 from starlette import status
 
 from wiki.permissions.domain.enums import DomainPermissionMode
@@ -14,7 +14,7 @@ from wiki.database.utils import (
     NotFoundResultMode
 )
 from wiki.permissions.domain.models import PermissionDomain
-from wiki.permissions.domain.schemas import CreatePermissionDomain
+from wiki.permissions.domain.schemas import CreatePermissionDomain, PermissionDomainFilter
 
 
 class PermissionDomainRepository(BaseRepository):
@@ -34,6 +34,19 @@ class PermissionDomainRepository(BaseRepository):
         st = select(PermissionDomain).where(PermissionDomain.domain == domain.lower())
         domain_query = (await self.session.execute(st)).scalar()
         return domain_query
+
+    async def get_all_permission_domains_filter(self, permission_domain_filter: PermissionDomainFilter) -> list[PermissionDomain]:
+        filters = []
+        if permission_domain_filter.domain is not None:
+            filters.append(select(PermissionDomain.domain.ilike(f'%{permission_domain_filter.domain}%')))
+        if permission_domain_filter.mode is not None:
+            filters.append(select(PermissionDomain.mode.like(str(permission_domain_filter.mode))))
+        if permission_domain_filter.is_enabled is not None:
+            filters.append(select(PermissionDomain.is_enabled.like(permission_domain_filter.is_enabled)))
+
+        result = await self.session.execute(select(PermissionDomain).where(and_(*filters)))
+
+        return result.scalars().all()
 
     async def get_all_permission_domains(self) -> list[PermissionDomain]:
         users_query = await self.session.execute(select(PermissionDomain))
