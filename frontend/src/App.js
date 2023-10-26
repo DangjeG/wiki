@@ -2,7 +2,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import {api} from "./app.config";
 import {useEffect, useState} from "react";
 import AppNavbar from "./Components/Navbar";
-import {BrowserRouter, Route, Routes} from "react-router-dom";
+import {Route, HashRouter, Routes} from "react-router-dom";
 import Home from "./Pages/Home";
 import Login from "./Pages/Login";
 import Verify from "./Pages/Verify";
@@ -10,8 +10,6 @@ import SignUp from "./Pages/SignUp";
 import Logout from "./Pages/Logout";
 import Admin from "./Pages/Admin";
 import Profile from "./Pages/Profile";
-import AppSidebar from "./Components/Sidebar";
-
 
 export default function App() {
 
@@ -31,7 +29,7 @@ export default function App() {
 
 
         return (
-            <BrowserRouter>
+            <HashRouter>
                 <AppNavbar user={user}/>
                     <Routes>
                         <Route path={"/"} element={<Home/>}/>
@@ -42,6 +40,6 @@ export default function App() {
                         <Route path={"/admin"} element={<Admin/>}/>
                         <Route path={"/profile"} element={<Profile/>}/>
                     </Routes>
-                </BrowserRouter>
+                </HashRouter>
         )
 }

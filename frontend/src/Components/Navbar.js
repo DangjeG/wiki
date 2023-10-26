@@ -10,8 +10,8 @@ export default function AppNavbar(props){
         if (props.user === null) {
             return (
                 <Nav>
-                    <Button variant="dark" href="/login" className="mr-2">Login</Button>
-                    <Button variant="dark" href="/signup" className="mr-2">Sign Up</Button>
+                    <Button variant="dark" href="#login" className="mr-2">Login</Button>
+                    <Button variant="dark" href="#signup" className="mr-2">Sign Up</Button>
                 </Nav>
             )
         }
@@ -23,11 +23,11 @@ export default function AppNavbar(props){
                             {props.user.username}
                         </Dropdown.Toggle>
                         <Dropdown.Menu variant="dark">
-                            <Dropdown.Item href="/profile">Profile</Dropdown.Item>
+                            <Dropdown.Item href="#profile">Profile</Dropdown.Item>
                             {props.user.wiki_api_client.responsibility === "ADMIN" ?
-                                <Dropdown.Item href="/admin">Admin Tools</Dropdown.Item> : <></>}
+                                <Dropdown.Item href="#admin">Admin Tools</Dropdown.Item> : <></>}
                             <Dropdown.Divider/>
-                            <Dropdown.Item href="/logout">Logout</Dropdown.Item>
+                            <Dropdown.Item href="#logout">Logout</Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
                 </Nav>)
