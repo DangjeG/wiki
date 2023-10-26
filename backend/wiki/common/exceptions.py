@@ -14,6 +14,7 @@ class WikiErrorCode(IntEnum):
             3501-3999: permission error
             4000-5000: user errors
             5001-6000: permission errors
+            6001-7000: workspace errors
         """
 
     # 0-1000: general errors
@@ -60,6 +61,16 @@ class WikiErrorCode(IntEnum):
     # 5001-6000: permission errors
     PERMISSION_DOMAIN_NOT_FOUND = 5001
     PERMISSION_DOMAIN_NOT_SPECIFIED = 5001
+
+    # 6001-7000: workspace errors
+    WORKSPACE_NOT_FOUND = 6001
+    WORKSPACE_NOT_SPECIFIED = 6002
+
+    DOCUMENT_NOT_FOUND = 6003
+    DOCUMENT_NOT_SPECIFIED = 6004
+
+    BLOCK_NOT_FOUND = 6005
+    BLOCK_NOT_SPECIFIED = 6006
 
 
 class WikiException(Exception):

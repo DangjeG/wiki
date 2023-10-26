@@ -10,11 +10,11 @@ help:
 
 .PHONY: up
 up:
-		docker-compose -f docker-compose.yaml up -d
+		docker-compose -f docker-compose-local.yaml up -d
 
 .PHONY: down
 down:
-		docker-compose -f docker-compose.yaml down && docker network prune --force
+		docker-compose -f docker-compose-local.yaml down && docker network prune --force
 
 .PHONY: export-dep
 export-dep:
