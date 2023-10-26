@@ -27,3 +27,8 @@ class PermissionDomainInfoResponse(WikiBase):
     mode: DomainPermissionMode
     is_enabled: bool
     created_at: datetime
+
+class PermissionDomainFilter(WikiBase):
+    domain: Optional[str] = None
+    mode: Optional[DomainPermissionMode] = None
+    is_enabled: Optional[bool] = None

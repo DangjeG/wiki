@@ -16,6 +16,7 @@ python-jose = "^3.3.0"
 fastapi-mail = "^1.4.1"
 stackprinter = "^0.2.10"
 lakefs-client = "^1.0.0"
+fastapi-pagination = "^0.12.11"
 
 [build-system]
 requires = ["poetry-core"]

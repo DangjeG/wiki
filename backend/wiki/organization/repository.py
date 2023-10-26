@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import select, bindparam, and_
 from starlette import status
 
 from wiki.common.exceptions import WikiException, WikiErrorCode
@@ -12,7 +12,7 @@ from wiki.database.utils import (
     menage_db_commit_method
 )
 from wiki.organization.models import Organization
-from wiki.organization.schemas import CreateOrganization
+from wiki.organization.schemas import CreateOrganization, OrganizationFilter
 
 
 class OrganizationRepository(BaseRepository):
@@ -26,6 +26,19 @@ class OrganizationRepository(BaseRepository):
     async def get_organization_by_id(self, organization_id: UUID) -> Organization:
         organization_query = await self.session.get(Organization, organization_id)
         return organization_query
+
+    async def get_all_organization_filter(self, organization_filter: OrganizationFilter) -> list[Organization]:
+        filters = []
+        if organization_filter.name is not None:
+            filters.append(Organization.name.ilike(f'%{organization_filter.name}%'))
+        if organization_filter.access is not None:
+            filters.append(Organization.access.like(str(organization_filter.access)))
+        if organization_filter.description is not None:
+            filters.append(Organization.description.ilike(f'%{organization_filter.description}%'))
+
+        result = await self.session.execute(select(Organization).where(and_(*filters)))
+
+        return result.scalars().all()
 
     async def get_all_organization(self) -> list[Organization]:
         organization_query = await self.session.execute(select(Organization))

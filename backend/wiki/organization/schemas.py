@@ -22,3 +22,9 @@ class UpdateOrganization(WikiBase):
     name: Optional[str] = None
     description: Optional[str] = None
     access: Optional[OrganizationAccessType] = None
+
+
+class OrganizationFilter(WikiBase):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    access: Optional[OrganizationAccessType] = None

@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from fastapi_pagination import Page, paginate
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
@@ -12,7 +13,7 @@ from wiki.permissions.domain.schemas import (
     CreatePermissionDomain,
     PermissionDomainInfoResponse,
     PermissionDomainIdentifiers,
-    UpdatePermissionDomain
+    UpdatePermissionDomain, PermissionDomainFilter
 )
 from wiki.wiki_api_client.enums import ResponsibilityType
 
@@ -86,16 +87,17 @@ async def _get_permission_domain(session: AsyncSession, identifier: PermissionDo
 
 @permission_domain_router.get(
     "/all",
-    response_model=list[PermissionDomainInfoResponse],
+    response_model=Page[PermissionDomainInfoResponse],
     status_code=status.HTTP_200_OK,
     summary="Get all permission domain"
 )
 async def get_permission_domains(
+        permission_domain_filter: PermissionDomainFilter = Depends(PermissionDomainFilter),
         user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.ADMIN)),
         session: AsyncSession = Depends(get_db)
 ):
     domain_repository: PermissionDomainRepository = PermissionDomainRepository(session)
-    domains: list[PermissionDomain] = await domain_repository.get_all_permission_domains()
+    domains: list[PermissionDomain] = await domain_repository.get_all_permission_domains_filter(permission_domain_filter)
     result_domains: list[PermissionDomainInfoResponse] = []
 
     for domain in domains:
@@ -107,7 +109,7 @@ async def get_permission_domains(
             created_at=domain.created_at
         ))
 
-    return result_domains
+    return paginate(result_domains)
 
 
 @permission_domain_router.put(
