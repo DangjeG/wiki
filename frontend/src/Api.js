@@ -1,15 +1,6 @@
 import {instance} from "./api.config";
-import {User} from "./Models/User";
-import {Organization} from "./Models/Organization";
 
 export default class Api {
-
-
-    isLogin() {
-        return (!(localStorage.getItem("token").length === 0))
-    }
-
-
     async login(email) {
         await instance.post(`/auth/login`,
             {
@@ -18,7 +9,6 @@ export default class Api {
             localStorage.setItem('verify', response.data.verify_token)
         })
     }
-
 
     async signup(email, username, first_name, last_name, second_name,  organization_id, is_user_agreement_accepted) {
         await instance.post(`/auth/signup`,
@@ -35,7 +25,6 @@ export default class Api {
         })
     }
 
-
     async verify(code) {
         await instance.get(`/auth/verify?token=${localStorage.getItem("verify")}&verification_code=${code}`)
             .then((resp) => {
@@ -47,22 +36,17 @@ export default class Api {
         localStorage.setItem('token', "");
     }
 
-
      async getUsers() {
          let users = []
          await instance.get(`/user/all`,)
              .then((resp) => {
                  resp.data.forEach((user) => {
-                     if (user.wiki_api_client === null) {
-                         users.push(new User(user.email, user.username, user.first_name, user.last_name, user.second_name, ""))
+                         users.push(user)
                      }
-                     else {
-                         users.push(new User(user.email, user.username, user.first_name, user.last_name, user.second_name, user.wiki_api_client.responsibility))
-                     }
-                 })
+                 )
              })
          return users;
-     }
+    }
 
 
      async getOrganizations() {
@@ -70,9 +54,8 @@ export default class Api {
          await instance.get(`/organization/all`,)
              .then((resp) => {
                  resp.data.forEach((organization) => {
-                         organizations.push(new Organization(organization.access, organization.description, organization.id, organization.name))
-                     }
-                 )
+                         organizations.push(organization)
+                 })
              })
          return organizations
      }
@@ -86,13 +69,90 @@ export default class Api {
             })
     }
 
-    async getMe() {
-        let user
-        await instance.get(`/user/me`,)
-            .then((resp) => {
-                user = new User(resp.data.email, resp.data.username, resp.data.first_name, resp.data.last_name, resp.data.second_name, resp.data.wiki_api_client.responsibility)
-            })
-
+     async getMe() {
+        let user = null
+          await instance.get(`/user/me`).then((resp) => {
+              user = resp.data
+         })
         return user
+    }
+
+    async approveUser(username, responsibility, description){
+        await instance.post(`/admins/approve_user?username=${username}`, {
+            "responsibility": responsibility,
+            "api_client_description": description
+        } )
+    }
+
+    async getWorkspaces(){
+        let workspaces = []
+        await instance.get(`/workspace/all`).then((resp)=>{
+            resp.data.forEach((workspace) => {
+                workspaces.push(workspace)
+            })}
+        )
+       return workspaces
+    }
+
+    async addWorkspaces(title){
+        await instance.post(`/workspace`,{
+            "title" : title
+        })
+    }
+
+    async getWorkspace(id){
+        let workspace = null
+        await instance.get(`/workspace/all`).then((resp)=>{
+            workspace=resp.data
+           }
+        )
+        return workspace
+    }
+
+    async addDocument(title, workspace_id, parent_document_id){
+        await instance.post(`/document`,{
+            "title" : title,
+            "workspace_id": workspace_id,
+            "parent_document_id": parent_document_id
+        })
+    }
+
+    async getDocumentsTree(workspace_id){
+        let documents = []
+        await instance.get(`/document/tree?workspace_id=${workspace_id}`).then((resp)=>{
+            resp.data.forEach((document) => {
+                documents.push(document)
+            })}
+        )
+        return documents
+    }
+
+    async addBlock(document_id, position, type_block){
+        await instance.post(`/block`,{
+            "document_id": document_id,
+            "position": position,
+            "type_block": type_block
+        })
+    }
+
+    async deleteBlock(block_id){
+        await instance.delete(`/block?block_id=${block_id}`)
+    }
+
+    async updateBlockData(block_id, content){
+        await instance.put(`/block/data`,{
+            "block_id": block_id,
+            "content": content
+        })
+    }
+
+    async getBlocks(document_id){
+        let res = []
+        await instance.get(`/block/data?document_id=${document_id}`).then((resp)=>{
+            resp.data.forEach((item) => {
+                res.push(item)
+            })}
+        )
+        return res
     }
 }

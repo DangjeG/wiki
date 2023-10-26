@@ -4,8 +4,11 @@ import {Modal, Button} from "react-bootstrap";
 
 
 export default function Logout() {
-    React.useEffect(async () => {
-        await api.logout()
+    React.useEffect( () => {
+        async function fetch(){
+            const logout = await api.logout()
+        }
+        fetch()
     })
     return (
         <div
@@ -15,7 +18,6 @@ export default function Logout() {
             <Modal.Header>
                 <Modal.Title>Successful</Modal.Title>
             </Modal.Header>
-
             <Modal.Body>
                 <p>You have successfully logged out of your account.</p>
             </Modal.Body>
