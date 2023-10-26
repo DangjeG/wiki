@@ -32,7 +32,6 @@ export default function SignUp() {
 
     async function handleFormSubmit(event) {
         event.preventDefault();
-
         try {
             await api.signup(email, username, first_name, last_name, second_name, organizationId, is_user_agreement_accepted)
             window.location.href = '/verify';

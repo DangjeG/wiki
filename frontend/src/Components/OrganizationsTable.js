@@ -5,10 +5,6 @@ import {api} from "../app.config";
 
 export default function OrganizationsTable() {
 
-
-
-    const [organizations, setOrganizations] = useState([]);
-
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -22,17 +18,23 @@ export default function OrganizationsTable() {
     }, []);
 
 
+    const [organizations, setOrganizations] = useState([]);
+    const [show, setShow] = useState(false);
 
     const [name, setName] = useState();
     const [description, setDescription] = useState();
     const [access, setAccess] = useState();
 
 
-    const [show, setShow] = useState(false);
-    const handleClose = () => setShow(false);
+    const handleClose = () => {
+        Add()
+        setShow(false)
+    };
     const handleShow = () => setShow(true);
 
+
     async function Add() {
+
         await api.addOrganizations(name, description, access)
         const fetchData = async () => {
             try {
@@ -51,7 +53,7 @@ export default function OrganizationsTable() {
     return (<div style={{"padding": "50px 150px"}}>
         <Table>
             <thead>
-            <tr>
+            <tr key="header">
                 <th>Name</th>
                 <th>Description</th>
                 <th>Access</th>
@@ -59,11 +61,12 @@ export default function OrganizationsTable() {
             </tr>
             </thead>
             <tbody>
-            {Array.from(organizations).map((organization) => (<tr>
-                <td>{organization.name}</td>
-                <td>{organization.description}</td>
-                <td>{organization.access}</td>
-            </tr>))}
+            {Array.from(organizations).map((organization) => (
+                <tr key={organization.name}>
+                    <td>{organization.name}</td>
+                    <td>{organization.description}</td>
+                    <td>{organization.access}</td>
+                </tr>))}
             </tbody>
         </Table>
         <Modal show={show} onHide={handleClose}>
@@ -95,10 +98,7 @@ export default function OrganizationsTable() {
                 <Button variant="secondary" onClick={handleClose}>
                     Close
                 </Button>
-                <Button variant="primary" onClick={() => {
-                    Add()
-                    handleClose()
-                }}>
+                <Button variant="primary" onClick={handleClose}>
                     Save Changes
                 </Button>
             </Modal.Footer>

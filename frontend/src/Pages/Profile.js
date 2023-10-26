@@ -1,12 +1,11 @@
 import React, {useEffect, useState} from "react";
-import {User} from "../Models/User";
 import {api} from "../app.config";
 import {ListGroup} from "react-bootstrap";
 
 
 export default function Profile(){
 
-    const [user, setUser] = useState(new User())
+    const [user, setUser] = useState(null)
 
     useEffect(() => {
         const fetchData = async () => {
@@ -21,7 +20,7 @@ export default function Profile(){
     }, []);
 
     function getApproved(){
-        if(user.responsibility !=="") return <ListGroup.Item style={{color: "lightgreen"}}>You are approved</ListGroup.Item>
+        if(user.wiki_api_client.responsibility !== null) return <ListGroup.Item style={{color: "lightgreen"}}>You are approved</ListGroup.Item>
         else return <ListGroup.Item style={{color: "red"}}>You are not approved</ListGroup.Item>
     }
 

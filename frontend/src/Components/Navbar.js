@@ -1,29 +1,14 @@
-import {Nav, Navbar, Dropdown, Button} from "react-bootstrap";
-import {useEffect, useState} from "react";
-import {api} from "../app.config";
-import {User} from "../Models/User";
+import {Button, Dropdown, Nav, Navbar} from "react-bootstrap";
+
 
 
 export default function AppNavbar(props){
 
-    const [user, setUser] = useState(new User())
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await api.getMe();
-                setUser(response);
-            } catch (error) {
-                console.log(error)
-            }
-        };
-        fetchData();
-    }, []);
-
     function getRightPanel(){
 
-        if (!props.isLogin){
-            return(
+
+        if (props.user === null) {
+            return (
                 <Nav>
                     <Button variant="dark" href="/login" className="mr-2">Login</Button>
                     <Button variant="dark" href="/signup" className="mr-2">Sign Up</Button>
@@ -35,22 +20,18 @@ export default function AppNavbar(props){
                 <Nav>
                     <Dropdown>
                         <Dropdown.Toggle variant="dark" id="dropdown-basic">
-                            {user.username}
+                            {props.user.username}
                         </Dropdown.Toggle>
-                        <Dropdown.Menu variant="dark" >
+                        <Dropdown.Menu variant="dark">
                             <Dropdown.Item href="/profile">Profile</Dropdown.Item>
-                            {addAdmin()}
+                            {props.user.wiki_api_client.responsibility === "ADMIN" ?
+                                <Dropdown.Item href="/admin">Admin Tools</Dropdown.Item> : <></>}
                             <Dropdown.Divider/>
                             <Dropdown.Item href="/logout">Logout</Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
-                </Nav>
-            )
+                </Nav>)
         }
-    }
-
-    function addAdmin(){
-        if (user.responsibility === "ADMIN") return(<Dropdown.Item href="/admin">Admin Tools</Dropdown.Item>)
     }
 
     return (
