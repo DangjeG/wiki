@@ -11,6 +11,7 @@ from wiki.user.router import user_router
 from wiki.wiki_workspace.block.router import block_router
 from wiki.wiki_workspace.document.router import document_router
 from wiki.wiki_workspace.router import workspace_router
+from wiki.wiki_workspace.versioning.router import versioning_workspace_router
 
 api_router = APIRouter(
     default_response_class=JSONResponse
@@ -27,3 +28,4 @@ api_router.include_router(wiki_api_client_router, prefix="/api_client", tags=["W
 api_router.include_router(workspace_router, prefix="/workspace", tags=["Workspace"])
 api_router.include_router(document_router, prefix="/document", tags=["WorkspaceDocument"])
 api_router.include_router(block_router, prefix="/block", tags=["WorkspaceBlock"])
+api_router.include_router(versioning_workspace_router, prefix="/versioning", tags=["WorkspaceVersioning"])

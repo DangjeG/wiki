@@ -15,6 +15,7 @@ class WikiErrorCode(IntEnum):
             4000-5000: user errors
             5001-6000: permission errors
             6001-7000: workspace errors
+            7001-8000: version errors
         """
 
     # 0-1000: general errors
@@ -71,6 +72,10 @@ class WikiErrorCode(IntEnum):
 
     BLOCK_NOT_FOUND = 6005
     BLOCK_NOT_SPECIFIED = 6006
+
+    # 7001-8000: version errors
+    VERSION_WORKSPACE_NOT_FOUND = 7001
+    ROOT_VERSION_WORKSPACE_NOT_FOUND = 7002
 
 
 class WikiException(Exception):

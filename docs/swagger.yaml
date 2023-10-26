@@ -427,11 +427,6 @@ components:
         content:
           title: Content
           type: string
-        position:
-          anyOf:
-          - type: integer
-          - type: 'null'
-          title: Position
       required:
       - block_id
       - content
@@ -693,6 +688,70 @@ components:
       - msg
       - type
       title: ValidationError
+      type: object
+    VersionWorkspaceInfoGraphResponse:
+      properties:
+        branch:
+          title: Branch
+          type: string
+        committer_user:
+          $ref: '#/components/schemas/UserBaseInfoResponse'
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        id:
+          format: uuid
+          title: Id
+          type: string
+        parent_version_workspace:
+          anyOf:
+          - $ref: '#/components/schemas/VersionWorkspaceInfoGraphResponse'
+          - type: 'null'
+        workspace_id:
+          format: uuid
+          title: Workspace Id
+          type: string
+      required:
+      - id
+      - workspace_id
+      - committer_user
+      - branch
+      - created_at
+      title: VersionWorkspaceInfoGraphResponse
+      type: object
+    VersionWorkspaceInfoResponse:
+      properties:
+        branch:
+          title: Branch
+          type: string
+        committer_user:
+          $ref: '#/components/schemas/UserBaseInfoResponse'
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        id:
+          format: uuid
+          title: Id
+          type: string
+        parent_version_workspace_id:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Parent Version Workspace Id
+        workspace_id:
+          format: uuid
+          title: Workspace Id
+          type: string
+      required:
+      - id
+      - workspace_id
+      - committer_user
+      - branch
+      - created_at
+      title: VersionWorkspaceInfoResponse
       type: object
     WikiApiClientInfoResponse:
       properties:
@@ -1880,6 +1939,76 @@ paths:
       summary: Create a verified user (has access to the system)
       tags:
       - User
+  /api/v1/versioning/wp/{workspace_id}/info:
+    get:
+      operationId: get_list_info_versions_workspace_api_v1_versioning_wp__workspace_id__info_get
+      parameters:
+      - in: path
+        name: workspace_id
+        required: true
+        schema:
+          format: uuid
+          title: Workspace Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/VersionWorkspaceInfoResponse'
+                title: Response Get List Info Versions Workspace Api V1 Versioning
+                  Wp  Workspace Id  Info Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get info as a list of all versions workspace
+      tags:
+      - WorkspaceVersioning
+  /api/v1/versioning/wp/{workspace_id}/info/graph:
+    get:
+      operationId: get_graph_info_versions_workspace_api_v1_versioning_wp__workspace_id__info_graph_get
+      parameters:
+      - in: path
+        name: workspace_id
+        required: true
+        schema:
+          format: uuid
+          title: Workspace Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VersionWorkspaceInfoGraphResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get info as a list of all versions workspace
+      tags:
+      - WorkspaceVersioning
   /api/v1/workspace/:
     post:
       operationId: create_workspace_api_v1_workspace__post

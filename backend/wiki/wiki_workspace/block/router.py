@@ -76,8 +76,9 @@ async def update_block_data(
         user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER))
 ):
     block_repository: BlockRepository = BlockRepository(session)
-    block = await block_repository.update_block(update_data_block.block_id,
-                                                position=update_data_block.position)
+    # block = await block_repository.update_block(update_data_block.block_id,
+    #                                             position=update_data_block.position)
+    block = await block_repository.update_block(update_data_block.block_id)
     document_repository: DocumentRepository = DocumentRepository(session)
     document = await document_repository.get_document_by_id(block.document_id)
     workspace_repository: WorkspaceRepository = WorkspaceRepository(session)

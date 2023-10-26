@@ -16,7 +16,8 @@ class UpdateBlockInfo(WikiBase):
     position: Optional[int] = None
 
 
-class UpdateBlockData(UpdateBlockInfo):
+class UpdateBlockData(WikiBase):
+    block_id: UUID
     content: str  # WYSIWYG
 
 
