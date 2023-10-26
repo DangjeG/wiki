@@ -79,7 +79,9 @@ class Settings(BaseSettings):
 
     DB_METADATA_CREATE_ALL: bool = True
 
-    BACKEND_CORS_ORIGINS: list[str] = ["*"]
+    BACKEND_CORS_ORIGINS: list[str] = ["http://127.0.0.1:3000",
+                                       "http://localhost:3000",
+                                       "https://egorov-m.github.io"]
 
     EMAIL_HOST: str
     EMAIL_PORT: int

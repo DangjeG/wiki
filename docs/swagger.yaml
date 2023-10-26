@@ -2119,5 +2119,5 @@ servers:
   url: http://localhost:8000/
 - description: Demo server
   url: https://api.wiki.example.com/
-- description: Ngrok
-  url: https://0240-176-59-209-217.ngrok-free.app/
+- description: Ngrok free server
+  url: https://poorly-ideal-cobra.ngrok-free.app/
