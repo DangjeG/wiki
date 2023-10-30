@@ -1,23 +1,31 @@
-from wiki.wiki_workspace.document.model import Document
-from wiki.wiki_workspace.document.repository import DocumentRepository
+from uuid import UUID
+
+from starlette import status
+
+from wiki.common.exceptions import WikiException, WikiErrorCode
+from wiki.config import settings
 
 
-def forming_document_storage_path(unique_names_parents_documents: list[str],
-                                  unique_block_name: str) -> str:
-    if len(unique_names_parents_documents) < 1:
-        raise ValueError
-    path = f"{'/'.join(unique_names_parents_documents)}/{unique_block_name}.html"
+def forming_document_block_storage_path(document_ids: list[UUID],
+                                        block_id: UUID) -> str:
+    if len(document_ids) < 1:
+        raise WikiException(
+            message="The block must necessarily be attached to the document.",
+            error_code=WikiErrorCode.GENERIC_ERROR,
+            http_status_code=status.HTTP_400_BAD_REQUEST
+        )
+    path = f"{'/'.join([str(item) for item in document_ids])}/{str(block_id)}{settings.LAKEFS_DOCUMENT_BLOCK_FILE_EXT}"
 
     return path
 
 
-async def get_unique_names_parents_documents(document: Document, document_repository: DocumentRepository) -> list[str]:
-    unique_names_parents_documents = [str(document.id)]
+def forming_document_storage_path(document_ids: list[UUID]):
+    if len(document_ids) < 1:
+        raise WikiException(
+            message="At least one top-level document id must be specified to retrieve a document.",
+            error_code=WikiErrorCode.GENERIC_ERROR,
+            http_status_code=status.HTTP_400_BAD_REQUEST
+        )
+    path = f"{'/'.join([str(item) for item in document_ids])}"
 
-    while document.parent_document_id is not None:
-        document = await document_repository.get_document_by_id(document.parent_document_id)
-        unique_names_parents_documents.append(str(document.id))
-
-    unique_names_parents_documents.reverse()
-
-    return unique_names_parents_documents
+    return path

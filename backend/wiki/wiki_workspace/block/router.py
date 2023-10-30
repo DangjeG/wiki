@@ -12,7 +12,6 @@ from wiki.permissions.base import BasePermission
 from wiki.wiki_api_client.enums import ResponsibilityType
 from wiki.wiki_storage.deps import get_storage_client
 from wiki.wiki_storage.services.base import BaseWikiStorageService
-from wiki.wiki_storage.utils import get_unique_names_parents_documents
 from wiki.wiki_workspace.block.repository import BlockRepository
 from wiki.wiki_workspace.block.schemas import (
     CreateBlock,
@@ -42,18 +41,16 @@ async def create_block(
 ):
     document_repository: DocumentRepository = DocumentRepository(session)
     document = await document_repository.get_document_by_id(new_block.document_id)
-    unique_workspace_name = document.workspace_id
-
-    unique_names_parents_documents = await get_unique_names_parents_documents(document, document_repository)
+    document_ids = await document_repository.get_list_ids_of_document_hierarchy(document)
 
     block_repository: BlockRepository = BlockRepository(session)
     block = await block_repository.create_block(new_block)
 
     storage_service: BaseWikiStorageService = BaseWikiStorageService(storage_client)
     storage_service.upload_document_block_in_workspace_storage(content=StringIO(""),
-                                                               unique_workspace_name=unique_workspace_name,
-                                                               unique_names_parents_documents=unique_names_parents_documents,
-                                                               unique_block_name=block.id)
+                                                               workspace_id=document.workspace_id,
+                                                               document_ids=document_ids,
+                                                               block_id=block.id)
     return BlockDataResponse(
         id=block.id,
         position=block.position,
@@ -76,20 +73,18 @@ async def update_block_data(
         user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER))
 ):
     block_repository: BlockRepository = BlockRepository(session)
-    # block = await block_repository.update_block(update_data_block.block_id,
-    #                                             position=update_data_block.position)
     block = await block_repository.update_block(update_data_block.block_id)
     document_repository: DocumentRepository = DocumentRepository(session)
     document = await document_repository.get_document_by_id(block.document_id)
+    document_ids = await document_repository.get_list_ids_of_document_hierarchy(document)
     workspace_repository: WorkspaceRepository = WorkspaceRepository(session)
     workspace: Workspace = await workspace_repository.get_workspace_by_id(document.workspace_id)
-    unique_names_parents_documents = await get_unique_names_parents_documents(document, document_repository)
 
     storage_service: BaseWikiStorageService = BaseWikiStorageService(storage_client)
     storage_service.upload_document_block_in_workspace_storage(content=StringIO(update_data_block.content),
-                                                               unique_workspace_name=workspace.id,
-                                                               unique_names_parents_documents=unique_names_parents_documents,
-                                                               unique_block_name=block.id)
+                                                               workspace_id=workspace.id,
+                                                               document_ids=document_ids,
+                                                               block_id=block.id)
     return BlockDataResponse(
         id=block.id,
         document_id=block.document_id,
@@ -157,7 +152,7 @@ async def get_blocks(
     blocks = await block_repository.get_all_block_by_document_id(document_id=document_id)
     document_repository: DocumentRepository = DocumentRepository(session)
     document = await document_repository.get_document_by_id(document_id)
-    unique_names_parents_documents = await get_unique_names_parents_documents(document, document_repository)
+    document_ids = await document_repository.get_list_ids_of_document_hierarchy(document)
     workspace_repository: WorkspaceRepository = WorkspaceRepository(session)
     workspace = workspace_repository.get_workspace_by_id(document.workspace_id)
 
@@ -171,7 +166,7 @@ async def get_blocks(
             position=block.position,
             type_block=block.type_block,
             content=storage_service.get_content_document_block_in_workspace_storage(document.workspace_id,
-                                                                                    unique_names_parents_documents,
+                                                                                    document_ids,
                                                                                     block.id)
         )
         result_blocks.append(append_block)

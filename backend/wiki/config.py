@@ -81,7 +81,10 @@ class Settings(BaseSettings):
 
     BACKEND_CORS_ORIGINS: list[str] = ["http://127.0.0.1:3000",
                                        "http://localhost:3000",
-                                       "https://egorov-m.github.io"]
+                                       "http://127.0.0.1:8000",
+                                       "http://localhost:8000",
+                                       "https://egorov-m.github.io",
+                                       "https://poorly-ideal-cobra.ngrok-free.app"]
 
     EMAIL_HOST: str
     EMAIL_PORT: int
@@ -102,6 +105,7 @@ class Settings(BaseSettings):
     LAKEFS_INSTALLATION_USER_NAME: str = "wiki-admin"
     LAKEFS_INSTALLATION_ACCESS_KEY_ID: str = "12345"
     LAKEFS_INSTALLATION_SECRET_ACCESS_KEY: str = "12345"
+    LAKEFS_DOCUMENT_BLOCK_FILE_EXT: str = ".html"
 
     def get_db_url(self):
         return (f"{self.DB_SCHEMA}+{self.DB_DRIVER}://{self.DB_USER}:{self.DB_PASSWORD}@"

@@ -47,3 +47,14 @@ class DocumentRepository(BaseRepository):
         document_query = await self.session.execute(select(Document).where(Document.workspace_id == workspace_id))
         result = document_query.scalars().all()
         return result
+
+    async def get_list_ids_of_document_hierarchy(self, document: Document) -> list[UUID]:
+        ids = [document.id]
+
+        while document.parent_document_id is not None:
+            document = await self.get_document_by_id(document.parent_document_id)
+            ids.append(document.id)
+
+        ids.reverse()
+
+        return ids

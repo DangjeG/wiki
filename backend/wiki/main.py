@@ -31,6 +31,7 @@ api = FastAPI(
 
 add_pagination(api)
 
+
 @api.exception_handler(WikiException)
 async def wiki_exception_handler(request: Request, exc: WikiException):
     wiki_logger.info(msg=exc)

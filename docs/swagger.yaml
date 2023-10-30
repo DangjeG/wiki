@@ -377,6 +377,114 @@ components:
       - access
       title: OrganizationInfoResponse
       type: object
+    Page_OrganizationInfoResponse_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/OrganizationInfoResponse'
+          title: Items
+          type: array
+        page:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Page
+        pages:
+          anyOf:
+          - minimum: 0.0
+            type: integer
+          - type: 'null'
+          title: Pages
+        size:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Size
+        total:
+          minimum: 0.0
+          title: Total
+          type: integer
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[OrganizationInfoResponse]
+      type: object
+    Page_PermissionDomainInfoResponse_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/PermissionDomainInfoResponse'
+          title: Items
+          type: array
+        page:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Page
+        pages:
+          anyOf:
+          - minimum: 0.0
+            type: integer
+          - type: 'null'
+          title: Pages
+        size:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Size
+        total:
+          minimum: 0.0
+          title: Total
+          type: integer
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[PermissionDomainInfoResponse]
+      type: object
+    Page_UserFullInfoResponse_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/UserFullInfoResponse'
+          title: Items
+          type: array
+        page:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Page
+        pages:
+          anyOf:
+          - minimum: 0.0
+            type: integer
+          - type: 'null'
+          title: Pages
+        size:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Size
+        total:
+          minimum: 0.0
+          title: Total
+          type: integer
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[UserFullInfoResponse]
+      type: object
     PermissionDomainInfoResponse:
       properties:
         created_at:
@@ -1508,16 +1616,65 @@ paths:
     get:
       description: Get all organizations.
       operationId: get_organizations_api_v1_organization_all_get
+      parameters:
+      - in: query
+        name: name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      - in: query
+        name: description
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      - in: query
+        name: access
+        required: false
+        schema:
+          anyOf:
+          - $ref: '#/components/schemas/OrganizationAccessType'
+          - type: 'null'
+          title: Access
+      - description: Page number
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          description: Page number
+          minimum: 1
+          title: Page
+          type: integer
+      - description: Page size
+        in: query
+        name: size
+        required: false
+        schema:
+          default: 50
+          description: Page size
+          maximum: 100
+          minimum: 1
+          title: Size
+          type: integer
       responses:
         '200':
           content:
             application/json:
               schema:
-                items:
-                  $ref: '#/components/schemas/OrganizationInfoResponse'
-                title: Response Get Organizations Api V1 Organization All Get
-                type: array
+                $ref: '#/components/schemas/Page_OrganizationInfoResponse_'
           description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
       security:
       - WikiRootApiKey: []
       - WikiApiKey: []
@@ -1643,17 +1800,65 @@ paths:
   /api/v1/permission/domain/all:
     get:
       operationId: get_permission_domains_api_v1_permission_domain_all_get
+      parameters:
+      - in: query
+        name: domain
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Domain
+      - in: query
+        name: mode
+        required: false
+        schema:
+          anyOf:
+          - $ref: '#/components/schemas/DomainPermissionMode'
+          - type: 'null'
+          title: Mode
+      - in: query
+        name: is_enabled
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Enabled
+      - description: Page number
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          description: Page number
+          minimum: 1
+          title: Page
+          type: integer
+      - description: Page size
+        in: query
+        name: size
+        required: false
+        schema:
+          default: 50
+          description: Page size
+          maximum: 100
+          minimum: 1
+          title: Size
+          type: integer
       responses:
         '200':
           content:
             application/json:
               schema:
-                items:
-                  $ref: '#/components/schemas/PermissionDomainInfoResponse'
-                title: Response Get Permission Domains Api V1 Permission Domain All
-                  Get
-                type: array
+                $ref: '#/components/schemas/Page_PermissionDomainInfoResponse_'
           description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
       security:
       - WikiRootApiKey: []
       - WikiApiKey: []
@@ -1818,16 +2023,73 @@ paths:
   /api/v1/user/all:
     get:
       operationId: get_users_api_v1_user_all_get
+      parameters:
+      - in: query
+        name: username
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+      - in: query
+        name: first_name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: First Name
+      - in: query
+        name: last_name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Last Name
+      - in: query
+        name: second_name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Second Name
+      - description: Page number
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          description: Page number
+          minimum: 1
+          title: Page
+          type: integer
+      - description: Page size
+        in: query
+        name: size
+        required: false
+        schema:
+          default: 50
+          description: Page size
+          maximum: 100
+          minimum: 1
+          title: Size
+          type: integer
       responses:
         '200':
           content:
             application/json:
               schema:
-                items:
-                  $ref: '#/components/schemas/UserFullInfoResponse'
-                title: Response Get Users Api V1 User All Get
-                type: array
+                $ref: '#/components/schemas/Page_UserFullInfoResponse_'
           description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
       security:
       - WikiRootApiKey: []
       - WikiApiKey: []
@@ -1939,6 +2201,70 @@ paths:
       summary: Create a verified user (has access to the system)
       tags:
       - User
+  /api/v1/versioning/block/{block_id}/info:
+    get:
+      operationId: get_list_versions_document_block_api_v1_versioning_block__block_id__info_get
+      parameters:
+      - in: path
+        name: block_id
+        required: true
+        schema:
+          format: uuid
+          title: Block Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get info as a list of all versions block
+      tags:
+      - WorkspaceVersioning
+  /api/v1/versioning/document/{document_id}/info:
+    get:
+      operationId: get_list_versions_document_api_v1_versioning_document__document_id__info_get
+      parameters:
+      - in: path
+        name: document_id
+        required: true
+        schema:
+          format: uuid
+          title: Document Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get info as a list of all versions document
+      tags:
+      - WorkspaceVersioning
   /api/v1/versioning/wp/{workspace_id}/info:
     get:
       operationId: get_list_info_versions_workspace_api_v1_versioning_wp__workspace_id__info_get

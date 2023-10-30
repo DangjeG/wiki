@@ -1,10 +1,11 @@
 from io import StringIO
+from uuid import UUID
 
 from lakefs_client.client import LakeFSClient
 from lakefs_client.model.repository_creation import RepositoryCreation
 
 from wiki.config import settings
-from wiki.wiki_storage.utils import forming_document_storage_path
+from wiki.wiki_storage.utils import forming_document_block_storage_path
 
 
 class BaseWikiStorageService:
@@ -13,7 +14,7 @@ class BaseWikiStorageService:
     def __init__(self, client: LakeFSClient):
         self.client = client
 
-    def create_workspace_storage(self, unique_workspace_name) -> dict:
+    def create_workspace_storage(self, workspace_id: UUID) -> dict:
         """
         Creating a new repository in the repository to store workspace data.
         :return: dict {
@@ -22,8 +23,8 @@ class BaseWikiStorageService:
             'id': unique_workspace_name,
             'storage_namespace': 'local://wiki_storage/{unique_workspace_name}'}
         """
-        repo = RepositoryCreation(name=str(unique_workspace_name),
-                                  storage_namespace=f"{settings.LAKEFS_STORAGE_NAMESPACE_ROOT}{unique_workspace_name}",
+        repo = RepositoryCreation(name=str(workspace_id),
+                                  storage_namespace=f"{settings.LAKEFS_STORAGE_NAMESPACE_ROOT}{workspace_id}",
                                   default_branch=settings.LAKEFS_DEFAULT_BRANCH)
         thread = self.client.repositories_api.create_repository(repo, async_req=True)
         result = thread.get()
@@ -32,9 +33,9 @@ class BaseWikiStorageService:
 
     def upload_document_block_in_workspace_storage(self,
                                                    content: StringIO,
-                                                   unique_workspace_name: str,
-                                                   unique_names_parents_documents: list[str],
-                                                   unique_block_name: str) -> dict:
+                                                   workspace_id: UUID,
+                                                   document_ids: list[UUID],
+                                                   block_id: UUID) -> dict:
         """
         Create a new or update a document block.
         :return: {'checksum': '...',
@@ -46,8 +47,8 @@ class BaseWikiStorageService:
                   'size_bytes': ...}
         """
         api_instance = self.client.objects_api
-        path = forming_document_storage_path(unique_names_parents_documents, str(unique_block_name))
-        thread = api_instance.upload_object(repository=str(unique_workspace_name),
+        path = forming_document_block_storage_path(document_ids, block_id)
+        thread = api_instance.upload_object(repository=str(workspace_id),
                                             branch=settings.LAKEFS_DEFAULT_BRANCH,
                                             path=path,
                                             content=content,
@@ -55,12 +56,12 @@ class BaseWikiStorageService:
         return thread.get()
 
     def get_content_document_block_in_workspace_storage(self,
-                                                        unique_workspace_name: str,
-                                                        unique_names_parents_documents: list[str],
-                                                        unique_block_name: str) -> str:
+                                                        workspace_id: UUID,
+                                                        document_ids: list[UUID],
+                                                        block_id: UUID) -> str:
         api_instance = self.client.objects_api
-        path = forming_document_storage_path(unique_names_parents_documents, str(unique_block_name))
-        thread = api_instance.get_object(repository=str(unique_workspace_name),
+        path = forming_document_block_storage_path(document_ids, block_id)
+        thread = api_instance.get_object(repository=str(workspace_id),
                                          ref=settings.LAKEFS_DEFAULT_BRANCH,
                                          path=path,
                                          async_req=True)

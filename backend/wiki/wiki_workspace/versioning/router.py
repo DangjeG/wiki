@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
+from lakefs_client.client import LakeFSClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
@@ -9,6 +10,12 @@ from wiki.database.deps import get_db
 from wiki.permissions.base import BasePermission
 from wiki.user.utils import get_user_info
 from wiki.wiki_api_client.enums import ResponsibilityType
+from wiki.wiki_storage.deps import get_storage_client
+from wiki.wiki_storage.services.versioning import VersioningWikiStorageService
+from wiki.wiki_workspace.block.model import Block
+from wiki.wiki_workspace.block.repository import BlockRepository
+from wiki.wiki_workspace.document.model import Document
+from wiki.wiki_workspace.document.repository import DocumentRepository
 from wiki.wiki_workspace.repository import WorkspaceRepository
 from wiki.wiki_workspace.versioning.model import VersionWorkspace
 from wiki.wiki_workspace.versioning.repository import VersioningWorkspaceRepository
@@ -18,6 +25,48 @@ from wiki.wiki_workspace.versioning.schemas import (
 )
 
 versioning_workspace_router = APIRouter()
+
+
+@versioning_workspace_router.get(
+    "/block/{block_id}/info",
+    status_code=status.HTTP_200_OK,
+    summary="Get info as a list of all versions block"
+)
+async def get_list_versions_document_block(
+        block_id: UUID,
+        session: AsyncSession = Depends(get_db),
+        storage_client: LakeFSClient = Depends(get_storage_client),
+        user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER))
+):
+    block_repository: BlockRepository = BlockRepository(session)
+    block: Block = await block_repository.get_block_by_id(block_id)
+    document_repository: DocumentRepository = DocumentRepository(session)
+    document: Document = await document_repository.get_document_by_id(block.document_id)
+    document_ids = await document_repository.get_list_ids_of_document_hierarchy(document)
+
+    storage_service: VersioningWikiStorageService = VersioningWikiStorageService(storage_client)
+    return str(storage_service.get_version_document_block(document.workspace_id,
+                                                          document_ids,
+                                                          block_id))
+
+
+@versioning_workspace_router.get(
+    "/document/{document_id}/info",
+    status_code=status.HTTP_200_OK,
+    summary="Get info as a list of all versions document"
+)
+async def get_list_versions_document(
+        document_id: UUID,
+        session: AsyncSession = Depends(get_db),
+        storage_client: LakeFSClient = Depends(get_storage_client),
+        user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER))
+):
+    document_repository: DocumentRepository = DocumentRepository(session)
+    document: Document = await document_repository.get_document_by_id(document_id)
+    document_ids = await document_repository.get_list_ids_of_document_hierarchy(document)
+
+    storage_service: VersioningWikiStorageService = VersioningWikiStorageService(storage_client)
+    return str(storage_service.get_versions_document(document.workspace_id, document_ids))
 
 
 @versioning_workspace_router.get(
