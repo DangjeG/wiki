@@ -1,5 +1,6 @@
 from datetime import datetime
 from functools import wraps
+from typing import Optional
 from uuid import UUID
 
 from lakefs_client import ApiException
@@ -8,36 +9,57 @@ from starlette import status
 
 from wiki.common.exceptions import WikiException, WikiErrorCode
 from wiki.user.utils import get_user_info
-from wiki.wiki_workspace.versioning.schemas import VersionObjectInfo
+from wiki.wiki_workspace.block.model import Block
+from wiki.wiki_workspace.document.model import Document
+from wiki.wiki_workspace.versioning.schemas import VersionBlockInfo, VersionDocumentInfo
 
 
-async def get_version_object_info_list(results: dict, object_id: UUID, session: AsyncSession) -> list[VersionObjectInfo]:
+async def get_version_block_info_list(results: dict, block: Block, session: AsyncSession) -> list[VersionBlockInfo]:
     """
     :param results: Result get from the dictionary from lakefs answer
-    :param object_id: Versioning object identifier (Document, block, etc.)
+    :param block: Versioning block
     :param session: Database session
     """
 
-    return [VersionObjectInfo(
+    return [VersionBlockInfo(
         commit_id=item.get("id"),
-        object_id=object_id,
+        object_id=block.id,
         committer_user=await get_user_info(UUID(item.get("metadata").get("committer_user_id")), session, is_full=False),
         created_at=datetime.fromtimestamp(int(item.get("creation_date")))
     ) for item in results]
 
 
-def menage_lakefs_api_exception_method():
+async def get_version_document_info_list(results: dict, document: Document, session: AsyncSession) -> list[VersionDocumentInfo]:
+    """
+    :param results: Result get from the dictionary from lakefs answer
+    :param document: Versioning document
+    :param session: Database session
+    """
+
+    return [VersionDocumentInfo(
+        commit_id=item.get("id"),
+        object_id=document.id,
+        committer_user=await get_user_info(UUID(item.get("metadata").get("committer_user_id")), session, is_full=False),
+        created_at=datetime.fromtimestamp(int(item.get("creation_date"))),
+        is_published=item.get("id") == document.current_published_version_commit_id
+    ) for item in results]
+
+
+def menage_lakefs_api_exception_method(e: Optional[WikiException] = None):
     def decorator(f):
         @wraps(f)
         def wrapped_f(self, *args, **kwargs):
             try:
                 result = f(self, *args, **kwargs)
-            except ApiException as e:
-                raise WikiException(
-                    message=e.body,
-                    error_code=WikiErrorCode.LAKEFS_API_EXCEPTION,
-                    http_status_code=status.HTTP_400_BAD_REQUEST
-                )
+            except ApiException as exc:
+                if e is not None:
+                    raise e
+                else:
+                    raise WikiException(
+                        message=exc.body,
+                        error_code=WikiErrorCode.LAKEFS_API_EXCEPTION,
+                        http_status_code=status.HTTP_400_BAD_REQUEST
+                    )
 
             return result
 

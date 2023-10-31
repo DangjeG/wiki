@@ -84,7 +84,6 @@ class UserRepository(BaseRepository):
 
         return result.scalars().all()
 
-
     async def get_all_users(self, is_only_existing: bool = True) -> list[User]:
         st = select(User)
         if is_only_existing:

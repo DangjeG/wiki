@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
@@ -17,6 +18,7 @@ class DocumentInfoResponse(WikiBase):
     workspace_id: UUID
     creator_user: UserBaseInfoResponse
     parent_document_id: Optional[UUID] = None
+    created_at: datetime
 
 
 class DocumentNodeInfoResponse(WikiBase):
