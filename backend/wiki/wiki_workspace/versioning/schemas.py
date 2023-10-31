@@ -22,3 +22,10 @@ class VersionWorkspaceInfoGraphResponse(WikiBase):
     branch: str
     created_at: datetime
     parent_version_workspace: Optional["VersionWorkspaceInfoGraphResponse"] = None
+
+
+class VersionObjectInfo(WikiBase):
+    commit_id: str
+    object_id: UUID
+    committer_user: UserBaseInfoResponse
+    created_at: datetime

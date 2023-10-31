@@ -797,6 +797,28 @@ components:
       - type
       title: ValidationError
       type: object
+    VersionObjectInfo:
+      properties:
+        commit_id:
+          title: Commit Id
+          type: string
+        committer_user:
+          $ref: '#/components/schemas/UserBaseInfoResponse'
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        object_id:
+          format: uuid
+          title: Object Id
+          type: string
+      required:
+      - commit_id
+      - object_id
+      - committer_user
+      - created_at
+      title: VersionObjectInfo
+      type: object
     VersionWorkspaceInfoGraphResponse:
       properties:
         branch:
@@ -1541,6 +1563,42 @@ paths:
       summary: Get all tree document by workspace id
       tags:
       - WorkspaceDocument
+  /api/v1/document/{document_id}/save:
+    post:
+      description: '## Saving document
+
+        Commits changes, a new version will be created for all changed objects'
+      operationId: save_document_api_v1_document__document_id__save_post
+      parameters:
+      - in: path
+        name: document_id
+        required: true
+        schema:
+          format: uuid
+          title: Document Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Saving document
+      tags:
+      - WorkspaceDocument
   /api/v1/organization/:
     post:
       description: Create organization.
@@ -2216,7 +2274,12 @@ paths:
         '200':
           content:
             application/json:
-              schema: {}
+              schema:
+                items:
+                  $ref: '#/components/schemas/VersionObjectInfo'
+                title: Response Get List Versions Document Block Api V1 Versioning
+                  Block  Block Id  Info Get
+                type: array
           description: Successful Response
         '422':
           content:
@@ -2267,6 +2330,7 @@ paths:
       - WorkspaceVersioning
   /api/v1/versioning/wp/{workspace_id}/info:
     get:
+      deprecated: true
       operationId: get_list_info_versions_workspace_api_v1_versioning_wp__workspace_id__info_get
       parameters:
       - in: path
@@ -2304,6 +2368,7 @@ paths:
       - WorkspaceVersioning
   /api/v1/versioning/wp/{workspace_id}/info/graph:
     get:
+      deprecated: true
       operationId: get_graph_info_versions_workspace_api_v1_versioning_wp__workspace_id__info_graph_get
       parameters:
       - in: path

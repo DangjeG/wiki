@@ -1,16 +1,22 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
+from lakefs_client.client import LakeFSClient
+from lakefs_client.model.commit import Commit
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from wiki.common.exceptions import WikiException, WikiErrorCode
-from wiki.common.schemas import WikiUserHandlerData
+from wiki.common.schemas import WikiUserHandlerData, BaseResponse
 from wiki.database.deps import get_db
 from wiki.permissions.base import BasePermission
+from wiki.user.models import User
 from wiki.user.repository import UserRepository
 from wiki.user.utils import get_user_info
 from wiki.wiki_api_client.enums import ResponsibilityType
+from wiki.wiki_storage.deps import get_storage_client
+from wiki.wiki_storage.schemas import CommitMetadataScheme
+from wiki.wiki_storage.services.versioning import VersioningWikiStorageService
 from wiki.wiki_workspace.document.model import Document
 from wiki.wiki_workspace.document.repository import DocumentRepository
 from wiki.wiki_workspace.document.schemas import (
@@ -58,6 +64,31 @@ async def create_document(
         creator_user=await get_user_info(user, session, is_full=False),
         parent_document_id=document.parent_document_id
     )
+
+
+@document_router.post(
+    "/{document_id}/save",
+    response_model=BaseResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Saving document",
+    description="## Saving document\nCommits changes, a new version will be created for all changed objects"
+)
+async def save_document(
+        document_id: UUID,
+        session: AsyncSession = Depends(get_db),
+        storage_client: LakeFSClient = Depends(get_storage_client),
+        user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER))
+):
+    document_repository: DocumentRepository = DocumentRepository(session)
+    document = await document_repository.get_document_by_id(document_id)
+    user_repository: UserRepository = UserRepository(session)
+    user_db: User = await user_repository.get_user_by_id(user.id)
+
+    storage_service: VersioningWikiStorageService = VersioningWikiStorageService(storage_client)
+    resp: Commit = storage_service.commit_workspace_version(document.workspace_id,
+                                                            CommitMetadataScheme(committer_user_id=str(user_db.id)))
+
+    return BaseResponse(msg="Document saved")
 
 
 @document_router.get(

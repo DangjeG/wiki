@@ -8,23 +8,27 @@ from wiki.database.utils import utcnow
 from wiki.wiki_storage.schemas import CommitMetadataScheme
 from wiki.wiki_storage.services.base import BaseWikiStorageService
 from wiki.wiki_storage.utils import forming_document_storage_path, forming_document_block_storage_path
+from wiki.wiki_workspace.versioning.utils import menage_lakefs_api_exception_method
 
 
 class VersioningWikiStorageService(BaseWikiStorageService):
-    def commit_workspace_version(self, unique_workspace_name, metadata: CommitMetadataScheme) -> dict:
+
+    @menage_lakefs_api_exception_method()
+    def commit_workspace_version(self, workspace_id, metadata: CommitMetadataScheme) -> dict:
         api_instance = self.client.commits_api
         commit_creation = CommitCreation(
-            message=utcnow(),
+            message=str(utcnow()),
             metadata=metadata.model_dump()
         )
         thread = api_instance.commit(
-            unique_workspace_name,
+            str(workspace_id),
             settings.LAKEFS_DEFAULT_BRANCH,
             commit_creation,
             async_req=True)
 
         return thread.get()
 
+    @menage_lakefs_api_exception_method()
     def _get_log_commits_workspace(self,
                                    repository: UUID,
                                    amount: Optional[int] = 250,

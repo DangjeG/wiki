@@ -21,14 +21,16 @@ from wiki.wiki_workspace.versioning.model import VersionWorkspace
 from wiki.wiki_workspace.versioning.repository import VersioningWorkspaceRepository
 from wiki.wiki_workspace.versioning.schemas import (
     VersionWorkspaceInfoResponse,
-    VersionWorkspaceInfoGraphResponse
+    VersionWorkspaceInfoGraphResponse, VersionObjectInfo
 )
+from wiki.wiki_workspace.versioning.utils import get_version_object_info_list
 
 versioning_workspace_router = APIRouter()
 
 
 @versioning_workspace_router.get(
     "/block/{block_id}/info",
+    response_model=list[VersionObjectInfo],
     status_code=status.HTTP_200_OK,
     summary="Get info as a list of all versions block"
 )
@@ -45,9 +47,9 @@ async def get_list_versions_document_block(
     document_ids = await document_repository.get_list_ids_of_document_hierarchy(document)
 
     storage_service: VersioningWikiStorageService = VersioningWikiStorageService(storage_client)
-    return str(storage_service.get_version_document_block(document.workspace_id,
-                                                          document_ids,
-                                                          block_id))
+    resp = storage_service.get_version_document_block(document.workspace_id, document_ids, block_id)
+    results: dict = resp["results"]
+    return await get_version_object_info_list(results, block.id, session)
 
 
 @versioning_workspace_router.get(
@@ -66,14 +68,17 @@ async def get_list_versions_document(
     document_ids = await document_repository.get_list_ids_of_document_hierarchy(document)
 
     storage_service: VersioningWikiStorageService = VersioningWikiStorageService(storage_client)
-    return str(storage_service.get_versions_document(document.workspace_id, document_ids))
+    resp = storage_service.get_versions_document(document.workspace_id, document_ids)
+    results: dict = resp["results"]
+    return await get_version_object_info_list(results, document.id, session)
 
 
 @versioning_workspace_router.get(
     "/wp/{workspace_id}/info",
     response_model=list[VersionWorkspaceInfoResponse],
     status_code=status.HTTP_200_OK,
-    summary="Get info as a list of all versions workspace"
+    summary="Get info as a list of all versions workspace",
+    deprecated=True
 )
 async def get_list_info_versions_workspace(
         workspace_id: UUID,
@@ -99,7 +104,8 @@ async def get_list_info_versions_workspace(
     "/wp/{workspace_id}/info/graph",
     response_model=VersionWorkspaceInfoGraphResponse,
     status_code=status.HTTP_200_OK,
-    summary="Get info as a list of all versions workspace"
+    summary="Get info as a list of all versions workspace",
+    deprecated=True
 )
 async def get_graph_info_versions_workspace(
         workspace_id: UUID,
