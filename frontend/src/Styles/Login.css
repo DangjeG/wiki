@@ -1,13 +1,14 @@
 
 .login-form{
     width: 400px;
-    height: auto;
     position: absolute;
     align-items: center;
     align-self: center;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
 
     background-color: #f1f1f1;
-    margin: 50px 600px;
 
     padding: 20px;
 
@@ -16,5 +17,23 @@
 
     justify-content: center;
 }
-/*
-color-overlay d-flex justify-content-center align-content-center*/
+
+#login {
+    height: auto;
+}
+
+#signup {
+    height: 400px;
+    overflow: auto;
+}
+
+.pink-button {
+    background-color: #f1f1f1;
+    color: #0f0f0f;
+    border: 2px solid #d4b0ce;
+}
+
+.pink-button:hover {
+    background-color: #d4b0ce;
+    border: 2px solid #d4b0ce;
+}

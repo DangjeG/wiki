@@ -1,7 +1,11 @@
 import React, {useEffect, useState} from "react";
 import {api} from "../app.config";
-import {Dropdown} from "react-bootstrap";
+import {List, ListItemButton, ListItemText, ListSubheader} from "@mui/material";
 
+
+function SendIcon() {
+    return null;
+}
 
 export default function Home(){
 
@@ -20,85 +24,27 @@ export default function Home(){
         fetchData();
     }, []);
 
-    let d = []
-    function getDocs(id){
-        const fetchData = async () => {
-            try {
-                return await api.getDocumentsTree(id);
-            } catch (error) {
-                console.log(error)
-                alert("gfh")
-            }
-        };
-        d = fetchData()
-    }
 
-    function getBlocs(id){
-        const fetchData = async () => {
-            try {
-                return await api.getBlocks(id);
-            } catch (error) {
-                console.log(error)
-
-            }
-        };
-        fetchData().then((resp)=>{
-            return resp
-        }) ;
-
-    }
-
-
-    const dcs = (id) => {
-        getDocs(id)
-        return(Array.from(d).map((doc) =>
-            <Dropdown drop={"end"}>
-                <Dropdown.Toggle id="dropdown-basic">
-                    {doc.title}
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                    {doc.children !== null? cldrn(doc.children): <></>}
-                    {blk(doc.id)}
-                </Dropdown.Menu>
-            </Dropdown>
-        ))
-    }
-
-    const cldrn = (childrens) => {
-        return(
-            Array.from(childrens).map((doc) =>
-            <Dropdown drop={"end"}>
-                <Dropdown.Toggle id="dropdown-basic">
-                    {doc.title}
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                    {childrens !== null? cldrn(doc.children): <></>}
-                    {blk(doc.id)}
-                </Dropdown.Menu>
-            </Dropdown>
-        ))
-    }
-
-    const blk = (id) => {
-        Array.from(getBlocs(id)).map((block) =>
-            <Dropdown.Item>{block.id}</Dropdown.Item>
-        )
-    }
 
 
     return (
         <>
+            <List
+                sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
+                component="nav"
+                aria-labelledby="nested-list-subheader"
+                subheader={
+                    <ListSubheader component="div" id="nested-list-subheader">
+                        List of workspaces
+                    </ListSubheader>
+                }
+            >
             {Array.from(workspaces).map((workspace) =>
-                <Dropdown drop={"end"}>
-                    <Dropdown.Toggle id="dropdown-basic">
-                        {workspace.title}
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu>
-                        {dcs(workspace.id)}
-                    </Dropdown.Menu>
-                </Dropdown>
+                <ListItemButton key={workspace.title}>
+                    <ListItemText primary={workspace.title}/>
+                </ListItemButton>
             )}
+            </List>
         </>
-
     )
 }

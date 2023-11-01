@@ -1,35 +1,42 @@
-import {Nav} from "react-bootstrap";
-import {useState} from "react";
-import UsersTable from "../Components/UsersTable";
-import OrganizationsTable from "../Components/OrganizationsTable";
+import React, { useState } from 'react';
+import Box from '@mui/material/Box';
+import Tab from '@mui/material/Tab';
+import Tabs from '@mui/material/Tabs';
+import UsersTable from '../Components/UsersTable';
+import OrganizationsTable from '../Components/OrganizationsTable';
 
 export default function Admin() {
+    const [activeTab, setActiveTab] = useState('users');
 
-    const [table, setTable] = useState(<UsersTable/>);
+    const handleTabChange = (event, newValue) => {
+        setActiveTab(newValue);
+    };
 
-    const handleSelect = (eventKey) => {
-        switch (eventKey){
-            case "users":
-                setTable(<UsersTable/>)
-                break
-            case "organizations":
-                setTable( <OrganizationsTable/>)
-                break
+    const renderTable = () => {
+        switch (activeTab) {
+            case 'users':
+                return <UsersTable />;
+            case 'organizations':
+                return <OrganizationsTable />;
+            default:
+                return null;
         }
     };
 
+    const styles = {
+        tabsContainer: {
+            display: 'flex',
+            justifyContent: 'center',
+        },
+    };
 
     return (
-        <>
-            <Nav variant="underlin" defaultActiveKey="users" onSelect={handleSelect}>
-                <Nav.Item>
-                    <Nav.Link  eventKey="users">Users</Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                    <Nav.Link eventKey="organizations">Organizations</Nav.Link>
-                </Nav.Item>
-            </Nav>
-            {table}
-        </>
-    )
+        <Box sx={{ padding: '50px 150px' }}>
+            <Tabs textColor="secondary" indicatorColor="secondary" value={activeTab} onChange={handleTabChange} variant="fullWidth">
+                <Tab sx={{color: '#423e42' , ':hover': {backgroundColor: '#d4b0ce'} }} value="users" label="Users" />
+                <Tab sx={{color: '#423e42' , ':hover': {backgroundColor: '#d4b0ce'} }} value="organizations" label="Organizations" />
+            </Tabs>
+            {renderTable()}
+        </Box>
+    );
 }

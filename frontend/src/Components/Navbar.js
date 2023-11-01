@@ -1,54 +1,116 @@
-import {Button, Dropdown, Nav, Navbar} from "react-bootstrap";
+import React from 'react';
+import Button from '@mui/material/Button';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Stack from '@mui/material/Stack';
+import Toolbar from '@mui/material/Toolbar';
+import AppBar from '@mui/material/AppBar';
+import Typography from '@mui/material/Typography';
+import {Box} from "@mui/system";
 
 
+export default function AppNavbar(props) {
+    const [anchorEl, setAnchorEl] = React.useState(null);
 
-export default function AppNavbar(props){
+    const handleMenuOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
 
-    function getRightPanel(){
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
 
+    function getLeftPanel() {
 
+        let base =
+            <Typography variant="h6"
+                        component="a"
+                        href="/"
+                        sx={{flexGrow: 1, color: '#423e42'}}>
+                Home
+            </Typography>
+
+        if (!props.user === null) {
+            return (
+                <>
+                    <Stack>
+                        {base}
+                        {props.user.wiki_api_client.responsibility === 'ADMIN' ? (
+                            <Button sx={{color: '#423e42', ':hover': {backgroundColor: '#bd97b6'}, background: '#d4b0ce'}}
+                                    variant="contained" href="#admin">
+                                Admin Tools
+                            </Button>
+                        ) : null}
+                        <Button sx={{color: '#423e42', ':hover': {backgroundColor: '#bd97b6'}, background: '#d4b0ce'}}
+                                variant="contained" href="#workspace">
+                            Go to workspaces
+                        </Button>
+                    </Stack>
+                </>
+            )
+        } else return base
+    }
+
+    function getRightPanel() {
         if (props.user === null) {
             return (
-                <Nav>
-                    <Button variant="dark" href="#login" className="mr-2">Login</Button>
-                    <Button variant="dark" href="#signup" className="mr-2">Sign Up</Button>
-                </Nav>
-            )
-        }
-        else {
+                <Stack direction="row" spacing={2}>
+                    <Button sx={{color: '#423e42', ':hover': {backgroundColor: '#bd97b6'}, background: '#d4b0ce'}}
+                            variant="contained" href="#login">
+                        Login
+                    </Button>
+                    <Button sx={{color: '#423e42', ':hover': {backgroundColor: '#bd97b6'}, background: '#d4b0ce'}}
+                            variant="contained" href="#signup">
+                        Sign Up
+                    </Button>
+                </Stack>
+            );
+        } else {
             return (
-                <Nav>
-                    <Dropdown>
-                        <Dropdown.Toggle variant="dark" id="dropdown-basic">
-                            {props.user.username}
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu variant="dark">
-                            <Dropdown.Item href="#profile">Profile</Dropdown.Item>
-                            {props.user.wiki_api_client.responsibility === "ADMIN" ?
-                                <Dropdown.Item href="#admin">Admin Tools</Dropdown.Item> : <></>}
-                            <Dropdown.Divider/>
-                            <Dropdown.Item href="#logout">Logout</Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown>
-                </Nav>)
+                <Stack direction="row">
+                    <Button
+                        variant="contained"
+                        onClick={handleMenuOpen}
+                        id="user-dropdown"
+
+                    >
+                        {props.user.username}
+                    </Button>
+                    <Menu
+                        anchorEl={anchorEl}
+                        open={Boolean(anchorEl)}
+                        onClose={handleMenuClose}
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'right',
+                        }}
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right',
+                        }}
+                    >
+                        <MenuItem href="#profile" onClick={handleMenuClose}>
+                            Profile
+                        </MenuItem>
+                        <MenuItem href="#logout" onClick={handleMenuClose}>
+                            Logout
+                        </MenuItem>
+                    </Menu>
+                </Stack>
+            );
         }
     }
 
     return (
         <>
-            <Navbar collapseOnSelect expand="lg" style={{"paddingRight": "50px", "paddingLeft": "50px"}} bg="dark" variant="dark">
-                <Navbar.Brand href="/">Home</Navbar.Brand>
-
-                <Navbar.Collapse id="responsetive-navbar-nav">
-                    <Nav className="me-auto my-2 my-lg-0"
-                         style={{maxHeight: '100px'}}
-                         navbarScroll
-                    >
-                    </Nav>
-                    {getRightPanel()}
-                </Navbar.Collapse>
-                <Navbar.Toggle aria-controls="responsetive-navbar-nav"/>
-            </Navbar>
+            <Box sx={{flexGrow: 1}}>
+                <AppBar position="fixed" sx={{background: '#d4b0ce'}}>
+                    <Toolbar sx={{background: '#d4b0ce'}}>
+                        {getLeftPanel()}
+                        {getRightPanel()}
+                    </Toolbar>
+                </AppBar>
+            </Box>
         </>
     )
 }

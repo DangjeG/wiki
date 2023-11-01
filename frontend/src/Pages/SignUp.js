@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Button, Form} from "react-bootstrap";
 import "../Styles/Login.css"
 import {api} from "../app.config";
+import {useSearchParams} from "react-router-dom";
 
 
 export default function SignUp() {
@@ -17,6 +18,8 @@ export default function SignUp() {
     const [organizations, setOrganizations] = useState([]);
 
 
+    let [searchParams, setSearchParams] = useSearchParams();
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -26,6 +29,8 @@ export default function SignUp() {
                 console.log(error)
             }
         };
+
+        alert(window.location.href)
         fetchData();
     }, []);
 
@@ -34,7 +39,7 @@ export default function SignUp() {
         event.preventDefault();
         try {
             await api.signup(email, username, first_name, last_name, second_name, organizationId, is_user_agreement_accepted)
-            window.location.href = '/verify';
+            window.location.href = '#verify';
         } catch (error) {
             console.error(error);
         }

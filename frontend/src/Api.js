@@ -40,7 +40,7 @@ export default class Api {
          let users = []
          await instance.get(`/user/all`,)
              .then((resp) => {
-                 resp.data.forEach((user) => {
+                 resp.data.items.forEach((user) => {
                          users.push(user)
                      }
                  )
@@ -53,7 +53,7 @@ export default class Api {
          let organizations = []
          await instance.get(`/organization/all`,)
              .then((resp) => {
-                 resp.data.forEach((organization) => {
+                 resp.data.items.forEach((organization) => {
                          organizations.push(organization)
                  })
              })
