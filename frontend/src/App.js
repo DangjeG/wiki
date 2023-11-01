@@ -40,7 +40,7 @@ export default function App() {
                         <Route path={"/logout"} element={<Logout/>}/>
                         <Route path={"/admin"} element={<Admin/>}/>
                         <Route path={"/profile"} element={<Profile/>}/>
-                        <Route path={"/workspace"} element={<Workspace/>}/>
+                        <Route path={"/workspace/*"} element={<Workspace/>}/>
                     </Routes>
                 </HashRouter>
         )

@@ -128,7 +128,7 @@ export default class Api {
     }
 
     async addBlock(document_id, position, type_block){
-        await instance.post(`/block`,{
+        await instance.post(`/blocks`,{
             "document_id": document_id,
             "position": position,
             "type_block": type_block
@@ -136,11 +136,11 @@ export default class Api {
     }
 
     async deleteBlock(block_id){
-        await instance.delete(`/block?block_id=${block_id}`)
+        await instance.delete(`/blocks?block_id=${block_id}`)
     }
 
     async updateBlockData(block_id, content){
-        await instance.put(`/block/data`,{
+        await instance.put(`/blocks/data`,{
             "block_id": block_id,
             "content": content
         })
@@ -148,7 +148,7 @@ export default class Api {
 
     async getBlocks(document_id){
         let res = []
-        await instance.get(`/block/data?document_id=${document_id}`).then((resp)=>{
+        await instance.get(`/blocks/data?document_id=${document_id}`).then((resp)=>{
             resp.data.forEach((item) => {
                 res.push(item)
             })}

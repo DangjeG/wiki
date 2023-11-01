@@ -26,23 +26,23 @@ export default function AppNavbar(props) {
             <Typography variant="h6"
                         component="a"
                         href="/"
-                        sx={{flexGrow: 1, color: '#423e42'}}>
+                        sx={{flexGrow: 1, color: '#423e42', maxWidth: '100px' }}>
                 Home
             </Typography>
 
-        if (!props.user === null) {
+        if (props.user !== null) {
             return (
                 <>
-                    <Stack>
+                    <Stack direction="row" alignItems="center" spacing={2}>
                         {base}
                         {props.user.wiki_api_client.responsibility === 'ADMIN' ? (
-                            <Button sx={{color: '#423e42', ':hover': {backgroundColor: '#bd97b6'}, background: '#d4b0ce'}}
+                            <Button sx={{color: '#423e42', ':hover': {backgroundColor: '#bd97b6'}, background: '#d4b0ce', }}
                                     variant="contained" href="#admin">
                                 Admin Tools
                             </Button>
                         ) : null}
                         <Button sx={{color: '#423e42', ':hover': {backgroundColor: '#bd97b6'}, background: '#d4b0ce'}}
-                                variant="contained" href="#workspace">
+                                variant="contained" href="#workspace/select">
                             Go to workspaces
                         </Button>
                     </Stack>
@@ -54,12 +54,12 @@ export default function AppNavbar(props) {
     function getRightPanel() {
         if (props.user === null) {
             return (
-                <Stack direction="row" spacing={2}>
+                <Stack direction="row" spacing={2} sx={{ justifyContent: 'flex-end', marginLeft: 'auto' }}>
                     <Button sx={{color: '#423e42', ':hover': {backgroundColor: '#bd97b6'}, background: '#d4b0ce'}}
                             variant="contained" href="#login">
                         Login
                     </Button>
-                    <Button sx={{color: '#423e42', ':hover': {backgroundColor: '#bd97b6'}, background: '#d4b0ce'}}
+                    <Button sx={{background:'#b07285', color: '#423e42', ':hover': {backgroundColor: '#8a4a5d'}}}
                             variant="contained" href="#signup">
                         Sign Up
                     </Button>
@@ -67,12 +67,12 @@ export default function AppNavbar(props) {
             );
         } else {
             return (
-                <Stack direction="row">
+                <Stack direction="row" sx={{ justifyContent: 'flex-end', marginLeft: 'auto' }}>
                     <Button
                         variant="contained"
                         onClick={handleMenuOpen}
                         id="user-dropdown"
-
+                        sx={{background:'#b07285', color: '#423e42', ':hover': {backgroundColor: '#8a4a5d'}}}
                     >
                         {props.user.username}
                     </Button>
@@ -104,8 +104,8 @@ export default function AppNavbar(props) {
     return (
         <>
             <Box sx={{flexGrow: 1}}>
-                <AppBar position="fixed" sx={{background: '#d4b0ce'}}>
-                    <Toolbar sx={{background: '#d4b0ce'}}>
+                <AppBar position="static" sx={{background: '#d49dca'}}>
+                    <Toolbar sx={{background: '#d1a3c9'}}>
                         {getLeftPanel()}
                         {getRightPanel()}
                     </Toolbar>

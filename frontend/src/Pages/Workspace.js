@@ -1,30 +1,20 @@
-import Sidebar from "../Components/Sidebar";
-import React, {useEffect, useState} from "react";
-import {api} from "../app.config";
-import {List, ListItemButton, ListItemText, ListSubheader} from "@mui/material";
-import Button from "@mui/material/Button";
+
+import {Route, Routes} from "react-router-dom";
+import WorkspaceDocs from "./WorkspaceDocs";
+import WorkspaceSelect from "./WorkspaceSelect";
+import {useState} from "react";
 
 
 
 
 export default function Workspace(){
 
-
-    useEffect(() => {
-
-    }, []);
-
-    const [sidebarOpen, setSidebarOpen] = React.useState(true);
-
-    const toggleSidebar = () => {
-        setSidebarOpen(!sidebarOpen);
-    };
-
+    const [workspaceID, setWorkspaceID] = useState("");
 
     return (
-        <>
-            <Button onClick={toggleSidebar} variant={"outlined"}> open </Button>
-            <Sidebar open={sidebarOpen} onClose={toggleSidebar} />
-        </>
+        <Routes>
+            <Route path="/docs" element={<WorkspaceDocs workspace_id={workspaceID} />} />
+            <Route path="/select" element={<WorkspaceSelect onSelect={setWorkspaceID}/>} />
+        </Routes>
     )
 }
