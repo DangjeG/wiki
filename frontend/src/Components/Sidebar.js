@@ -1,10 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import {Collapse, Grid} from "@mui/material";
-import {ExpandLess, ExpandMore} from "@mui/icons-material";
+import {Grid} from "@mui/material";
 import DirectoryListItem from "./DirectoryListItem";
 import {api} from "../app.config";
 

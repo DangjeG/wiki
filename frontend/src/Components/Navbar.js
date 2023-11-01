@@ -25,7 +25,7 @@ export default function AppNavbar(props) {
         let base =
             <Typography variant="h6"
                         component="a"
-                        href="/"
+                        href="#"
                         sx={{flexGrow: 1, color: '#423e42', maxWidth: '100px' }}>
                 Home
             </Typography>

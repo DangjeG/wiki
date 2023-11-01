@@ -29,8 +29,6 @@ export default function SignUp() {
                 console.log(error)
             }
         };
-
-        alert(window.location.href)
         fetchData();
     }, []);
 

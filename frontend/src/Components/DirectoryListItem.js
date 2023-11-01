@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {ExpandLess, ExpandMore} from "@mui/icons-material";
-import {Collapse, IconButton, List, ListItemButton} from "@mui/material";
+import {IconButton, List} from "@mui/material";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
-
 
 
 export default function DirectoryListItem(props) {
