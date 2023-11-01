@@ -24,8 +24,12 @@ class VersionWorkspaceInfoGraphResponse(WikiBase):
     parent_version_workspace: Optional["VersionWorkspaceInfoGraphResponse"] = None
 
 
-class VersionObjectInfo(WikiBase):
+class VersionBlockInfo(WikiBase):
     commit_id: str
     object_id: UUID
     committer_user: UserBaseInfoResponse
     created_at: datetime
+
+
+class VersionDocumentInfo(VersionBlockInfo):
+    is_published: bool = False

@@ -30,6 +30,10 @@ components:
         content:
           title: Content
           type: string
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
         document_id:
           format: uuid
           title: Document Id
@@ -48,11 +52,16 @@ components:
       - document_id
       - position
       - type_block
+      - created_at
       - content
       title: BlockDataResponse
       type: object
     BlockInfoResponse:
       properties:
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
         document_id:
           format: uuid
           title: Document Id
@@ -71,6 +80,7 @@ components:
       - document_id
       - position
       - type_block
+      - created_at
       title: BlockInfoResponse
       type: object
     CreateBlock:
@@ -261,6 +271,10 @@ components:
       type: object
     DocumentInfoResponse:
       properties:
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
         creator_user:
           $ref: '#/components/schemas/UserBaseInfoResponse'
         id:
@@ -285,6 +299,7 @@ components:
       - title
       - workspace_id
       - creator_user
+      - created_at
       title: DocumentInfoResponse
       type: object
     DocumentNodeInfoResponse:
@@ -797,7 +812,7 @@ components:
       - type
       title: ValidationError
       type: object
-    VersionObjectInfo:
+    VersionBlockInfo:
       properties:
         commit_id:
           title: Commit Id
@@ -817,7 +832,33 @@ components:
       - object_id
       - committer_user
       - created_at
-      title: VersionObjectInfo
+      title: VersionBlockInfo
+      type: object
+    VersionDocumentInfo:
+      properties:
+        commit_id:
+          title: Commit Id
+          type: string
+        committer_user:
+          $ref: '#/components/schemas/UserBaseInfoResponse'
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        is_published:
+          default: false
+          title: Is Published
+          type: boolean
+        object_id:
+          format: uuid
+          title: Object Id
+          type: string
+      required:
+      - commit_id
+      - object_id
+      - committer_user
+      - created_at
+      title: VersionDocumentInfo
       type: object
     VersionWorkspaceInfoGraphResponse:
       properties:
@@ -1264,9 +1305,9 @@ paths:
       summary: Verification by token and code
       tags:
       - Auth
-  /api/v1/block/:
+  /api/v1/blocks/:
     delete:
-      operationId: delete_block_api_v1_block__delete
+      operationId: delete_block_api_v1_blocks__delete
       parameters:
       - in: query
         name: block_id
@@ -1296,9 +1337,9 @@ paths:
       - WikiBearer: []
       summary: Delete a block from a document
       tags:
-      - WorkspaceBlock
+      - WorkspaceBlocks
     post:
-      operationId: create_block_api_v1_block__post
+      operationId: create_block_api_v1_blocks__post
       requestBody:
         content:
           application/json:
@@ -1326,10 +1367,17 @@ paths:
       - WikiBearer: []
       summary: Create block
       tags:
-      - WorkspaceBlock
-  /api/v1/block/data:
+      - WorkspaceBlocks
+  /api/v1/blocks/data:
     get:
-      operationId: get_blocks_api_v1_block_data_get
+      description: '## Getting document blocks data
+
+
+        :param document_id: Document Identifier
+
+        :param version_commit_id: Specify the commit identifier of a particular version.
+        If None, get the latest version of the data.'
+      operationId: get_blocks_api_v1_blocks_data_get
       parameters:
       - in: query
         name: document_id
@@ -1338,6 +1386,16 @@ paths:
           format: uuid
           title: Document Id
           type: string
+      - in: query
+        name: version_commit_id
+        required: false
+        schema:
+          anyOf:
+          - maxLength: 64
+            minLength: 64
+            type: string
+          - type: 'null'
+          title: Version Commit Id
       responses:
         '200':
           content:
@@ -1345,7 +1403,7 @@ paths:
               schema:
                 items:
                   $ref: '#/components/schemas/BlockDataResponse'
-                title: Response Get Blocks Api V1 Block Data Get
+                title: Response Get Blocks Api V1 Blocks Data Get
                 type: array
           description: Successful Response
         '422':
@@ -1362,9 +1420,9 @@ paths:
       - WikiBearer: []
       summary: Get all data blocks by id document
       tags:
-      - WorkspaceBlock
+      - WorkspaceBlocks
     put:
-      operationId: update_block_data_api_v1_block_data_put
+      operationId: update_block_data_api_v1_blocks_data_put
       requestBody:
         content:
           application/json:
@@ -1392,10 +1450,10 @@ paths:
       - WikiBearer: []
       summary: Update data document block
       tags:
-      - WorkspaceBlock
-  /api/v1/block/info:
+      - WorkspaceBlocks
+  /api/v1/blocks/info:
     put:
-      operationId: update_block_info_api_v1_block_info_put
+      operationId: update_block_info_api_v1_blocks_info_put
       requestBody:
         content:
           application/json:
@@ -1423,7 +1481,87 @@ paths:
       - WikiBearer: []
       summary: Update info document block
       tags:
-      - WorkspaceBlock
+      - WorkspaceBlocks
+  /api/v1/blocks/publish/data:
+    get:
+      description: '## Getting published document blocks data'
+      operationId: get_publish_blocks_api_v1_blocks_publish_data_get
+      parameters:
+      - in: query
+        name: document_id
+        required: true
+        schema:
+          format: uuid
+          title: Document Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/BlockDataResponse'
+                title: Response Get Publish Blocks Api V1 Blocks Publish Data Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all publish data blocks by id document
+      tags:
+      - WorkspaceBlocks
+  /api/v1/blocks/{block_id}/data:
+    get:
+      operationId: get_block_by_id_api_v1_blocks__block_id__data_get
+      parameters:
+      - in: path
+        name: block_id
+        required: true
+        schema:
+          format: uuid
+          title: Block Id
+          type: string
+      - in: query
+        name: version_commit_id
+        required: false
+        schema:
+          anyOf:
+          - maxLength: 64
+            minLength: 64
+            type: string
+          - type: 'null'
+          title: Version Commit Id
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockDataResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get data block by id document
+      tags:
+      - WorkspaceBlocks
   /api/v1/document/:
     post:
       operationId: create_document_api_v1_document__post
@@ -1563,11 +1701,63 @@ paths:
       summary: Get all tree document by workspace id
       tags:
       - WorkspaceDocument
+  /api/v1/document/{document_id}/publish:
+    post:
+      description: '## Publish document
+
+
+        The last committed (saved) version of the document will be published and available
+        for viewing according to the set permissions.
+
+
+        :param document_id: The identifier of the document you are publishing.
+
+        :param is_save_last_uncommitted_changes: If set to true, all uncommitted changes
+        (user did not send a save request) will be automatically saved.'
+      operationId: publish_document_api_v1_document__document_id__publish_post
+      parameters:
+      - in: path
+        name: document_id
+        required: true
+        schema:
+          format: uuid
+          title: Document Id
+          type: string
+      - in: query
+        name: is_save_last_uncommitted_changes
+        required: false
+        schema:
+          default: true
+          title: Is Save Last Uncommitted Changes
+          type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Publish document
+      tags:
+      - WorkspaceDocument
   /api/v1/document/{document_id}/save:
     post:
       description: '## Saving document
 
-        Commits changes, a new version will be created for all changed objects'
+
+        Commits changes, a new version will be created for all changed document objects.'
       operationId: save_document_api_v1_document__document_id__save_post
       parameters:
       - in: path
@@ -1601,6 +1791,7 @@ paths:
       - WorkspaceDocument
   /api/v1/organization/:
     post:
+      deprecated: true
       description: Create organization.
       operationId: create_organization_api_v1_organization__post
       requestBody:
@@ -1632,6 +1823,7 @@ paths:
       tags:
       - Organization
     put:
+      deprecated: true
       description: Update organization.
       operationId: update_organizations_api_v1_organization__put
       parameters:
@@ -1672,6 +1864,7 @@ paths:
       - Organization
   /api/v1/organization/all:
     get:
+      deprecated: true
       description: Get all organizations.
       operationId: get_organizations_api_v1_organization_all_get
       parameters:
@@ -1744,6 +1937,7 @@ paths:
       - Organization
   /api/v1/organization/info:
     get:
+      deprecated: true
       description: Get organization by id.
       operationId: get_organization_api_v1_organization_info_get
       parameters:
@@ -2276,7 +2470,7 @@ paths:
             application/json:
               schema:
                 items:
-                  $ref: '#/components/schemas/VersionObjectInfo'
+                  $ref: '#/components/schemas/VersionBlockInfo'
                 title: Response Get List Versions Document Block Api V1 Versioning
                   Block  Block Id  Info Get
                 type: array
@@ -2311,7 +2505,12 @@ paths:
         '200':
           content:
             application/json:
-              schema: {}
+              schema:
+                items:
+                  $ref: '#/components/schemas/VersionDocumentInfo'
+                title: Response Get List Versions Document Api V1 Versioning Document  Document
+                  Id  Info Get
+                type: array
           description: Successful Response
         '422':
           content:

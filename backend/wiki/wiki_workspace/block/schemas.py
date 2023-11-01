@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
@@ -26,6 +27,7 @@ class BlockInfoResponse(WikiBase):
     document_id: UUID
     position: int
     type_block: TypeBlock
+    created_at: datetime
 
 
 class BlockDataResponse(BlockInfoResponse):

@@ -21,16 +21,18 @@ from wiki.wiki_workspace.versioning.model import VersionWorkspace
 from wiki.wiki_workspace.versioning.repository import VersioningWorkspaceRepository
 from wiki.wiki_workspace.versioning.schemas import (
     VersionWorkspaceInfoResponse,
-    VersionWorkspaceInfoGraphResponse, VersionObjectInfo
+    VersionWorkspaceInfoGraphResponse,
+    VersionBlockInfo,
+    VersionDocumentInfo
 )
-from wiki.wiki_workspace.versioning.utils import get_version_object_info_list
+from wiki.wiki_workspace.versioning.utils import get_version_block_info_list, get_version_document_info_list
 
 versioning_workspace_router = APIRouter()
 
 
 @versioning_workspace_router.get(
     "/block/{block_id}/info",
-    response_model=list[VersionObjectInfo],
+    response_model=list[VersionBlockInfo],
     status_code=status.HTTP_200_OK,
     summary="Get info as a list of all versions block"
 )
@@ -49,11 +51,12 @@ async def get_list_versions_document_block(
     storage_service: VersioningWikiStorageService = VersioningWikiStorageService(storage_client)
     resp = storage_service.get_version_document_block(document.workspace_id, document_ids, block_id)
     results: dict = resp["results"]
-    return await get_version_object_info_list(results, block.id, session)
+    return await get_version_block_info_list(results, block, session)
 
 
 @versioning_workspace_router.get(
     "/document/{document_id}/info",
+    response_model=list[VersionDocumentInfo],
     status_code=status.HTTP_200_OK,
     summary="Get info as a list of all versions document"
 )
@@ -70,7 +73,7 @@ async def get_list_versions_document(
     storage_service: VersioningWikiStorageService = VersioningWikiStorageService(storage_client)
     resp = storage_service.get_versions_document(document.workspace_id, document_ids)
     results: dict = resp["results"]
-    return await get_version_object_info_list(results, document.id, session)
+    return await get_version_document_info_list(results, document, session)
 
 
 @versioning_workspace_router.get(

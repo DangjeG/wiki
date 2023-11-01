@@ -1,4 +1,5 @@
 from io import StringIO
+from typing import Optional
 from uuid import UUID
 
 from lakefs_client.client import LakeFSClient
@@ -6,6 +7,7 @@ from lakefs_client.model.repository_creation import RepositoryCreation
 
 from wiki.config import settings
 from wiki.wiki_storage.utils import forming_document_block_storage_path
+from wiki.wiki_workspace.versioning.utils import menage_lakefs_api_exception_method
 
 
 class BaseWikiStorageService:
@@ -14,6 +16,7 @@ class BaseWikiStorageService:
     def __init__(self, client: LakeFSClient):
         self.client = client
 
+    @menage_lakefs_api_exception_method()
     def create_workspace_storage(self, workspace_id: UUID) -> dict:
         """
         Creating a new repository in the repository to store workspace data.
@@ -31,6 +34,7 @@ class BaseWikiStorageService:
 
         return result
 
+    @menage_lakefs_api_exception_method()
     def upload_document_block_in_workspace_storage(self,
                                                    content: StringIO,
                                                    workspace_id: UUID,
@@ -49,20 +53,22 @@ class BaseWikiStorageService:
         api_instance = self.client.objects_api
         path = forming_document_block_storage_path(document_ids, block_id)
         thread = api_instance.upload_object(repository=str(workspace_id),
-                                            branch=settings.LAKEFS_DEFAULT_BRANCH,
+                                            branch=str(document_ids[-1]),  # settings.LAKEFS_DEFAULT_BRANCH,
                                             path=path,
                                             content=content,
                                             async_req=True)
         return thread.get()
 
+    @menage_lakefs_api_exception_method()
     def get_content_document_block_in_workspace_storage(self,
                                                         workspace_id: UUID,
                                                         document_ids: list[UUID],
-                                                        block_id: UUID) -> str:
+                                                        block_id: UUID,
+                                                        version_commit_id: Optional[str]) -> str:
         api_instance = self.client.objects_api
         path = forming_document_block_storage_path(document_ids, block_id)
         thread = api_instance.get_object(repository=str(workspace_id),
-                                         ref=settings.LAKEFS_DEFAULT_BRANCH,
+                                         ref=version_commit_id or str(document_ids[-1]), # specific version or latest
                                          path=path,
                                          async_req=True)
         res = thread.get()

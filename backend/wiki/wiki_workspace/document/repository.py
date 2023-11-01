@@ -21,6 +21,11 @@ class DocumentRepository(BaseRepository):
         error_code=WikiErrorCode.DOCUMENT_NOT_FOUND,
         http_status_code=status.HTTP_404_NOT_FOUND
     )
+    _document_current_commit_already_published_exception = WikiException(
+        message="The document in the current version has already been published.",
+        error_code=WikiErrorCode.DOCUMENT_CURRENT_COMMIT_ALREADY_PUBLISHED,
+        http_status_code=status.HTTP_409_CONFLICT
+    )
 
     @menage_db_not_found_result_method(NotFoundResultMode.EXCEPTION, ex=_document_not_found_exception)
     async def get_document_by_id(self, document_id: UUID) -> Document:
@@ -42,6 +47,26 @@ class DocumentRepository(BaseRepository):
         self.session.add(new_document)
 
         return new_document
+
+    @menage_db_commit_method(CommitMode.FLUSH)
+    async def update_document(self,
+                              document: Document,
+                              *,
+                              title: Optional[str] = None,
+                              parent_document: Optional[Document] = None,
+                              current_published_version_commit_id: Optional[str] = None):
+        if title is not None:
+            document.title = title
+        if parent_document is not None:
+            document.parent_document_id = parent_document.id
+        if current_published_version_commit_id is not None:
+            if document.current_published_version_commit_id == current_published_version_commit_id:
+                raise self._document_current_commit_already_published_exception
+            document.current_published_version_commit_id = current_published_version_commit_id
+
+        self.session.add(document)
+
+        return document
 
     async def get_all_document_by_workspace_id(self, workspace_id: UUID) -> list[Document]:
         document_query = await self.session.execute(select(Document).where(Document.workspace_id == workspace_id))
