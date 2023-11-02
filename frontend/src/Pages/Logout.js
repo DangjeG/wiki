@@ -6,7 +6,7 @@ import {Modal, Button} from "react-bootstrap";
 export default function Logout() {
     React.useEffect( () => {
         async function fetch(){
-            const logout = await api.logout()
+            await api.logout()
         }
         fetch()
     })
@@ -23,7 +23,7 @@ export default function Logout() {
             </Modal.Body>
 
             <Modal.Footer>
-                <Button href={"/"} variant="primary">Go back</Button>
+                <Button href={"#"} variant="primary">Go back</Button>
             </Modal.Footer>
         </Modal.Dialog>
     </div>)

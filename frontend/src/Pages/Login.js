@@ -30,7 +30,7 @@ export default function Login(){
                             onChange={(event) => setEmail(event.target.value)}
                         />
                     </Form.Group>
-                    <Button className="pink-button" type="submit" variant="outline-primary"> Verify </Button>
+                    <Button id="button-with-border" type="submit" variant="outline-primary"> Verify </Button>
                 </Form>
             </div>
         </div>

@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "https://egorov-m.github.io/wiki/demo/static/css/main.7235574f.css",
-    "main.js": "https://egorov-m.github.io/wiki/demo/static/js/main.38840768.js",
+    "main.css": "https://egorov-m.github.io/wiki/demo/static/css/main.c20f962c.css",
+    "main.js": "https://egorov-m.github.io/wiki/demo/static/js/main.609c4f69.js",
     "index.html": "https://egorov-m.github.io/wiki/demo/index.html",
-    "main.7235574f.css.map": "https://egorov-m.github.io/wiki/demo/static/css/main.7235574f.css.map",
-    "main.38840768.js.map": "https://egorov-m.github.io/wiki/demo/static/js/main.38840768.js.map"
+    "main.c20f962c.css.map": "https://egorov-m.github.io/wiki/demo/static/css/main.c20f962c.css.map",
+    "main.609c4f69.js.map": "https://egorov-m.github.io/wiki/demo/static/js/main.609c4f69.js.map"
   },
   "entrypoints": [
-    "static/css/main.7235574f.css",
-    "static/js/main.38840768.js"
+    "static/css/main.c20f962c.css",
+    "static/js/main.609c4f69.js"
   ]
 }

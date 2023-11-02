@@ -32,9 +32,9 @@ export default function Admin() {
 
     return (
         <Box sx={{ padding: '50px 150px' }}>
-            <Tabs textColor="secondary" indicatorColor="secondary" value={activeTab} onChange={handleTabChange} variant="fullWidth">
-                <Tab sx={{color: '#423e42' , ':hover': {backgroundColor: '#d4b0ce'} }} value="users" label="Users" />
-                <Tab sx={{color: '#423e42' , ':hover': {backgroundColor: '#d4b0ce'} }} value="organizations" label="Organizations" />
+            <Tabs textColor="primary" indicatorColor="primary" value={activeTab} onChange={handleTabChange} variant="fullWidth">
+                <Tab sx={{color: '#423e42' , ':hover': {backgroundColor: '#cdf'} }} value="users" label="Users" />
+                <Tab sx={{color: '#423e42' , ':hover': {backgroundColor: '#cdf'} }} value="organizations" label="Organizations" />
             </Tabs>
             {renderTable()}
         </Box>

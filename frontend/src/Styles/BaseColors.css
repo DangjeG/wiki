@@ -1,0 +1,40 @@
+#base-button{
+    color: #b4cbfa;
+    background-color: #3e65b3;
+}
+
+#base-button:hover{
+    background-color: #1d3e7f;
+}
+
+#accent-button{
+    color: #b4cbfa;
+    background-color: #103070;
+}
+
+#accent-button:hover{
+    background-color: #001847;
+}
+
+#main-background{
+    background-color: #6b98f2;
+}
+
+#notaccent-button{
+    color: #12151a;
+    background-color: #6b98f2;
+}
+
+#notaccent-button:hover{
+    background-color: #5983d9;
+}
+
+#button-with-border{
+    background-color: #f1f1f1;
+    color: #0f0f0f;
+    border: 2px solid #6b98f2;
+}
+
+#button-with-border:hover{
+    background-color: #6b98f2;
+}

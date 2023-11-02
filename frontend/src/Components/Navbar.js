@@ -7,6 +7,7 @@ import Toolbar from '@mui/material/Toolbar';
 import AppBar from '@mui/material/AppBar';
 import Typography from '@mui/material/Typography';
 import {Box} from "@mui/system";
+import "../Styles/BaseColors.css"
 
 
 export default function AppNavbar(props) {
@@ -26,27 +27,25 @@ export default function AppNavbar(props) {
             <Typography variant="h6"
                         component="a"
                         href="#"
-                        sx={{flexGrow: 1, color: '#423e42', maxWidth: '100px' }}>
+                        sx={{flexGrow: 1, color: '#12151a', maxWidth: '100px' }}>
                 Home
             </Typography>
 
         if (props.user !== null) {
             return (
-                <>
+                <div className="base-button">
                     <Stack direction="row" alignItems="center" spacing={2}>
                         {base}
                         {props.user.wiki_api_client.responsibility === 'ADMIN' ? (
-                            <Button sx={{color: '#423e42', ':hover': {backgroundColor: '#bd97b6'}, background: '#d4b0ce', }}
-                                    variant="contained" href="#admin">
+                            <Button id="notaccent-button" href="#admin">
                                 Admin Tools
                             </Button>
                         ) : null}
-                        <Button sx={{color: '#423e42', ':hover': {backgroundColor: '#bd97b6'}, background: '#d4b0ce'}}
-                                variant="contained" href="#workspace/select">
+                        <Button id="notaccent-button" href="#workspace/select">
                             Go to workspaces
                         </Button>
                     </Stack>
-                </>
+                </div>
             )
         } else return base
     }
@@ -55,11 +54,11 @@ export default function AppNavbar(props) {
         if (props.user === null) {
             return (
                 <Stack direction="row" spacing={2} sx={{ justifyContent: 'flex-end', marginLeft: 'auto' }}>
-                    <Button sx={{color: '#423e42', ':hover': {backgroundColor: '#bd97b6'}, background: '#d4b0ce'}}
+                    <Button id="base-button" /*sx={{color: '#423e42', ':hover': {backgroundColor: '#506796'}, background: '#637cad',}} */
                             variant="contained" href="#login">
                         Login
                     </Button>
-                    <Button sx={{background:'#b07285', color: '#423e42', ':hover': {backgroundColor: '#8a4a5d'}}}
+                    <Button id="accent-button"  /*sx={{background:'#b07285', color: '#423e42', ':hover': {backgroundColor: '#8a4a5d'}}}*/
                             variant="contained" href="#signup">
                         Sign Up
                     </Button>
@@ -72,7 +71,7 @@ export default function AppNavbar(props) {
                         variant="contained"
                         onClick={handleMenuOpen}
                         id="user-dropdown"
-                        sx={{background:'#b07285', color: '#423e42', ':hover': {backgroundColor: '#8a4a5d'}}}
+                        sx={{background:'#103070', color: '#b4cbfa', ':hover': {backgroundColor: '#001847'}}}
                     >
                         {props.user.username}
                     </Button>
@@ -89,10 +88,16 @@ export default function AppNavbar(props) {
                             horizontal: 'right',
                         }}
                     >
-                        <MenuItem href="#profile" onClick={handleMenuClose}>
+                        <MenuItem  onClick={()=> {
+                            handleMenuClose()
+                            window.location.href = "#profile"
+                        }}>
                             Profile
                         </MenuItem>
-                        <MenuItem href="#logout" onClick={handleMenuClose}>
+                        <MenuItem onClick={()=> {
+                            handleMenuClose()
+                            window.location.href = "#logout"
+                        }}>
                             Logout
                         </MenuItem>
                     </Menu>
@@ -104,8 +109,8 @@ export default function AppNavbar(props) {
     return (
         <>
             <Box sx={{flexGrow: 1}}>
-                <AppBar position="static" sx={{background: '#d49dca'}}>
-                    <Toolbar sx={{background: '#d1a3c9'}}>
+                <AppBar position="static">
+                    <Toolbar id="main-background">
                         {getLeftPanel()}
                         {getRightPanel()}
                     </Toolbar>

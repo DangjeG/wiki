@@ -18,8 +18,6 @@ export default function SignUp() {
     const [organizations, setOrganizations] = useState([]);
 
 
-    let [searchParams, setSearchParams] = useSearchParams();
-
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -29,6 +27,8 @@ export default function SignUp() {
                 console.log(error)
             }
         };
+
+        //alert(window.location.href)
         fetchData();
     }, []);
 
@@ -45,7 +45,7 @@ export default function SignUp() {
 
 
     return (
-        <div className="login-form">
+        <div  id="signup" className="login-form">
 
             <Form onSubmit={handleFormSubmit}>
                 <Form.Group className="mb-3">
@@ -119,7 +119,7 @@ export default function SignUp() {
                             setAgreements(!is_user_agreement_accepted)
                         }}/>
                 </Form.Group>
-                <Button type="submit" variant="outline-primary"> Verify </Button>
+                <Button id="button-with-border" type="submit" variant="outline-primary"> Verify </Button>
             </Form>
         </div>
     );

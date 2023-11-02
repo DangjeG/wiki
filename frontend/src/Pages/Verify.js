@@ -12,7 +12,7 @@ export default function Verify(){
         event.preventDefault();
         try {
              await api.verify(code);
-            window.location.href = '/';
+            window.location.href = '#';
             }
             catch (err){
             console.log(err)
@@ -30,7 +30,7 @@ export default function Verify(){
                         onChange={(event) => setCode(event.target.value)}
                     />
                 </Form.Group>
-                <Button type="submit" variant="outline-primary"> Submit </Button>
+                <Button id="button-with-border" type="submit" variant="outline-primary"> Submit </Button>
             </Form>
         </div>
     )

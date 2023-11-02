@@ -56,23 +56,23 @@ export default function OrganizationsTable() {
     }
 
     return (
-        <div style={{"padding": "10px 70px", margin: '20px', background: '#d4b0ce',  borderRadius: '8px'}}>
-            <Box sx={{width: '100%', margin: '10px', padding: '50px 50px', background: '#d4b0ce',  borderRadius: '8px'}}>
-                <Table style={{background: '#d4b0ce'}}>
+        <div style={{"padding": "10px 70px", margin: '20px', background: '#cdf',  borderRadius: '8px'}}>
+            <Box sx={{width: '100%', margin: '10px', padding: '50px 50px', background: '#cdf',  borderRadius: '8px'}}>
+                <Table style={{background: '#cdf'}}>
                     <thead >
                     <tr key="header">
-                        <th style={{ background: '#d4b0ce', border: 'none' }}>Name</th>
-                        <th style={{ background: '#d4b0ce', border: 'none' }}>Description</th>
-                        <th style={{ background: '#d4b0ce', border: 'none' }}>Access</th>
+                        <th style={{ background: '#cdf', border: 'none' }}>Name</th>
+                        <th style={{ background: '#cdf', border: 'none' }}>Description</th>
+                        <th style={{ background: '#cdf', border: 'none' }}>Access</th>
 
                     </tr>
                     </thead>
                     <tbody>
                     {Array.from(organizations).map((organization) => (
                         <tr key={organization.name}>
-                            <td style={{ background: '#d4b0ce', border: 'none' }}>{organization.name}</td>
-                            <td style={{ background: '#d4b0ce', border: 'none' }}>{organization.description}</td>
-                            <td style={{ background: '#d4b0ce', border: 'none' }}>{organization.access}</td>
+                            <td style={{ background: '#cdf', border: 'none' }}>{organization.name}</td>
+                            <td style={{ background: '#cdf', border: 'none' }}>{organization.description}</td>
+                            <td style={{ background: '#cdf', border: 'none' }}>{organization.access}</td>
                         </tr>))}
                     </tbody>
                 </Table>
@@ -110,7 +110,7 @@ export default function OrganizationsTable() {
                         </Button>
                     </Modal.Footer>
                 </Modal>
-                <Button style={{ background: '#bd97b6', border: 'none' }} variant="light" onClick={handleShow}>+</Button>
+                <Button style={{ background: '#cdf', border: 'none' }} variant="light" onClick={handleShow}>+</Button>
             </Box>
         </div>)
 }

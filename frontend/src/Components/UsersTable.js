@@ -50,23 +50,23 @@ export default function UsersTable() {
 
     return (
         <div style={{"padding": "10px 70px"}}>
-            <Box sx={{width: '100%', margin: '10px', padding: '50px 50px', background: '#d4b0ce',  borderRadius: '8px'}} >
+            <Box sx={{width: '100%', margin: '10px', padding: '50px 50px', background: '#cdf',  borderRadius: '8px'}} >
                 <Table >
                     <thead>
                     <tr key="header">
-                        <th style={{ background: '#d4b0ce', border: 'none' }}>Email</th>
-                        <th style={{ background: '#d4b0ce', border: 'none' }}>Username</th>
-                        <th style={{ background: '#d4b0ce', border: 'none' }}>Full name</th>
-                        <th style={{ background: '#d4b0ce', border: 'none' }}>Responsibility</th>
+                        <th style={{ background: '#cdf', border: 'none' }}>Email</th>
+                        <th style={{ background: '#cdf', border: 'none' }}>Username</th>
+                        <th style={{ background: '#cdf', border: 'none' }}>Full name</th>
+                        <th style={{ background: '#cdf', border: 'none' }}>Responsibility</th>
                     </tr>
                     </thead>
                     <tbody>
                     {users.map((user) => (
                         <tr key={user.username}>
-                            <td style={{ background: '#d4b0ce', border: 'none' }}>{user.email}</td>
-                            <td style={{ background: '#d4b0ce', border: 'none' }}>{user.username}</td>
-                            <td style={{ background: '#d4b0ce', border: 'none' }}>{user.first_name + ' ' + user.last_name + ' ' + user.second_name}</td>
-                            <td style={{ background: '#d4b0ce', border: 'none' }}>
+                            <td style={{ background: '#cdf', border: 'none' }}>{user.email}</td>
+                            <td style={{ background: '#cdf', border: 'none' }}>{user.username}</td>
+                            <td style={{ background: '#cdf', border: 'none' }}>{user.first_name + ' ' + user.last_name + ' ' + user.second_name}</td>
+                            <td style={{ background: '#cdf', border: 'none' }}>
                                 {user.wiki_api_client === null ? (
                                     <Button onClick={() => {
                                         setUsername(user.username);
