@@ -31,7 +31,7 @@ export default function AppNavbar(props) {
                 Home
             </Typography>
 
-        if (props.user !== null) {
+        if (props.user !== null && props.user.wiki_api_client !== null) {
             return (
                 <div className="base-button">
                     <Stack direction="row" alignItems="center" spacing={2}>

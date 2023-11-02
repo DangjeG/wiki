@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Button, FormControlLabel, FormLabel, Modal, Radio, RadioGroup, Table } from '@mui/material';
+import {Button, Form, Modal, Table} from "react-bootstrap";
 import { api } from '../app.config';
 import { Box } from '@mui/system';
+import {FormControlLabel, FormLabel, Radio, RadioGroup} from "@mui/material";
 
 export default function UsersTable() {
     const [users, setUsers] = useState([]);
@@ -82,38 +83,37 @@ export default function UsersTable() {
                     ))}
                     </tbody>
                 </Table>
-                <Modal open={show} onClose={handleClose}>
-                    <Box sx={{ padding: '20px' }}>
-                        <h2>Approve user</h2>
-                        <FormLabel>Description</FormLabel>
-                        <textarea
-                            value={description}
-                            onChange={(event) => setDescription(event.target.value)}
-                            rows={3}
-                            style={{ width: '100%' }}
-                        />
-                        <Box sx={{ display: 'flex', alignItems: 'center', marginTop: '10px' }}>
-                            <FormLabel>Responsibility</FormLabel>
-                            <RadioGroup
-                                row
-                                value={responsibility}
-                                onChange={(event) => setResponsibility(event.target.value)}
-                            >
-                                <FormControlLabel control={<Radio />} label="VIEWER" value="VIEWER" />
-                                <FormControlLabel control={<Radio />} label="EDITOR" value="EDITOR" />
-                                <FormControlLabel control={<Radio />} label="ADMIN" value="ADMIN" />
-                            </RadioGroup>
-                        </Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
-                            <Button variant="contained" onClick={handleClose} sx={{ marginRight: '10px' }}>
-                                Close
-                            </Button>
-                            <Button variant="contained" onClick={handleClose}>
-                                Save Changes
-                            </Button>
-                        </Box>
-                    </Box>
+                <Modal show={show} onHide={handleClose}>
+                    <Modal.Header>
+                        <Modal.Title>Add organization</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Description</Form.Label>
+                                <Form.Control value={description} onChange={(event) => (setDescription(event.target.value))}
+                                              as="textarea" rows={3}/>
+                            </Form.Group>
+                            <Form.Group className="mb-3">
+                                <Form.Check inline type="radio" label={`VIEWER`} name={"group"}
+                                            onClick={() => setResponsibility("VIEWER")}/>
+                                <Form.Check inline type="radio" label={`EDITOR`} name={"group"}
+                                            onClick={() => setResponsibility("EDITOR")}/>
+                                <Form.Check inline type="radio" label={`ADMIN`} name={"group"}
+                                            onClick={() => setResponsibility("ADMIN")}/>
+                            </Form.Group>
+                        </Form>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={handleClose}>
+                            Close
+                        </Button>
+                        <Button variant="primary" onClick={approve}>
+                            Save Changes
+                        </Button>
+                    </Modal.Footer>
                 </Modal>
+                <Button style={{ background: '#cdf', border: 'none' }} variant="light" onClick={handleShow}>+</Button>
             </Box>
         </div>
     );
