@@ -1,54 +1,131 @@
-import {Button, Dropdown, Nav, Navbar} from "react-bootstrap";
+import React from 'react';
+import Button from '@mui/material/Button';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Stack from '@mui/material/Stack';
+import Toolbar from '@mui/material/Toolbar';
+import AppBar from '@mui/material/AppBar';
+import Typography from '@mui/material/Typography';
+import {Box} from "@mui/system";
+import "../Styles/BaseColors.css"
+import "../Styles/Navbar.css"
 
 
+export default function AppNavbar(props) {
+    const [anchorEl, setAnchorEl] = React.useState(null);
 
-export default function AppNavbar(props){
+    const handleMenuOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
 
-    function getRightPanel(){
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    function getLeftPanel() {
+
+        let base =
+            <div>
+                <Typography variant="h6"
+                            component="a"
+                            href="#"
+                            id="typography-home">
+                    ГЛАВНАЯ
+                </Typography>
+                <Typography variant="h6"
+                            component="a"
+                            href="https://d-element.ru/?ysclid=lolx8ntig9911662351"
+                            id="typography-home">
+                    ПЕРЕЙТИ НА САЙТ
+                </Typography>
+            </div>
 
 
+        if (props.user !== null && props.user.wiki_api_client !== null) {
+            return (
+                <div className="base-button">
+                    <Stack direction="row" alignItems="center" spacing={2}>
+                        {base}
+                        {props.user.wiki_api_client.responsibility === 'ADMIN' ? (
+                            <Button id="notaccent-button" href="#admin">
+                                ИНСТРУМЕНТЫ АДМИНА
+                            </Button>
+                        ) : null}
+                        <Button id="notaccent-button" href="#workspace/select">
+                            ПРОЕКТЫ
+                        </Button>
+                    </Stack>
+                </div>
+            )
+        } else return base
+    }
+
+    function getRightPanel() {
         if (props.user === null) {
             return (
-                <Nav>
-                    <Button variant="dark" href="#login" className="mr-2">Login</Button>
-                    <Button variant="dark" href="#signup" className="mr-2">Sign Up</Button>
-                </Nav>
-            )
-        }
-        else {
+                <Stack direction="row" spacing={2} sx={{ justifyContent: 'flex-end', marginLeft: 'auto' }}>
+                    <Button id="base-button" /*sx={{color: '#423e42', ':hover': {backgroundColor: '#506796'}, background: '#637cad',}} */
+                            variant="contained" href="#login">
+                        ВОЙТИ
+                    </Button>
+                    <Button id="accent-button"  /*sx={{background:'#b07285', color: '#423e42', ':hover': {backgroundColor: '#8a4a5d'}}}*/
+                            variant="contained" href="#signup">
+                        ЗАРЕГИСТРИРОВАТЬСЯ
+                    </Button>
+                </Stack>
+            );
+        } else {
             return (
-                <Nav>
-                    <Dropdown>
-                        <Dropdown.Toggle variant="dark" id="dropdown-basic">
-                            {props.user.username}
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu variant="dark">
-                            <Dropdown.Item href="#profile">Profile</Dropdown.Item>
-                            {props.user.wiki_api_client.responsibility === "ADMIN" ?
-                                <Dropdown.Item href="#admin">Admin Tools</Dropdown.Item> : <></>}
-                            <Dropdown.Divider/>
-                            <Dropdown.Item href="#logout">Logout</Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown>
-                </Nav>)
+                <Stack direction="row" sx={{ justifyContent: 'flex-end', marginLeft: 'auto' }}>
+                    <Button
+                        variant="contained"
+                        onClick={handleMenuOpen}
+                        id="user-dropdown"
+                        sx={{background:'#103070', color: '#b4cbfa', ':hover': {backgroundColor: '#001847'}}}
+                    >
+                        {props.user.username}
+                    </Button>
+                    <Menu
+                        anchorEl={anchorEl}
+                        open={Boolean(anchorEl)}
+                        onClose={handleMenuClose}
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'right',
+                        }}
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right',
+                        }}
+                    >
+                        <MenuItem  onClick={()=> {
+                            handleMenuClose()
+                            window.location.href = "#profile"
+                        }}>
+                            Profile
+                        </MenuItem>
+                        <MenuItem onClick={()=> {
+                            handleMenuClose()
+                            window.location.href = "#logout"
+                        }}>
+                            Logout
+                        </MenuItem>
+                    </Menu>
+                </Stack>
+            );
         }
     }
 
     return (
         <>
-            <Navbar collapseOnSelect expand="lg" style={{"paddingRight": "50px", "paddingLeft": "50px"}} bg="dark" variant="dark">
-                <Navbar.Brand href="/">Home</Navbar.Brand>
-
-                <Navbar.Collapse id="responsetive-navbar-nav">
-                    <Nav className="me-auto my-2 my-lg-0"
-                         style={{maxHeight: '100px'}}
-                         navbarScroll
-                    >
-                    </Nav>
-                    {getRightPanel()}
-                </Navbar.Collapse>
-                <Navbar.Toggle aria-controls="responsetive-navbar-nav"/>
-            </Navbar>
+            <Box sx={{flexGrow: 1}}>
+                <AppBar position="static">
+                    <Toolbar id="main-background">
+                        {getLeftPanel()}
+                        {getRightPanel()}
+                    </Toolbar>
+                </AppBar>
+            </Box>
         </>
     )
 }

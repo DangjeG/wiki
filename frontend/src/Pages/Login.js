@@ -1,35 +1,58 @@
-import React, {useState} from "react";
-import {Button, Form} from "react-bootstrap";
-import "../Styles/Login.css"
-import {api} from "../app.config";
+import React, { useState } from "react";
+import {Button, FormControl, InputLabel, Input, Typography, TextField, styled} from "@mui/material";
+import { api } from "../app.config";
+import "../Styles/Login.css";
+import "../Styles/BaseColors.css";
 
+const CustomTextField = styled(TextField)({
+    '& .MuiInputLabel-root.Mui-focused': {
+        display: 'none', // Скрываем заголовок при активном поле ввода
+    },
+});
 
-export default function Login(){
-
+export default function Login() {
     const [email, setEmail] = useState("");
+
+    const [inputValue, setInputValue] = useState('');
+
+    const handleInputChange = (event) => {
+        setInputValue(event.target.value);
+    };
+
     async function handleFormSubmit(event) {
         event.preventDefault();
         try {
-            await api.login(email)
-            window.location.href = '/verify';
+            await api.login(email);
+            window.location.href = "#verify";
         } catch (error) {
             console.error(error);
         }
     }
-    return(
-        <div className="login-form">
-            <Form onSubmit={handleFormSubmit}>
-                <Form.Group className="mb-3">
-                    <Form.Label>Email address</Form.Label>
-                    <Form.Control
-                        type="email"
-                        placeholder="name@example.com"
-                        value={email}
-                        onChange={(event) => setEmail(event.target.value)}
-                    />
-                </Form.Group>
-                <Button type="submit" variant="outline-primary"> Verify </Button>
-            </Form>
+
+    return (
+        <div id="login" className="login-form">
+            <div>
+                <Typography component="h2" variant="h6">
+                    Email
+                </Typography>
+                <form onSubmit={handleFormSubmit}>
+                    <FormControl fullWidth id="text-field">
+                        <InputLabel htmlFor="email-input"
+                                    style={{ visibility: inputValue === '' ? 'visible' : 'hidden' }}
+                        >
+                            name@example.com
+                        </InputLabel>
+                        <CustomTextField fullWidth
+                                         variant="outlined"
+                                         type="email"
+                                         value={inputValue}
+                                         onChange={handleInputChange}/>
+                    </FormControl>
+                    <Button id="accent-button" variant="outlined" type="submit">
+                        ОТПРАВИТЬ КОД
+                    </Button>
+                </form>
+            </div>
         </div>
     );
 }
