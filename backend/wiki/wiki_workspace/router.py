@@ -8,6 +8,8 @@ from starlette import status
 from wiki.common.schemas import WikiUserHandlerData
 from wiki.database.deps import get_db
 from wiki.permissions.base import BasePermission
+from wiki.user.models import User
+from wiki.user.repository import UserRepository
 from wiki.user.utils import get_user_info
 from wiki.wiki_api_client.enums import ResponsibilityType
 from wiki.wiki_storage.deps import get_storage_client
@@ -32,7 +34,10 @@ async def create_workspace(
         user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER))
 ):
     workspace_repository: WorkspaceRepository = WorkspaceRepository(session)
-    workspace: Workspace = await workspace_repository.create_workspace(workspace_create.title, user.id)
+
+    user_repository: UserRepository = UserRepository(session)
+    user_db: User = await user_repository.get_user_by_id(user.id)
+    workspace: Workspace = await workspace_repository.create_workspace(workspace_create.title, user_db.id)
 
     storage_service: BaseWikiStorageService = BaseWikiStorageService(storage_client)
     storage_service.create_workspace_storage(workspace.id)
@@ -40,7 +45,7 @@ async def create_workspace(
     return WorkspaceInfoResponse(
         id=workspace.id,
         title=workspace.title,
-        owner_user=await get_user_info(user.id, session, is_full=False)
+        owner_user=await get_user_info(user_db.id, session, is_full=False)
     )
 
 

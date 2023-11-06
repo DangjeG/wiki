@@ -6,7 +6,6 @@ from pydantic import BaseModel
 from wiki.auth.enums import AuthorizationMode
 from wiki.common.exceptions import WikiErrorCode
 from wiki.models import WikiBase
-from wiki.organization.models import Organization
 from wiki.wiki_api_client.enums import ResponsibilityType
 from wiki.wiki_api_client.models import WikiApiClient
 
@@ -49,5 +48,4 @@ class WikiUserHandlerData(ExternalUserHandlerData):
     last_name: str
     second_name: Optional[str] = None
     position: Optional[str] = None
-    organization: Optional[Organization] = None
     wiki_api_client: Optional[WikiApiClient | FakeWikiApiClient]

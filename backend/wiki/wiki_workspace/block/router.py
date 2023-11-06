@@ -242,7 +242,7 @@ async def _get_blocks(session,
     document = await document_repository.get_document_by_id(document_id)
     document_ids = await document_repository.get_list_ids_of_document_hierarchy(document)
     workspace_repository: WorkspaceRepository = WorkspaceRepository(session)
-    workspace = workspace_repository.get_workspace_by_id(document.workspace_id)
+    workspace = await workspace_repository.get_workspace_by_id(document.workspace_id)
 
     storage_service: BaseWikiStorageService = BaseWikiStorageService(storage_client)
     result_blocks: list[BlockDataResponse] = []

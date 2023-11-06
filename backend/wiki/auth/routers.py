@@ -99,7 +99,6 @@ async def signup(request: Request,
         last_name=user_signup.last_name,
         second_name=user_signup.second_name,
         position=user_signup.position,
-        organization_id=user_signup.organization_id
     ))
 
     await email_provider.send_mail(EmailSchema(

@@ -7,8 +7,6 @@ from starlette import status
 
 from wiki.common.exceptions import WikiException, WikiErrorCode
 from wiki.database.deps import get_db
-from wiki.organization.models import Organization
-from wiki.organization.repository import OrganizationRepository
 from wiki.permissions.domain.deps import DomainPermission
 from wiki.user.repository import UserRepository
 from wiki.user.schemas import CreateUser
@@ -37,7 +35,5 @@ class SignUpPermission(ABC):
                 error_code=WikiErrorCode.USER_NOT_SPECIFIED,
                 http_status_code=status.HTTP_409_CONFLICT
             )
-        organisation_repository: OrganizationRepository = OrganizationRepository(session)
-        organization: Organization = await organisation_repository.get_organization_by_id(create_user.organization_id)
 
         return create_user

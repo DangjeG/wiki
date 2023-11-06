@@ -12,9 +12,6 @@ from wiki.common.exceptions import WikiException, WikiErrorCode
 from wiki.common.schemas import WikiUserHandlerData
 from wiki.config import settings
 from wiki.database.utils import utcnow
-from wiki.organization.enums import OrganizationAccessType
-from wiki.organization.models import Organization
-from wiki.organization.repository import OrganizationRepository
 from wiki.user.models import User
 from wiki.user.repository import UserRepository
 from wiki.wiki_api_client.models import WikiApiClient
@@ -39,13 +36,11 @@ class AuthenticatorInterface:
     session: AsyncSession
     api_client_repository: WikiApiClientRepository
     user_repository: UserRepository
-    organization_repository: OrganizationRepository
 
     def __init__(self, session: AsyncSession):
         self.session = session
         self.api_client_repository = WikiApiClientRepository(session)
         self.user_repository = UserRepository(session)
-        self.organization_repository = OrganizationRepository(session)
 
     async def verify_api_client(self, api_client_id: UUID) -> WikiApiClient:
         wiki_api_client: WikiApiClient = await self.api_client_repository.get_wiki_api_client_by_id(api_client_id)
@@ -69,24 +64,8 @@ class AuthenticatorInterface:
             raise self._credentials_not_valid_or_expired_exception
         if user.is_deleted:
             raise self._credentials_not_valid_or_expired_exception
-        organization = None
-        if user.organization_id is not None:
-            organization: Organization = await self.organization_repository.get_organization_by_id(user.organization_id)
-            if self.authenticator_type == AuthenticatorType.api_key:
-                if organization.access != OrganizationAccessType.FULL_ACCESS:
-                    raise WikiException(
-                        message="The organization you are a member of does not have access to API keys.",
-                        error_code=WikiErrorCode.AUTH_ORGANIZATION_NOT_ACCESS_API,
-                        http_status_code=status.HTTP_403_FORBIDDEN
-                    )
-            if organization.access == OrganizationAccessType.LOCKED:
-                raise WikiException(
-                    message="The organization you are a member of does not have access to Wiki service.",
-                    error_code=WikiErrorCode.AUTH_ORGANIZATION_NOT_ACCESS,
-                    http_status_code=status.HTTP_403_FORBIDDEN
-                )
 
-        return user, organization
+        return user
 
     async def validate(self, credentials, is_available_disapproved_user: bool) -> WikiUserHandlerData:
         pass

@@ -1,5 +1,3 @@
-from typing import Optional
-
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
@@ -7,9 +5,6 @@ from starlette import status
 from wiki.common.exceptions import WikiException, WikiErrorCode
 from wiki.common.schemas import WikiUserHandlerData
 from wiki.database.deps import get_db
-from wiki.organization.models import Organization
-from wiki.organization.repository import OrganizationRepository
-from wiki.organization.schemas import OrganizationInfoResponse
 from wiki.permissions.base import BasePermission
 from wiki.user.models import User
 from wiki.user.repository import UserRepository
@@ -68,17 +63,6 @@ async def approve_user(
                                                            is_verified_email=True,
                                                            wiki_api_client_id=new_api_client_db.id)
 
-    organization_response: Optional[OrganizationInfoResponse] = None
-    if updated_user.organization_id is not None:
-        organization_repository: OrganizationRepository = OrganizationRepository(session)
-        organization: Organization = await organization_repository.get_organization_by_id(user_db.organization_id)
-        organization_response = OrganizationInfoResponse(
-            id=organization.id,
-            name=organization.name,
-            description=organization.description,
-            access=organization.access
-        )
-
     wiki_api_client_response = WikiApiClientInfoResponse(
         id=new_api_client_db.id,
         description=new_api_client_db.description,
@@ -96,6 +80,5 @@ async def approve_user(
         is_user_agreement_accepted=user_db.is_user_agreement_accepted,
         is_verified_email=user_db.is_verified_email,
         is_enabled=user_db.is_enabled,
-        organization=organization_response,
         wiki_api_client=wiki_api_client_response
     )

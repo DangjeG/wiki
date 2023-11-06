@@ -101,8 +101,7 @@ class UserRepository(BaseRepository):
             last_name=create_user.last_name,
             second_name=create_user.second_name,
             position=create_user.position,
-            is_user_agreement_accepted=create_user.is_user_agreement_accepted,
-            organization_id=create_user.organization_id
+            is_user_agreement_accepted=create_user.is_user_agreement_accepted
         )
 
         self.session.add(new_user)
@@ -119,7 +118,6 @@ class UserRepository(BaseRepository):
                           last_name: Optional[str] = None,
                           second_name: Optional[str] = None,
                           position: Optional[str] = None,
-                          organization_id: Optional[UUID] = None,
                           is_enabled: Optional[bool] = None,
                           is_user_agreement_accepted: Optional[bool] = None,
                           is_verified_email: Optional[bool] = None,
@@ -137,8 +135,6 @@ class UserRepository(BaseRepository):
             user.second_name = second_name
         if position is not None:
             user.position = position
-        if organization_id is not None:
-            user.organization_id = organization_id
         if is_enabled is not None:
             user.is_enabled = is_enabled
         if is_user_agreement_accepted is not None:

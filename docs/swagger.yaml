@@ -120,23 +120,6 @@ components:
       - workspace_id
       title: CreateDocument
       type: object
-    CreateOrganization:
-      properties:
-        access:
-          $ref: '#/components/schemas/OrganizationAccessType'
-        description:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Description
-        name:
-          title: Name
-          type: string
-      required:
-      - name
-      - access
-      title: CreateOrganization
-      type: object
     CreatePermissionDomain:
       properties:
         domain:
@@ -165,10 +148,6 @@ components:
         last_name:
           title: Last Name
           type: string
-        organization_id:
-          format: uuid
-          title: Organization Id
-          type: string
         position:
           anyOf:
           - type: string
@@ -187,7 +166,6 @@ components:
       - username
       - first_name
       - last_name
-      - organization_id
       title: CreateUser
       type: object
     CreateVerifiedUser:
@@ -214,10 +192,6 @@ components:
         last_name:
           title: Last Name
           type: string
-        organization_id:
-          format: uuid
-          title: Organization Id
-          type: string
         position:
           anyOf:
           - type: string
@@ -239,7 +213,6 @@ components:
       - email
       - first_name
       - last_name
-      - organization_id
       - wiki_api_client
       title: CreateVerifiedUser
       type: object
@@ -361,72 +334,6 @@ components:
           title: Status
           type: string
       title: HealthCheck
-      type: object
-    OrganizationAccessType:
-      enum:
-      - LOCKED
-      - WEB_ONLY
-      - FULL_ACCESS
-      title: OrganizationAccessType
-      type: string
-    OrganizationInfoResponse:
-      properties:
-        access:
-          $ref: '#/components/schemas/OrganizationAccessType'
-        description:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Description
-        id:
-          format: uuid
-          title: Id
-          type: string
-        name:
-          title: Name
-          type: string
-      required:
-      - id
-      - name
-      - description
-      - access
-      title: OrganizationInfoResponse
-      type: object
-    Page_OrganizationInfoResponse_:
-      properties:
-        items:
-          items:
-            $ref: '#/components/schemas/OrganizationInfoResponse'
-          title: Items
-          type: array
-        page:
-          anyOf:
-          - minimum: 1.0
-            type: integer
-          - type: 'null'
-          title: Page
-        pages:
-          anyOf:
-          - minimum: 0.0
-            type: integer
-          - type: 'null'
-          title: Pages
-        size:
-          anyOf:
-          - minimum: 1.0
-            type: integer
-          - type: 'null'
-          title: Size
-        total:
-          minimum: 0.0
-          title: Total
-          type: integer
-      required:
-      - items
-      - total
-      - page
-      - size
-      title: Page[OrganizationInfoResponse]
       type: object
     Page_PermissionDomainInfoResponse_:
       properties:
@@ -570,24 +477,6 @@ components:
       - block_id
       title: UpdateBlockInfo
       type: object
-    UpdateOrganization:
-      properties:
-        access:
-          anyOf:
-          - $ref: '#/components/schemas/OrganizationAccessType'
-          - type: 'null'
-        description:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Description
-        name:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Name
-      title: UpdateOrganization
-      type: object
     UpdatePermissionDomain:
       properties:
         domain:
@@ -631,8 +520,6 @@ components:
         last_name:
           title: Last Name
           type: string
-        organization:
-          $ref: '#/components/schemas/OrganizationInfoResponse'
         position:
           anyOf:
           - type: string
@@ -656,7 +543,6 @@ components:
       - email
       - first_name
       - last_name
-      - organization
       title: UserBaseInfoResponse
       type: object
     UserFullInfoResponse:
@@ -680,8 +566,6 @@ components:
         last_name:
           title: Last Name
           type: string
-        organization:
-          $ref: '#/components/schemas/OrganizationInfoResponse'
         position:
           anyOf:
           - type: string
@@ -705,7 +589,6 @@ components:
       - email
       - first_name
       - last_name
-      - organization
       - is_user_agreement_accepted
       - is_verified_email
       - is_enabled
@@ -762,12 +645,6 @@ components:
           - type: string
           - type: 'null'
           title: Last Name
-        organization_id:
-          anyOf:
-          - format: uuid
-            type: string
-          - type: 'null'
-          title: Organization Id
         position:
           anyOf:
           - type: string
@@ -1789,187 +1666,6 @@ paths:
       summary: Saving document
       tags:
       - WorkspaceDocument
-  /api/v1/organization/:
-    post:
-      deprecated: true
-      description: Create organization.
-      operationId: create_organization_api_v1_organization__post
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateOrganization'
-        required: true
-      responses:
-        '202':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrganizationInfoResponse'
-          description: Successful Response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-          description: Validation Error
-      security:
-      - WikiRootApiKey: []
-      - WikiApiKey: []
-      - WikiApiKey: []
-      - WikiAccessToken: []
-      - WikiBearer: []
-      summary: Create Organization
-      tags:
-      - Organization
-    put:
-      deprecated: true
-      description: Update organization.
-      operationId: update_organizations_api_v1_organization__put
-      parameters:
-      - in: query
-        name: organization_id
-        required: true
-        schema:
-          format: uuid
-          title: Organization Id
-          type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateOrganization'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrganizationInfoResponse'
-          description: Successful Response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-          description: Validation Error
-      security:
-      - WikiRootApiKey: []
-      - WikiApiKey: []
-      - WikiApiKey: []
-      - WikiAccessToken: []
-      - WikiBearer: []
-      summary: Update Organizations
-      tags:
-      - Organization
-  /api/v1/organization/all:
-    get:
-      deprecated: true
-      description: Get all organizations.
-      operationId: get_organizations_api_v1_organization_all_get
-      parameters:
-      - in: query
-        name: name
-        required: false
-        schema:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Name
-      - in: query
-        name: description
-        required: false
-        schema:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Description
-      - in: query
-        name: access
-        required: false
-        schema:
-          anyOf:
-          - $ref: '#/components/schemas/OrganizationAccessType'
-          - type: 'null'
-          title: Access
-      - description: Page number
-        in: query
-        name: page
-        required: false
-        schema:
-          default: 1
-          description: Page number
-          minimum: 1
-          title: Page
-          type: integer
-      - description: Page size
-        in: query
-        name: size
-        required: false
-        schema:
-          default: 50
-          description: Page size
-          maximum: 100
-          minimum: 1
-          title: Size
-          type: integer
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Page_OrganizationInfoResponse_'
-          description: Successful Response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-          description: Validation Error
-      security:
-      - WikiRootApiKey: []
-      - WikiApiKey: []
-      - WikiApiKey: []
-      - WikiAccessToken: []
-      - WikiBearer: []
-      summary: Get Organizations
-      tags:
-      - Organization
-  /api/v1/organization/info:
-    get:
-      deprecated: true
-      description: Get organization by id.
-      operationId: get_organization_api_v1_organization_info_get
-      parameters:
-      - in: query
-        name: organization_id
-        required: true
-        schema:
-          format: uuid
-          title: Organization Id
-          type: string
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrganizationInfoResponse'
-          description: Successful Response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-          description: Validation Error
-      security:
-      - WikiRootApiKey: []
-      - WikiApiKey: []
-      - WikiApiKey: []
-      - WikiAccessToken: []
-      - WikiBearer: []
-      summary: Get Organization
-      tags:
-      - Organization
   /api/v1/permission/domain/:
     post:
       operationId: create_permission_domain_api_v1_permission_domain__post

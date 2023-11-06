@@ -47,9 +47,9 @@ class WikiTokenAuthenticatorInterface(BaseTokenAuthenticatorInterface):
         api_client = None
         if not is_available_disapproved_user:
             api_client = await self.verify_api_client(api_client_id)
-            user, organization = await self.verify_user(api_client=api_client)
+            user = await self.verify_user(api_client=api_client)
         else:
-            user, organization = await self.verify_user(user_email=user_email)
+            user = await self.verify_user(user_email=user_email)
 
         return WikiUserHandlerData(
             id=user.id,
@@ -59,6 +59,5 @@ class WikiTokenAuthenticatorInterface(BaseTokenAuthenticatorInterface):
             last_name=user.last_name,
             second_name=user.second_name,
             position=user.position,
-            organization=organization,
             wiki_api_client=api_client
         )
