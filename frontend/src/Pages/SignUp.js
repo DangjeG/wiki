@@ -1,22 +1,19 @@
-import React, {useEffect, useState} from "react";
-import {Button, Form} from "react-bootstrap";
-import "../Styles/Login.css"
-import {api} from "../app.config";
-import {useSearchParams} from "react-router-dom";
-
+import React, { useEffect, useState } from "react";
+import { Button, Checkbox, FormControl, FormControlLabel, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
+import { api } from "../app.config";
+import { useSearchParams } from "react-router-dom";
+import "../Styles/Login.css";
 
 export default function SignUp() {
-
     const [email, setEmail] = useState("");
     const [username, setUsername] = useState("");
-    const [first_name, setFirstName] = useState("");
-    const [last_name, setLastName] = useState("");
-    const [second_name, setSecondName] = useState("");
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [secondName, setSecondName] = useState("");
     const [organizationId, setOrganizationId] = useState("");
-    const [is_user_agreement_accepted, setAgreements] = useState(false);
-    const [is_second_name_exist, setExist] = useState(true);
+    const [isUserAgreementAccepted, setAgreements] = useState(false);
+    const [isSecondNameExist, setExist] = useState(true);
     const [organizations, setOrganizations] = useState([]);
-
 
     useEffect(() => {
         const fetchData = async () => {
@@ -24,104 +21,122 @@ export default function SignUp() {
                 const response = await api.getOrganizations();
                 setOrganizations(response);
             } catch (error) {
-                console.log(error)
+                console.log(error);
             }
         };
 
-        //alert(window.location.href)
         fetchData();
     }, []);
-
 
     async function handleFormSubmit(event) {
         event.preventDefault();
         try {
-            await api.signup(email, username, first_name, last_name, second_name, organizationId, is_user_agreement_accepted)
-            window.location.href = '#verify';
+            await api.signup(email, username, firstName, lastName, secondName, organizationId, isUserAgreementAccepted);
+            window.location.href = "#verify";
         } catch (error) {
             console.error(error);
         }
     }
 
-
     return (
-        <div  id="signup" className="login-form">
-
-            <Form onSubmit={handleFormSubmit}>
-                <Form.Group className="mb-3">
-                    <Form.Label>Email</Form.Label>
-                    <Form.Control
-                        type="email"
-                        placeholder="name@example.com"
-                        value={email}
-                        onChange={(event) => setEmail(event.target.value)}
-                    />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                    <Form.Label>Username</Form.Label>
-                    <Form.Control
-                        type="text"
-                        placeholder="example_username"
-                        value={username}
-                        onChange={(event) => setUsername(event.target.value)}
-                    />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                    <Form.Label>First name</Form.Label>
-                    <Form.Control
-                        type="text"
-                        placeholder="Иванов"
-                        value={first_name}
-                        onChange={(event) => setFirstName(event.target.value)}
-                    />
-                </Form.Group>
-                <Form.Group className="mb-3" >
-                    <Form.Label>Last name</Form.Label>
-                    <Form.Control
-                        type="text"
-                        placeholder="Иван"
-                        value={last_name}
-                        onChange={(event) => setLastName(event.target.value)}
-                    />
-                </Form.Group>
-                <Form.Group className="mb-3" >
-                    <Form.Label>Second name</Form.Label>
-                    <Form.Control
-                        type="text"
-                        placeholder="Иванович"
-                        value={second_name}
-                        onChange={(event) => setSecondName(event.target.value)}
-                        disabled={is_second_name_exist}
-                    />
-                </Form.Group>
-                <Form.Group>
-                    <Form.Label>Organization</Form.Label>
-                    <Form.Select onChange={(e) => setOrganizationId(e.currentTarget.value)}>
-                        {Array.from(organizations).map((organization) => (
-                            <option value={organization.id}>{organization.name}</option>
+        <div id="signup" className="login-form">
+            <form onSubmit={handleFormSubmit}>
+                <Typography component="h2" variant="h6">
+                    Email
+                </Typography>
+                <TextField
+                    type="email"
+                    placeholder="name@example.com"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    fullWidth
+                    margin="normal"
+                    required
+                    sx={{background:'#FFFFFF'}}
+                />
+                <Typography component="h2" variant="h6">
+                    Логин
+                </Typography>
+                <TextField
+                    type="text"
+                    placeholder="example_username"
+                    value={username}
+                    onChange={(event) => setUsername(event.target.value)}
+                    fullWidth
+                    margin="normal"
+                    required
+                    sx={{background:'#FFFFFF'}}
+                />
+                <Typography component="h2" variant="h6">
+                    Имя
+                </Typography>
+                <TextField
+                    type="text"
+                    placeholder="Иванов"
+                    value={firstName}
+                    onChange={(event) => setFirstName(event.target.value)}
+                    fullWidth
+                    margin="normal"
+                    required
+                    sx={{background:'#FFFFFF'}}
+                />
+                <Typography component="h2" variant="h6">
+                    Фамилия
+                </Typography>
+                <TextField
+                    type="text"
+                    placeholder="Иван"
+                    value={lastName}
+                    onChange={(event) => setLastName(event.target.value)}
+                    fullWidth
+                    margin="normal"
+                    required
+                    sx={{background:'#FFFFFF'}}
+                />
+                <Typography component="h2" variant="h6">
+                    Отчество
+                </Typography>
+                <TextField
+                    type="text"
+                    placeholder="Иванович"
+                    value={secondName}
+                    onChange={(event) => setSecondName(event.target.value)}
+                    fullWidth
+                    margin="normal"
+                    disabled={isSecondNameExist}
+                    required={!isSecondNameExist}
+                    sx={{background:'#FFFFFF'}}
+                />
+                <FormControl fullWidth margin="normal">
+                    <InputLabel>Организация</InputLabel>
+                    <Select value={organizationId} sx={{background:'#FFFFFF'}} onChange={(e) => setOrganizationId(e.target.value)} required>
+                        {organizations.map((organization) => (
+                            <MenuItem key={organization.id} value={organization.id} sx={{background:'#FFFFFF'}}>
+                                {organization.name}
+                            </MenuItem>
                         ))}
-                    </Form.Select>
-                </Form.Group>
-                <Form.Group className="mb-3">
-                    <Form.Check
-                        inline
-                        label="second name exist"
-                        type="checkbox"
-                        onClick={()=>{
-                            setExist(!is_second_name_exist);
-                            setSecondName("");
-                        }}/>
-                    <Form.Check
-                        inline
-                        label="accept user agreement"
-                        type="checkbox"
-                        onClick={()=> {
-                            setAgreements(!is_user_agreement_accepted)
-                        }}/>
-                </Form.Group>
-                <Button id="button-with-border" type="submit" variant="outline-primary"> Verify </Button>
-            </Form>
+                    </Select>
+                </FormControl>
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={!isSecondNameExist}
+                            onClick={() => {
+                                setExist(!isSecondNameExist);
+                                setSecondName("");
+                            }}
+                        />
+                    }
+                    label="Отчество существует"
+                />
+                <FormControlLabel
+                    control={<Checkbox checked={isUserAgreementAccepted} onClick={() => setAgreements(!isUserAgreementAccepted)} />}
+                    label="Принять пользовательское соглашение"
+                />
+                <Button  id="accent-button" variant="outlined" type="submit" fullWidth>
+                    ОТПРАВИТЬ КОД
+                </Button>
+            </form>
         </div>
     );
-
 }

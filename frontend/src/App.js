@@ -11,6 +11,7 @@ import Logout from "./Pages/Logout";
 import Admin from "./Pages/Admin";
 import Profile from "./Pages/Profile";
 import Workspace from "./Pages/Workspace";
+import TestPage from "./Pages/TestPage";
 
 export default function App() {
 
@@ -41,6 +42,7 @@ export default function App() {
                         <Route path={"/admin"} element={<Admin/>}/>
                         <Route path={"/profile"} element={<Profile/>}/>
                         <Route path={"/workspace/*"} element={<Workspace/>}/>
+                        <Route path={"/test/*"} element={<TestPage/>}/>
                     </Routes>
                 </HashRouter>
         )

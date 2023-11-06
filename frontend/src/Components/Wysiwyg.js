@@ -1,17 +1,17 @@
-import {Editor} from 'react-draft-wysiwyg';
 import { convertToHTML } from 'draft-convert';
 import React, { useState, useEffect } from 'react';
-import { EditorState } from 'draft-js';
-import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+import {Editor, EditorState } from 'draft-js';
+import 'draft-js/dist/Draft.css';
 
-
-export default function Wysiwyg({onChange}){
+export default function Wysiwyg(props){
 
     const handleChange = () => {
-        onChange(convertedContent)
+        props.onChange(convertedContent)
     }
 
-    const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
+    const [editorState, setEditorState] = React.useState(
+        () => EditorState.createEmpty(),
+    ) ;
     const [convertedContent, setConvertedContent] = useState();
 
     useEffect(() => {
@@ -25,9 +25,7 @@ export default function Wysiwyg({onChange}){
         <>
             <Editor
                 editorState={editorState}
-                onEditorStateChange={setEditorState}
-
-            />
+                onChange={(data) =>{setEditorState(data)}}/>
         </>
     )
 }

@@ -15,7 +15,7 @@ export default function Admin() {
     const renderTable = () => {
         switch (activeTab) {
             case 'users':
-                return <UsersTable />;
+                return <UsersTable  />;
             case 'organizations':
                 return <OrganizationsTable />;
             default:
@@ -33,8 +33,8 @@ export default function Admin() {
     return (
         <Box sx={{ padding: '50px 150px' }}>
             <Tabs textColor="primary" indicatorColor="primary" value={activeTab} onChange={handleTabChange} variant="fullWidth">
-                <Tab sx={{color: '#423e42' , ':hover': {backgroundColor: '#cdf'} }} value="users" label="Users" />
-                <Tab sx={{color: '#423e42' , ':hover': {backgroundColor: '#cdf'} }} value="organizations" label="Organizations" />
+                <Tab sx={{color: '#423e42' , ':hover': {backgroundColor: '#cdf'} }} value="users" label="Пользователи" />
+                <Tab sx={{color: '#423e42' , ':hover': {backgroundColor: '#cdf'} }} value="organizations" label="Группы" />
             </Tabs>
             {renderTable()}
         </Box>

@@ -8,6 +8,7 @@ import AppBar from '@mui/material/AppBar';
 import Typography from '@mui/material/Typography';
 import {Box} from "@mui/system";
 import "../Styles/BaseColors.css"
+import "../Styles/Navbar.css"
 
 
 export default function AppNavbar(props) {
@@ -24,12 +25,21 @@ export default function AppNavbar(props) {
     function getLeftPanel() {
 
         let base =
-            <Typography variant="h6"
-                        component="a"
-                        href="#"
-                        sx={{flexGrow: 1, color: '#12151a', maxWidth: '100px' }}>
-                Home
-            </Typography>
+            <div>
+                <Typography variant="h6"
+                            component="a"
+                            href="#"
+                            id="typography-home">
+                    ГЛАВНАЯ
+                </Typography>
+                <Typography variant="h6"
+                            component="a"
+                            href="https://d-element.ru/?ysclid=lolx8ntig9911662351"
+                            id="typography-home">
+                    ПЕРЕЙТИ НА САЙТ
+                </Typography>
+            </div>
+
 
         if (props.user !== null && props.user.wiki_api_client !== null) {
             return (
@@ -38,11 +48,11 @@ export default function AppNavbar(props) {
                         {base}
                         {props.user.wiki_api_client.responsibility === 'ADMIN' ? (
                             <Button id="notaccent-button" href="#admin">
-                                Admin Tools
+                                ИНСТРУМЕНТЫ АДМИНА
                             </Button>
                         ) : null}
                         <Button id="notaccent-button" href="#workspace/select">
-                            Go to workspaces
+                            ПРОЕКТЫ
                         </Button>
                     </Stack>
                 </div>
@@ -56,11 +66,11 @@ export default function AppNavbar(props) {
                 <Stack direction="row" spacing={2} sx={{ justifyContent: 'flex-end', marginLeft: 'auto' }}>
                     <Button id="base-button" /*sx={{color: '#423e42', ':hover': {backgroundColor: '#506796'}, background: '#637cad',}} */
                             variant="contained" href="#login">
-                        Login
+                        ВОЙТИ
                     </Button>
                     <Button id="accent-button"  /*sx={{background:'#b07285', color: '#423e42', ':hover': {backgroundColor: '#8a4a5d'}}}*/
                             variant="contained" href="#signup">
-                        Sign Up
+                        ЗАРЕГИСТРИРОВАТЬСЯ
                     </Button>
                 </Stack>
             );
