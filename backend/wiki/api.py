@@ -10,6 +10,7 @@ from wiki.organization.router import organization_router
 from wiki.user.router import user_router
 from wiki.wiki_workspace.block.router import block_router
 from wiki.wiki_workspace.document.router import document_router
+from wiki.wiki_workspace.document_template.router import document_template_router
 from wiki.wiki_workspace.router import workspace_router
 from wiki.wiki_workspace.versioning.router import versioning_workspace_router
 
@@ -29,3 +30,5 @@ api_router.include_router(workspace_router, prefix="/workspace", tags=["Workspac
 api_router.include_router(document_router, prefix="/document", tags=["WorkspaceDocument"])
 api_router.include_router(block_router, prefix="/blocks", tags=["WorkspaceBlocks"])
 api_router.include_router(versioning_workspace_router, prefix="/versioning", tags=["WorkspaceVersioning"])
+
+api_router.include_router(document_template_router, prefix="/document_template", tags=["DocumentTemplate"])

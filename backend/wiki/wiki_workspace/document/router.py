@@ -37,7 +37,7 @@ document_router = APIRouter()
     "/",
     response_model=DocumentInfoResponse,
     status_code=status.HTTP_202_ACCEPTED,
-    summary="Create document if parent_document_id=None then document is in the root."
+    summary="Create a document if parent_document_id=None then document is in the root."
 )
 async def create_document(
         new_document: CreateDocument,
@@ -62,7 +62,6 @@ async def create_document(
                                                          new_document.workspace_id,
                                                          user_db.id,
                                                          new_document.parent_document_id)
-
     storage_service: VersioningWikiStorageService = VersioningWikiStorageService(storage_client)
     storage_service.create_branch_for_workspace_document(workspace.id, document.id)
 
