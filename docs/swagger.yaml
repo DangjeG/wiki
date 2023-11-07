@@ -254,6 +254,10 @@ components:
           format: uuid
           title: Id
           type: string
+        last_published_version_at:
+          format: date-time
+          title: Last Published Version At
+          type: string
         parent_document_id:
           anyOf:
           - format: uuid
@@ -273,6 +277,7 @@ components:
       - workspace_id
       - creator_user
       - created_at
+      - last_published_version_at
       title: DocumentInfoResponse
       type: object
     DocumentNodeInfoResponse:
@@ -287,12 +292,17 @@ components:
           format: uuid
           title: Id
           type: string
+        last_published_version_at:
+          format: date-time
+          title: Last Published Version At
+          type: string
         title:
           title: Title
           type: string
       required:
       - id
       - title
+      - last_published_version_at
       title: DocumentNodeInfoResponse
       type: object
     DomainPermissionMode:
@@ -692,6 +702,8 @@ components:
     VersionBlockInfo:
       properties:
         commit_id:
+          maxLength: 64
+          minLength: 64
           title: Commit Id
           type: string
         committer_user:
@@ -714,6 +726,8 @@ components:
     VersionDocumentInfo:
       properties:
         commit_id:
+          maxLength: 64
+          minLength: 64
           title: Commit Id
           type: string
         committer_user:
@@ -736,70 +750,6 @@ components:
       - committer_user
       - created_at
       title: VersionDocumentInfo
-      type: object
-    VersionWorkspaceInfoGraphResponse:
-      properties:
-        branch:
-          title: Branch
-          type: string
-        committer_user:
-          $ref: '#/components/schemas/UserBaseInfoResponse'
-        created_at:
-          format: date-time
-          title: Created At
-          type: string
-        id:
-          format: uuid
-          title: Id
-          type: string
-        parent_version_workspace:
-          anyOf:
-          - $ref: '#/components/schemas/VersionWorkspaceInfoGraphResponse'
-          - type: 'null'
-        workspace_id:
-          format: uuid
-          title: Workspace Id
-          type: string
-      required:
-      - id
-      - workspace_id
-      - committer_user
-      - branch
-      - created_at
-      title: VersionWorkspaceInfoGraphResponse
-      type: object
-    VersionWorkspaceInfoResponse:
-      properties:
-        branch:
-          title: Branch
-          type: string
-        committer_user:
-          $ref: '#/components/schemas/UserBaseInfoResponse'
-        created_at:
-          format: date-time
-          title: Created At
-          type: string
-        id:
-          format: uuid
-          title: Id
-          type: string
-        parent_version_workspace_id:
-          anyOf:
-          - format: uuid
-            type: string
-          - type: 'null'
-          title: Parent Version Workspace Id
-        workspace_id:
-          format: uuid
-          title: Workspace Id
-          type: string
-      required:
-      - id
-      - workspace_id
-      - committer_user
-      - branch
-      - created_at
-      title: VersionWorkspaceInfoResponse
       type: object
     WikiApiClientInfoResponse:
       properties:
@@ -2149,6 +2099,55 @@ paths:
       summary: Create a verified user (has access to the system)
       tags:
       - User
+  /api/v1/versioning/block/{block_id}/diff:
+    get:
+      description: Find the difference between the contents of the block versions
+        in diff format.
+      operationId: get_diff_versions_document_block_api_v1_versioning_block__block_id__diff_get
+      parameters:
+      - in: path
+        name: block_id
+        required: true
+        schema:
+          format: uuid
+          title: Block Id
+          type: string
+      - in: query
+        name: commit_id_1
+        required: true
+        schema:
+          title: Commit Id 1
+          type: string
+      - in: query
+        name: commit_id_2
+        required: true
+        schema:
+          title: Commit Id 2
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                title: Response Get Diff Versions Document Block Api V1 Versioning
+                  Block  Block Id  Diff Get
+                type: string
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get the difference between the blocks
+      tags:
+      - WorkspaceVersioning
   /api/v1/versioning/block/{block_id}/info:
     get:
       operationId: get_list_versions_document_block_api_v1_versioning_block__block_id__info_get
@@ -2184,6 +2183,51 @@ paths:
       - WikiAccessToken: []
       - WikiBearer: []
       summary: Get info as a list of all versions block
+      tags:
+      - WorkspaceVersioning
+  /api/v1/versioning/block/{block_id}/rollback:
+    post:
+      description: '## Rollback block
+
+        The state of the specified version of the block will be received,
+
+        an update will be performed, and a commit will be performed (a new version
+        will appear).'
+      operationId: version_rollback_document_block_api_v1_versioning_block__block_id__rollback_post
+      parameters:
+      - in: path
+        name: block_id
+        required: true
+        schema:
+          format: uuid
+          title: Block Id
+          type: string
+      - in: query
+        name: rollback_commit_id
+        required: true
+        schema:
+          title: Rollback Commit Id
+          type: string
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockDataResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Rollback block contents to the specified version
       tags:
       - WorkspaceVersioning
   /api/v1/versioning/document/{document_id}/info:
@@ -2223,27 +2267,38 @@ paths:
       summary: Get info as a list of all versions document
       tags:
       - WorkspaceVersioning
-  /api/v1/versioning/wp/{workspace_id}/info:
-    get:
-      deprecated: true
-      operationId: get_list_info_versions_workspace_api_v1_versioning_wp__workspace_id__info_get
+  /api/v1/versioning/document/{document_id}/rollback:
+    post:
+      description: '## Rollback document
+
+        The state of the specified version of the document will be retrieved,
+
+        all blocks will be updated, and a commit will be performed (a new version
+        will appear).'
+      operationId: version_rollback_document_api_v1_versioning_document__document_id__rollback_post
       parameters:
       - in: path
-        name: workspace_id
+        name: document_id
         required: true
         schema:
           format: uuid
-          title: Workspace Id
+          title: Document Id
+          type: string
+      - in: query
+        name: rollback_commit_id
+        required: true
+        schema:
+          title: Rollback Commit Id
           type: string
       responses:
-        '200':
+        '202':
           content:
             application/json:
               schema:
                 items:
-                  $ref: '#/components/schemas/VersionWorkspaceInfoResponse'
-                title: Response Get List Info Versions Workspace Api V1 Versioning
-                  Wp  Workspace Id  Info Get
+                  $ref: '#/components/schemas/BlockDataResponse'
+                title: Response Version Rollback Document Api V1 Versioning Document  Document
+                  Id  Rollback Post
                 type: array
           description: Successful Response
         '422':
@@ -2258,41 +2313,7 @@ paths:
       - WikiApiKey: []
       - WikiAccessToken: []
       - WikiBearer: []
-      summary: Get info as a list of all versions workspace
-      tags:
-      - WorkspaceVersioning
-  /api/v1/versioning/wp/{workspace_id}/info/graph:
-    get:
-      deprecated: true
-      operationId: get_graph_info_versions_workspace_api_v1_versioning_wp__workspace_id__info_graph_get
-      parameters:
-      - in: path
-        name: workspace_id
-        required: true
-        schema:
-          format: uuid
-          title: Workspace Id
-          type: string
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/VersionWorkspaceInfoGraphResponse'
-          description: Successful Response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-          description: Validation Error
-      security:
-      - WikiRootApiKey: []
-      - WikiApiKey: []
-      - WikiApiKey: []
-      - WikiAccessToken: []
-      - WikiBearer: []
-      summary: Get info as a list of all versions workspace
+      summary: Rollback document contents to the specified version
       tags:
       - WorkspaceVersioning
   /api/v1/workspace/:

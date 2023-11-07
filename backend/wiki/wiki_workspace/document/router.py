@@ -89,7 +89,8 @@ async def create_document(
         workspace_id=document.workspace_id,
         creator_user=await get_user_info(user, session, is_full=False),
         parent_document_id=document.parent_document_id,
-        created_at=document.created_at
+        created_at=document.created_at,
+        last_published_version_at=document.last_published_version_at
     )
 
 
@@ -199,7 +200,8 @@ async def get_documents_by_workspace_id(
             workspace_id=doc.workspace_id,
             creator_user=await get_user_info(user_db, session, is_full=False),
             parent_document_id=doc.parent_document_id,
-            created_at=doc.created_at
+            created_at=doc.created_at,
+            last_published_version_at=doc.last_published_version_at
         )
         result_documents.append(append_document)
 
@@ -226,7 +228,8 @@ async def get_document_info_by_id(
         workspace_id=document.workspace_id,
         creator_user=await get_user_info(document.creator_user_id, session, False),
         parent_document_id=document.parent_document_id,
-        created_at=document.created_at
+        created_at=document.created_at,
+        last_published_version_at=document.last_published_version_at
     )
 
 
@@ -254,7 +257,8 @@ def get_children_document(documents: list[Document], document_id: UUID = None) -
         if doc.parent_document_id == document_id:
             new_doc = DocumentNodeInfoResponse(
                 id=doc.id,
-                title=doc.title
+                title=doc.title,
+                last_published_version_at=doc.last_published_version_at
             )
             result_docs.append(new_doc)
             children = get_children_document(documents, doc.id)
