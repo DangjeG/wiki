@@ -8,10 +8,6 @@ from uuid_extensions import uuid7
 
 from wiki.database.deps import db_metadata_create_all, get_db
 from wiki.database.utils import utcnow
-from wiki.organization.enums import OrganizationAccessType
-from wiki.organization.models import Organization
-from wiki.organization.repository import OrganizationRepository
-from wiki.organization.schemas import CreateOrganization
 from wiki.permissions.domain.enums import DomainPermissionMode
 from wiki.permissions.domain.models import PermissionDomain
 from wiki.permissions.domain.repository import PermissionDomainRepository
@@ -23,12 +19,6 @@ from wiki.wiki_api_client.enums import ResponsibilityType
 from wiki.wiki_api_client.models import WikiApiClient
 from wiki.wiki_api_client.repository import WikiApiClientRepository
 from wiki.wiki_api_client.schemas import CreateWikiApiClient
-
-
-# async def get_db():
-#     session: AsyncSession = get_session()
-#     async with session.begin() as transaction:
-#         return session
 
 
 async def init_db():
@@ -45,24 +35,16 @@ def generate_hex(length: int):
 
 async def gen_random_users(session: AsyncSession, count: int):
     permission_domain_repo: PermissionDomainRepository = PermissionDomainRepository(session)
-    organization_repository: OrganizationRepository = OrganizationRepository(session)
     user_repo: UserRepository = UserRepository(session)
     for _ in range(count):
-        yield await _gen_random_user(permission_domain_repo,
-                                     organization_repository,
-                                     user_repo)
+        yield await _gen_random_user(permission_domain_repo, user_repo)
 
 
 async def _gen_random_user(permission_domain_repo: PermissionDomainRepository,
-                           organization_repository: OrganizationRepository,
                            user_repo: UserRepository):
     permission_domains: list[PermissionDomain] = await permission_domain_repo.get_all_permission_domains()
     if len(permission_domains) < 1:
         raise Exception("No resolved domains for email were found.")
-
-    organizations: list[Organization] = await organization_repository.get_all_organization()
-    if len(organizations) < 1:
-        raise Exception("Can't find any organizations.")
 
     user_repo: UserRepository
     new_user: User = await user_repo.create_user(CreateUser(
@@ -72,8 +54,7 @@ async def _gen_random_user(permission_domain_repo: PermissionDomainRepository,
         last_name="gen last name",
         second_name="gen second name",
         position="gen position",
-        is_user_agreement_accepted=True,
-        organization_id=random.choice(organizations).id
+        is_user_agreement_accepted=True
     ))
 
     return new_user
@@ -117,26 +98,10 @@ async def gen_permission_domains(session: AsyncSession, count: int):
         await _gen_permission_domain(PermissionDomainRepository(session))
 
 
-async def _gen_organization(organization_repository: OrganizationRepository):
-    await organization_repository.create_organization(CreateOrganization(
-        name="gen organization",
-        description="gen description",
-        access=OrganizationAccessType.FULL_ACCESS
-    ))
-
-
-async def gen_organizations(session: AsyncSession, count: int):
-    print(f"Start gen organisations [{count}]")
-    organization_repository: OrganizationRepository = OrganizationRepository(session)
-    for _ in range(count):
-        await _gen_organization(organization_repository)
-
-
 async def init_test_db():
     await init_db()
     async for session in get_db():
         await gen_permission_domains(session, 20)
-        await gen_organizations(session, 20)
         await gen_verified_and_trust_user(session, 50)
 
 

@@ -120,23 +120,6 @@ components:
       - workspace_id
       title: CreateDocument
       type: object
-    CreateOrganization:
-      properties:
-        access:
-          $ref: '#/components/schemas/OrganizationAccessType'
-        description:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Description
-        name:
-          title: Name
-          type: string
-      required:
-      - name
-      - access
-      title: CreateOrganization
-      type: object
     CreatePermissionDomain:
       properties:
         domain:
@@ -165,10 +148,6 @@ components:
         last_name:
           title: Last Name
           type: string
-        organization_id:
-          format: uuid
-          title: Organization Id
-          type: string
         position:
           anyOf:
           - type: string
@@ -187,7 +166,6 @@ components:
       - username
       - first_name
       - last_name
-      - organization_id
       title: CreateUser
       type: object
     CreateVerifiedUser:
@@ -214,10 +192,6 @@ components:
         last_name:
           title: Last Name
           type: string
-        organization_id:
-          format: uuid
-          title: Organization Id
-          type: string
         position:
           anyOf:
           - type: string
@@ -239,7 +213,6 @@ components:
       - email
       - first_name
       - last_name
-      - organization_id
       - wiki_api_client
       title: CreateVerifiedUser
       type: object
@@ -281,6 +254,10 @@ components:
           format: uuid
           title: Id
           type: string
+        last_published_version_at:
+          format: date-time
+          title: Last Published Version At
+          type: string
         parent_document_id:
           anyOf:
           - format: uuid
@@ -300,6 +277,7 @@ components:
       - workspace_id
       - creator_user
       - created_at
+      - last_published_version_at
       title: DocumentInfoResponse
       type: object
     DocumentNodeInfoResponse:
@@ -314,12 +292,17 @@ components:
           format: uuid
           title: Id
           type: string
+        last_published_version_at:
+          format: date-time
+          title: Last Published Version At
+          type: string
         title:
           title: Title
           type: string
       required:
       - id
       - title
+      - last_published_version_at
       title: DocumentNodeInfoResponse
       type: object
     DomainPermissionMode:
@@ -361,72 +344,6 @@ components:
           title: Status
           type: string
       title: HealthCheck
-      type: object
-    OrganizationAccessType:
-      enum:
-      - LOCKED
-      - WEB_ONLY
-      - FULL_ACCESS
-      title: OrganizationAccessType
-      type: string
-    OrganizationInfoResponse:
-      properties:
-        access:
-          $ref: '#/components/schemas/OrganizationAccessType'
-        description:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Description
-        id:
-          format: uuid
-          title: Id
-          type: string
-        name:
-          title: Name
-          type: string
-      required:
-      - id
-      - name
-      - description
-      - access
-      title: OrganizationInfoResponse
-      type: object
-    Page_OrganizationInfoResponse_:
-      properties:
-        items:
-          items:
-            $ref: '#/components/schemas/OrganizationInfoResponse'
-          title: Items
-          type: array
-        page:
-          anyOf:
-          - minimum: 1.0
-            type: integer
-          - type: 'null'
-          title: Page
-        pages:
-          anyOf:
-          - minimum: 0.0
-            type: integer
-          - type: 'null'
-          title: Pages
-        size:
-          anyOf:
-          - minimum: 1.0
-            type: integer
-          - type: 'null'
-          title: Size
-        total:
-          minimum: 0.0
-          title: Total
-          type: integer
-      required:
-      - items
-      - total
-      - page
-      - size
-      title: Page[OrganizationInfoResponse]
       type: object
     Page_PermissionDomainInfoResponse_:
       properties:
@@ -570,24 +487,6 @@ components:
       - block_id
       title: UpdateBlockInfo
       type: object
-    UpdateOrganization:
-      properties:
-        access:
-          anyOf:
-          - $ref: '#/components/schemas/OrganizationAccessType'
-          - type: 'null'
-        description:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Description
-        name:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Name
-      title: UpdateOrganization
-      type: object
     UpdatePermissionDomain:
       properties:
         domain:
@@ -631,8 +530,6 @@ components:
         last_name:
           title: Last Name
           type: string
-        organization:
-          $ref: '#/components/schemas/OrganizationInfoResponse'
         position:
           anyOf:
           - type: string
@@ -656,7 +553,6 @@ components:
       - email
       - first_name
       - last_name
-      - organization
       title: UserBaseInfoResponse
       type: object
     UserFullInfoResponse:
@@ -680,8 +576,6 @@ components:
         last_name:
           title: Last Name
           type: string
-        organization:
-          $ref: '#/components/schemas/OrganizationInfoResponse'
         position:
           anyOf:
           - type: string
@@ -705,7 +599,6 @@ components:
       - email
       - first_name
       - last_name
-      - organization
       - is_user_agreement_accepted
       - is_verified_email
       - is_enabled
@@ -762,12 +655,6 @@ components:
           - type: string
           - type: 'null'
           title: Last Name
-        organization_id:
-          anyOf:
-          - format: uuid
-            type: string
-          - type: 'null'
-          title: Organization Id
         position:
           anyOf:
           - type: string
@@ -815,6 +702,8 @@ components:
     VersionBlockInfo:
       properties:
         commit_id:
+          maxLength: 64
+          minLength: 64
           title: Commit Id
           type: string
         committer_user:
@@ -837,6 +726,8 @@ components:
     VersionDocumentInfo:
       properties:
         commit_id:
+          maxLength: 64
+          minLength: 64
           title: Commit Id
           type: string
         committer_user:
@@ -859,70 +750,6 @@ components:
       - committer_user
       - created_at
       title: VersionDocumentInfo
-      type: object
-    VersionWorkspaceInfoGraphResponse:
-      properties:
-        branch:
-          title: Branch
-          type: string
-        committer_user:
-          $ref: '#/components/schemas/UserBaseInfoResponse'
-        created_at:
-          format: date-time
-          title: Created At
-          type: string
-        id:
-          format: uuid
-          title: Id
-          type: string
-        parent_version_workspace:
-          anyOf:
-          - $ref: '#/components/schemas/VersionWorkspaceInfoGraphResponse'
-          - type: 'null'
-        workspace_id:
-          format: uuid
-          title: Workspace Id
-          type: string
-      required:
-      - id
-      - workspace_id
-      - committer_user
-      - branch
-      - created_at
-      title: VersionWorkspaceInfoGraphResponse
-      type: object
-    VersionWorkspaceInfoResponse:
-      properties:
-        branch:
-          title: Branch
-          type: string
-        committer_user:
-          $ref: '#/components/schemas/UserBaseInfoResponse'
-        created_at:
-          format: date-time
-          title: Created At
-          type: string
-        id:
-          format: uuid
-          title: Id
-          type: string
-        parent_version_workspace_id:
-          anyOf:
-          - format: uuid
-            type: string
-          - type: 'null'
-          title: Parent Version Workspace Id
-        workspace_id:
-          format: uuid
-          title: Workspace Id
-          type: string
-      required:
-      - id
-      - workspace_id
-      - committer_user
-      - branch
-      - created_at
-      title: VersionWorkspaceInfoResponse
       type: object
     WikiApiClientInfoResponse:
       properties:
@@ -1789,187 +1616,6 @@ paths:
       summary: Saving document
       tags:
       - WorkspaceDocument
-  /api/v1/organization/:
-    post:
-      deprecated: true
-      description: Create organization.
-      operationId: create_organization_api_v1_organization__post
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateOrganization'
-        required: true
-      responses:
-        '202':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrganizationInfoResponse'
-          description: Successful Response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-          description: Validation Error
-      security:
-      - WikiRootApiKey: []
-      - WikiApiKey: []
-      - WikiApiKey: []
-      - WikiAccessToken: []
-      - WikiBearer: []
-      summary: Create Organization
-      tags:
-      - Organization
-    put:
-      deprecated: true
-      description: Update organization.
-      operationId: update_organizations_api_v1_organization__put
-      parameters:
-      - in: query
-        name: organization_id
-        required: true
-        schema:
-          format: uuid
-          title: Organization Id
-          type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateOrganization'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrganizationInfoResponse'
-          description: Successful Response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-          description: Validation Error
-      security:
-      - WikiRootApiKey: []
-      - WikiApiKey: []
-      - WikiApiKey: []
-      - WikiAccessToken: []
-      - WikiBearer: []
-      summary: Update Organizations
-      tags:
-      - Organization
-  /api/v1/organization/all:
-    get:
-      deprecated: true
-      description: Get all organizations.
-      operationId: get_organizations_api_v1_organization_all_get
-      parameters:
-      - in: query
-        name: name
-        required: false
-        schema:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Name
-      - in: query
-        name: description
-        required: false
-        schema:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Description
-      - in: query
-        name: access
-        required: false
-        schema:
-          anyOf:
-          - $ref: '#/components/schemas/OrganizationAccessType'
-          - type: 'null'
-          title: Access
-      - description: Page number
-        in: query
-        name: page
-        required: false
-        schema:
-          default: 1
-          description: Page number
-          minimum: 1
-          title: Page
-          type: integer
-      - description: Page size
-        in: query
-        name: size
-        required: false
-        schema:
-          default: 50
-          description: Page size
-          maximum: 100
-          minimum: 1
-          title: Size
-          type: integer
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Page_OrganizationInfoResponse_'
-          description: Successful Response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-          description: Validation Error
-      security:
-      - WikiRootApiKey: []
-      - WikiApiKey: []
-      - WikiApiKey: []
-      - WikiAccessToken: []
-      - WikiBearer: []
-      summary: Get Organizations
-      tags:
-      - Organization
-  /api/v1/organization/info:
-    get:
-      deprecated: true
-      description: Get organization by id.
-      operationId: get_organization_api_v1_organization_info_get
-      parameters:
-      - in: query
-        name: organization_id
-        required: true
-        schema:
-          format: uuid
-          title: Organization Id
-          type: string
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrganizationInfoResponse'
-          description: Successful Response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-          description: Validation Error
-      security:
-      - WikiRootApiKey: []
-      - WikiApiKey: []
-      - WikiApiKey: []
-      - WikiAccessToken: []
-      - WikiBearer: []
-      summary: Get Organization
-      tags:
-      - Organization
   /api/v1/permission/domain/:
     post:
       operationId: create_permission_domain_api_v1_permission_domain__post
@@ -2453,6 +2099,55 @@ paths:
       summary: Create a verified user (has access to the system)
       tags:
       - User
+  /api/v1/versioning/block/{block_id}/diff:
+    get:
+      description: Find the difference between the contents of the block versions
+        in diff format.
+      operationId: get_diff_versions_document_block_api_v1_versioning_block__block_id__diff_get
+      parameters:
+      - in: path
+        name: block_id
+        required: true
+        schema:
+          format: uuid
+          title: Block Id
+          type: string
+      - in: query
+        name: commit_id_1
+        required: true
+        schema:
+          title: Commit Id 1
+          type: string
+      - in: query
+        name: commit_id_2
+        required: true
+        schema:
+          title: Commit Id 2
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                title: Response Get Diff Versions Document Block Api V1 Versioning
+                  Block  Block Id  Diff Get
+                type: string
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get the difference between the blocks
+      tags:
+      - WorkspaceVersioning
   /api/v1/versioning/block/{block_id}/info:
     get:
       operationId: get_list_versions_document_block_api_v1_versioning_block__block_id__info_get
@@ -2488,6 +2183,51 @@ paths:
       - WikiAccessToken: []
       - WikiBearer: []
       summary: Get info as a list of all versions block
+      tags:
+      - WorkspaceVersioning
+  /api/v1/versioning/block/{block_id}/rollback:
+    post:
+      description: '## Rollback block
+
+        The state of the specified version of the block will be received,
+
+        an update will be performed, and a commit will be performed (a new version
+        will appear).'
+      operationId: version_rollback_document_block_api_v1_versioning_block__block_id__rollback_post
+      parameters:
+      - in: path
+        name: block_id
+        required: true
+        schema:
+          format: uuid
+          title: Block Id
+          type: string
+      - in: query
+        name: rollback_commit_id
+        required: true
+        schema:
+          title: Rollback Commit Id
+          type: string
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockDataResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Rollback block contents to the specified version
       tags:
       - WorkspaceVersioning
   /api/v1/versioning/document/{document_id}/info:
@@ -2527,27 +2267,38 @@ paths:
       summary: Get info as a list of all versions document
       tags:
       - WorkspaceVersioning
-  /api/v1/versioning/wp/{workspace_id}/info:
-    get:
-      deprecated: true
-      operationId: get_list_info_versions_workspace_api_v1_versioning_wp__workspace_id__info_get
+  /api/v1/versioning/document/{document_id}/rollback:
+    post:
+      description: '## Rollback document
+
+        The state of the specified version of the document will be retrieved,
+
+        all blocks will be updated, and a commit will be performed (a new version
+        will appear).'
+      operationId: version_rollback_document_api_v1_versioning_document__document_id__rollback_post
       parameters:
       - in: path
-        name: workspace_id
+        name: document_id
         required: true
         schema:
           format: uuid
-          title: Workspace Id
+          title: Document Id
+          type: string
+      - in: query
+        name: rollback_commit_id
+        required: true
+        schema:
+          title: Rollback Commit Id
           type: string
       responses:
-        '200':
+        '202':
           content:
             application/json:
               schema:
                 items:
-                  $ref: '#/components/schemas/VersionWorkspaceInfoResponse'
-                title: Response Get List Info Versions Workspace Api V1 Versioning
-                  Wp  Workspace Id  Info Get
+                  $ref: '#/components/schemas/BlockDataResponse'
+                title: Response Version Rollback Document Api V1 Versioning Document  Document
+                  Id  Rollback Post
                 type: array
           description: Successful Response
         '422':
@@ -2562,41 +2313,7 @@ paths:
       - WikiApiKey: []
       - WikiAccessToken: []
       - WikiBearer: []
-      summary: Get info as a list of all versions workspace
-      tags:
-      - WorkspaceVersioning
-  /api/v1/versioning/wp/{workspace_id}/info/graph:
-    get:
-      deprecated: true
-      operationId: get_graph_info_versions_workspace_api_v1_versioning_wp__workspace_id__info_graph_get
-      parameters:
-      - in: path
-        name: workspace_id
-        required: true
-        schema:
-          format: uuid
-          title: Workspace Id
-          type: string
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/VersionWorkspaceInfoGraphResponse'
-          description: Successful Response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-          description: Validation Error
-      security:
-      - WikiRootApiKey: []
-      - WikiApiKey: []
-      - WikiApiKey: []
-      - WikiAccessToken: []
-      - WikiBearer: []
-      summary: Get info as a list of all versions workspace
+      summary: Rollback document contents to the specified version
       tags:
       - WorkspaceVersioning
   /api/v1/workspace/:

@@ -1,0 +1,16 @@
+.main-page{
+    position: absolute;
+    width: 601px;
+    height: 44px;
+    top: 35%;
+    left: 10%;
+}
+
+#main-text{
+    font-family: Inter;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 44px;
+    letter-spacing: 0em;
+    text-align: left;
+}

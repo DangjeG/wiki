@@ -1,15 +1,38 @@
 #base-button{
-    color: #b4cbfa;
-    background-color: #3e65b3;
+    color: #1C6CD5;
+    background-color: #FFFFFF;
+    border: 1px solid #1C6CD5;
+    font-family: Inter, serif;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 15px;
+    letter-spacing: 0em;
+    text-align: left;
+    border-radius: 10px;
+    width: 157px;
+    height: 44px;
+    box-shadow: none;
 }
 
 #base-button:hover{
-    background-color: #1d3e7f;
+    color: #222222;
+    background-color: #C0D6F4;
+
 }
 
 #accent-button{
-    color: #b4cbfa;
-    background-color: #103070;
+    color: #FFFFFF;
+    background-color: #1C6CD5;
+    font-family: Inter, serif;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 15px;
+    letter-spacing: 0em;
+    text-align: left;
+    border-radius: 10px;
+    width: 157px;
+    height: 44px;
+    box-shadow: none;
 }
 
 #accent-button:hover{
@@ -17,7 +40,7 @@
 }
 
 #main-background{
-    background-color: #6b98f2;
+    background-color: #FFFFFF;
 }
 
 #notaccent-button{

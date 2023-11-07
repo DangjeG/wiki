@@ -4,7 +4,6 @@ from uuid import UUID
 from pydantic import EmailStr
 
 from wiki.models import WikiBase
-from wiki.organization.schemas import OrganizationInfoResponse
 from wiki.wiki_api_client.enums import ResponsibilityType
 from wiki.wiki_api_client.schemas import WikiApiClientInfoResponse, CreateWikiApiClient
 
@@ -17,7 +16,6 @@ class CreateUser(WikiBase):
     second_name: Optional[str] = None
     position: Optional[str] = None
     is_user_agreement_accepted: bool = False
-    organization_id: UUID
 
 
 class CreateVerifiedUser(WikiBase):
@@ -30,7 +28,6 @@ class CreateVerifiedUser(WikiBase):
     is_user_agreement_accepted: bool = True
     is_verified_email: bool = True
     is_enabled: bool = True
-    organization_id: UUID
     wiki_api_client: CreateWikiApiClient
 
 
@@ -52,7 +49,6 @@ class UserBaseInfoResponse(WikiBase):
     last_name: str
     second_name: Optional[str] = None
     position: Optional[str] = None
-    organization: OrganizationInfoResponse
     wiki_api_client: Optional[WikiApiClientInfoResponse] = None
 
 
@@ -69,11 +65,11 @@ class UserUpdate(WikiBase):
     last_name: Optional[str] = None
     second_name: Optional[str] = None
     position: Optional[str] = None
-    organization_id: Optional[UUID] = None
     is_enabled: Optional[bool] = None
     is_user_agreement_accepted: Optional[bool] = None
     is_verified_email: Optional[bool] = None
     wiki_api_client_id: Optional[UUID] = None
+
 
 class UserFilter(WikiBase):
     username: Optional[str] = None

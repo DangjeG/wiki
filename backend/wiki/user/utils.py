@@ -4,9 +4,6 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from wiki.common.schemas import WikiUserHandlerData
-from wiki.organization.models import Organization
-from wiki.organization.repository import OrganizationRepository
-from wiki.organization.schemas import OrganizationInfoResponse
 from wiki.user.models import User
 from wiki.user.repository import UserRepository
 from wiki.user.schemas import UserFullInfoResponse, UserBaseInfoResponse
@@ -41,17 +38,6 @@ async def get_user_info(
             is_enabled=wiki_api_client.is_enabled
         )
 
-    organization_response: Optional[OrganizationInfoResponse] = None
-    if user.organization_id is not None:
-        organization_repository: OrganizationRepository = OrganizationRepository(session)
-        organization: Organization = await organization_repository.get_organization_by_id(user.organization_id)
-        organization_response = OrganizationInfoResponse(
-            id=organization.id,
-            name=organization.name,
-            description=organization.description,
-            access=organization.access
-        )
-
     kwargs = {
         "email": user.email,
         "username": user.username,
@@ -59,7 +45,6 @@ async def get_user_info(
         "last_name": user.last_name,
         "second_name": user.second_name,
         "position": user.position,
-        "organization": organization_response,
         "wiki_api_client": wiki_api_client_response
     }
 

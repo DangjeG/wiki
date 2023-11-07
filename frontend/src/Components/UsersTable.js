@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import {Button, Form, Modal, Table} from "react-bootstrap";
+import { Box, Button, FormControlLabel, FormLabel, Radio, RadioGroup, Table, Tooltip } from '@mui/material';
 import { api } from '../app.config';
-import { Box } from '@mui/system';
-import {FormControlLabel, FormLabel, Radio, RadioGroup} from "@mui/material";
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import AddIcon from '@mui/icons-material/Add';
+import {Form, Modal} from "react-bootstrap";
+import "../Styles/BaseColors.css"
 
 export default function UsersTable() {
     const [users, setUsers] = useState([]);
@@ -50,15 +52,61 @@ export default function UsersTable() {
     };
 
     return (
-        <div style={{"padding": "10px 70px"}}>
-            <Box sx={{width: '100%', margin: '10px', padding: '50px 50px', background: '#cdf',  borderRadius: '8px'}} >
-                <Table >
+        <div style={{display: 'flex'}}>
+            <Button style={{ background: '#cdf', border: 'none', width: '1%', height: '7%', position: 'absolute', left: '5%', top: '30%'}}
+                    variant="outlined"
+                    onClick={handleShow}>
+                <Tooltip sx={{width:'8%', height:'-5%', marginBottom: '2%', marginRight:'1%'}}
+                         title="Добавить пользователя"
+                         placement="top"
+                         arrow>
+                    <AddIcon sx={{color:'#000000'}}/>
+                </Tooltip>
+
+            </Button>
+            <Box sx={{ container:'true', margin: '10px', padding: '50px 50px', background: '#cdf',  borderRadius: '10px', width:'100%' }}>
+                <Table sx={{borderCollapse: 'collapse', width: '100%'}}>
                     <thead>
                     <tr key="header">
-                        <th style={{ background: '#cdf', border: 'none' }}>Email</th>
-                        <th style={{ background: '#cdf', border: 'none' }}>Username</th>
-                        <th style={{ background: '#cdf', border: 'none' }}>Full name</th>
-                        <th style={{ background: '#cdf', border: 'none' }}>Responsibility</th>
+                        <th style={{ background: '#cdf', border: 'none' }}>
+                            <Tooltip sx={{width:'8%', height:'-5%', marginBottom: '2%', marginRight:'1%'}}
+                                     title="email пользователя - его контактная почта, куда можно отправить код"
+                                     placement="top"
+                                     arrow>
+                                <InfoOutlinedIcon />
+                            </Tooltip>
+                            Email
+                        </th>
+                        <th style={{ background: '#cdf', border: 'none' }}>
+                            <Tooltip sx={{width:'8%', height:'-5%', marginBottom: '2%', marginRight:'1%'}}
+                                     title="Логин используется пользователем для входа в систему"
+                                     placement="top"
+                                     arrow>
+                                <InfoOutlinedIcon />
+                            </Tooltip>
+                            Логин
+                        </th>
+                        <th style={{ background: '#cdf', border: 'none' }}>
+                            <Tooltip sx={{width:'8%', height:'-5%', marginBottom: '2%', marginRight:'1%'}}
+                                     title="Фамилия, имя и отчество пользователя"
+                                     placement="top"
+                                     arrow>
+                                <InfoOutlinedIcon />
+                            </Tooltip>
+                            ФИО
+                        </th>
+                        <th style={{ background: '#cdf', border: 'none' }}>
+                            <Tooltip sx={{width:'8%', height:'-5%', marginBottom: '2%', marginRight:'1%'}}
+                                     title={<span><strong>Зритель</strong> - будет описание.<br/>
+                                            <strong>Редактор</strong> - будет описание.<br/>
+                                            <strong>Админ</strong> - будет описание.
+                                            </span>}
+                                     placement="top"
+                                     arrow>
+                                <InfoOutlinedIcon />
+                            </Tooltip>
+                            Роль
+                        </th>
                     </tr>
                     </thead>
                     <tbody>
@@ -85,36 +133,37 @@ export default function UsersTable() {
                 </Table>
                 <Modal show={show} onHide={handleClose}>
                     <Modal.Header>
-                        <Modal.Title>Add organization</Modal.Title>
+                        <Modal.Title>Добавить пользователя</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Description</Form.Label>
-                                <Form.Control value={description} onChange={(event) => (setDescription(event.target.value))}
-                                              as="textarea" rows={3}/>
+                                <Form.Label>Описание</Form.Label>
+                                <Form.Control
+                                    value={description}
+                                    onChange={(event) => setDescription(event.target.value)}
+                                    as="textarea"
+                                    rows={3}
+                                />
                             </Form.Group>
                             <Form.Group className="mb-3">
-                                <Form.Check inline type="radio" label={`VIEWER`} name={"group"}
-                                            onClick={() => setResponsibility("VIEWER")}/>
-                                <Form.Check inline type="radio" label={`EDITOR`} name={"group"}
-                                            onClick={() => setResponsibility("EDITOR")}/>
-                                <Form.Check inline type="radio" label={`ADMIN`} name={"group"}
-                                            onClick={() => setResponsibility("ADMIN")}/>
+                                <FormLabel component="legend">Роль</FormLabel>
+                                <RadioGroup aria-label="responsibility" value={responsibility} onChange={(event) => setResponsibility(event.target.value)}>
+                                    <FormControlLabel value="VIEWER" control={<Radio />} label="ЗРИТЕЛЬ" />
+                                    <FormControlLabel value="EDITOR" control={<Radio />} label="РЕДАКТОР" />
+                                    <FormControlLabel value="ADMIN" control={<Radio />} label="АДМИН" />
+                                </RadioGroup>
                             </Form.Group>
                         </Form>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button variant="secondary" onClick={handleClose}>
-                            Close
-                        </Button>
-                        <Button variant="primary" onClick={approve}>
-                            Save Changes
-                        </Button>
+                        <Button id="base-button" variant="outlined" onClick={handleClose}>Закрыть</Button>
+                        <Box sx={{ marginLeft: '10px' }}></Box>
+                        <Button id="accent-button" variant="contained" onClick={approve}>Сохранить</Button>
                     </Modal.Footer>
                 </Modal>
-                <Button style={{ background: '#cdf', border: 'none' }} variant="light" onClick={handleShow}>+</Button>
             </Box>
+
         </div>
     );
 }

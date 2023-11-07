@@ -1,11 +1,12 @@
 from typing import Optional
 from uuid import UUID
 
-from sqlalchemy import Column, Uuid, ForeignKey, String
+from sqlalchemy import Column, Uuid, ForeignKey, String, event, DateTime
 from uuid_extensions import uuid7
 
 from wiki.common.models import EnabledDeletedMixin
 from wiki.database.core import Base
+from wiki.database.utils import utcnow
 
 
 class Document(Base, EnabledDeletedMixin):
@@ -18,6 +19,17 @@ class Document(Base, EnabledDeletedMixin):
     parent_document_id = Column(ForeignKey("document.id"), nullable=True)
 
     current_published_version_commit_id = Column(String(64), nullable=True)
+    last_published_version_at = Column(DateTime(timezone=True), nullable=False, default=utcnow())
+    last_published_version_at._creation_order = 9998
+
+    @staticmethod
+    def _last_published_version_at(target, value, oldvalue, initiator):
+        target.last_published_version_at = utcnow()
+
+    @classmethod
+    def __declare_last__(cls):
+        super().__declare_last__()
+        event.listen(cls.current_published_version_commit_id, "set", cls._last_published_version_at)
 
     def __init__(self,
                  title: str,

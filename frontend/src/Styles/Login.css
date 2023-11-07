@@ -1,4 +1,3 @@
-
 .login-form{
     width: 400px;
     position: absolute;
@@ -27,13 +26,28 @@
     overflow: auto;
 }
 
-.pink-button {
-    background-color: #f1f1f1;
-    color: #0f0f0f;
-    border: 2px solid #d4b0ce;
+::-webkit-scrollbar {
+    width: 10px;
+    /* Ширина полоски прокрутки */
 }
 
-.pink-button:hover {
-    background-color: #d4b0ce;
-    border: 2px solid #d4b0ce;
+::-webkit-scrollbar-thumb {
+    background-color: #1C6CD5; /* Цвет полоски прокрутки */
+    border-radius: 10px;
+}
+
+/*::-webkit-scrollbar-button {
+    background-image: url('путь_к_вашему_изображению'); !* Путь к вашему изображению *!
+    background-size: cover; !* Подогнать размер изображения *!
+    background-repeat: no-repeat; !* Запретить повторение изображения *!
+    display: block; !* Показать изображение *!
+    width: 20px; !* Ширина стрелочки *!
+    height: 20px; !* Высота стрелочки *!
+}*/
+
+#text-field{
+    margin-bottom: 5%;
+    margin-top: 1%;
+    background-color: #FFFFFF;
+    color: #222222;
 }

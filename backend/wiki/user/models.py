@@ -4,7 +4,7 @@ from uuid import UUID
 from sqlalchemy import Column, String, Uuid, Boolean, ForeignKey
 from uuid_extensions import uuid7
 
-from wiki.common.models import TimeStampMixin, EnabledDeletedMixin
+from wiki.common.models import EnabledDeletedMixin
 from wiki.database.core import Base
 
 
@@ -22,7 +22,6 @@ class User(Base, EnabledDeletedMixin):
     is_user_agreement_accepted = Column(Boolean, nullable=False, default=False)
     is_verified_email = Column(Boolean, nullable=False, default=False)
 
-    organization_id = Column(ForeignKey("organization.id"), nullable=False)
     wiki_api_client_id = Column(ForeignKey("wiki_api_client.id"), unique=True, nullable=True)
 
     def __init__(self,
@@ -33,7 +32,6 @@ class User(Base, EnabledDeletedMixin):
                  second_name: Optional[str] = None,
                  position: Optional[str] = None,
                  is_user_agreement_accepted: bool = False,
-                 organization_id: Optional[UUID] = None,
                  wiki_api_client_id: Optional[UUID] = None):
         self.email = email
         self.username = username
@@ -42,5 +40,4 @@ class User(Base, EnabledDeletedMixin):
         self.second_name = second_name
         self.position = position
         self.is_user_agreement_accepted = is_user_agreement_accepted
-        self.organization_id = organization_id
         self.wiki_api_client_id = wiki_api_client_id

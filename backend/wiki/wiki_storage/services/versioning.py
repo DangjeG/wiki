@@ -2,6 +2,8 @@ from typing import Optional
 from uuid import UUID
 
 from lakefs_client.model.branch_creation import BranchCreation
+from lakefs_client.model.cherry_pick_creation import CherryPickCreation
+from lakefs_client.model.commit import Commit
 from lakefs_client.model.commit_creation import CommitCreation
 from starlette import status
 
@@ -47,6 +49,20 @@ class VersioningWikiStorageService(BaseWikiStorageService):
         )
         thread = api_instance.create_branch(str(workspace_id), branch_creation, async_req=True)
 
+        return thread.get()
+
+    @menage_lakefs_api_exception_method()
+    def rollback_document(self,
+                          workspace_id: UUID,
+                          document_id: UUID,
+                          commit_id: str,
+                          metadata: CommitMetadataScheme) -> Commit:
+        api_instance = self.client.branches_api
+        cherry_pick_creation = CherryPickCreation(ref=commit_id, metadata=metadata.model_dump())
+        thread = api_instance.cherry_pick(repository=str(workspace_id),
+                                          branch=str(document_id),
+                                          cherry_pick_creation=cherry_pick_creation,
+                                          async_req=True)
         return thread.get()
 
     @menage_lakefs_api_exception_method()

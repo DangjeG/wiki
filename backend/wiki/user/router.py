@@ -6,12 +6,17 @@ from starlette import status
 from wiki.common.exceptions import WikiException, WikiErrorCode
 from wiki.common.schemas import BaseResponse, WikiUserHandlerData
 from wiki.database.deps import get_db
-from wiki.organization.repository import OrganizationRepository
 from wiki.permissions.base import BasePermission
 from wiki.user.models import User
 from wiki.user.repository import UserRepository
-from wiki.user.schemas import UserFullInfoResponse, UserIdentifiers, UserUpdate, CreateVerifiedUser, CreateUser, \
+from wiki.user.schemas import (
+    UserFullInfoResponse,
+    UserIdentifiers,
+    UserUpdate,
+    CreateVerifiedUser,
+    CreateUser,
     UserFilter
+)
 from wiki.user.utils import get_user_info
 from wiki.wiki_api_client.enums import ResponsibilityType
 from wiki.wiki_api_client.models import WikiApiClient
@@ -34,8 +39,6 @@ async def create_verified_user(
 ):
     user_repository: UserRepository = UserRepository(session)
     api_client_repository: WikiApiClientRepository = WikiApiClientRepository(session)
-    organization_repository: OrganizationRepository = OrganizationRepository(session)
-    organization = await organization_repository.get_organization_by_id(create_user.organization_id)
     user_db = await user_repository.create_user(CreateUser(
         email=create_user.email,
         username=create_user.username,
@@ -43,8 +46,7 @@ async def create_verified_user(
         last_name=create_user.last_name,
         second_name=create_user.second_name,
         position=create_user.position,
-        is_user_agreement_accepted=create_user.is_user_agreement_accepted,
-        organization_id=create_user.organization_id))
+        is_user_agreement_accepted=create_user.is_user_agreement_accepted))
     api_client_db: WikiApiClient = await api_client_repository.create_wiki_api_client(CreateWikiApiClient(
         description=create_user.wiki_api_client.description,
         responsibility=create_user.wiki_api_client.responsibility,
@@ -191,7 +193,6 @@ async def update_user(user_update: UserUpdate,
         last_name=user_update.last_name,
         second_name=user_update.second_name,
         position=user_update.position,
-        organization_id=user_update.organization_id,
         is_enabled=user_update.is_enabled,
         is_user_agreement_accepted=user_update.is_user_agreement_accepted,
         is_verified_email=user_update.is_verified_email,

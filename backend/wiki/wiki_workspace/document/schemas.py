@@ -19,9 +19,11 @@ class DocumentInfoResponse(WikiBase):
     creator_user: UserBaseInfoResponse
     parent_document_id: Optional[UUID] = None
     created_at: datetime
+    last_published_version_at: datetime
 
 
 class DocumentNodeInfoResponse(WikiBase):
     id: UUID
     title: str
+    last_published_version_at: datetime
     children: Optional[list] = None
