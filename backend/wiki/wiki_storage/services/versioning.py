@@ -22,7 +22,7 @@ class VersioningWikiStorageService(BaseWikiStorageService):
     def commit_workspace_document_version(self,
                                           workspace_id: UUID,
                                           document_id: UUID,
-                                          metadata: CommitMetadataScheme) -> dict:
+                                          metadata: CommitMetadataScheme) -> Commit:
         api_instance = self.client.commits_api
         commit_creation = CommitCreation(
             message=str(utcnow()),

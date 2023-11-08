@@ -14,7 +14,6 @@ class DocumentTemplate(Base, EnabledDeletedMixin):
 
     title = Column(String, nullable=False)
     description = Column(String, nullable=False)
-    is_default_template = Column(Boolean, nullable=False, default=False)
     document_template_type = Column(String, nullable=False, default=str(DocumentTemplateType.START))
 
     document_id = Column(ForeignKey("document.id"), nullable=False)
@@ -25,7 +24,7 @@ class DocumentTemplate(Base, EnabledDeletedMixin):
                  document_id: UUID,
                  title: str,
                  description: str,
-                 orig_commit_id: UUID,
+                 orig_commit_id: str,
                  document_template_type: DocumentTemplateType,
                  creator_user_id: Optional[UUID] = None):
         self.document_id = document_id
@@ -33,7 +32,4 @@ class DocumentTemplate(Base, EnabledDeletedMixin):
         self.description = description
         self.orig_commit_id = orig_commit_id
         self.document_template_type = str(document_template_type)
-        if creator_user_id is None:
-            self.is_default_template = True
-        else:
-            self.creator_user_id = creator_user_id
+        self.creator_user_id = creator_user_id

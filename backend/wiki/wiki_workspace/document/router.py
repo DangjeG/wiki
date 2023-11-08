@@ -18,7 +18,9 @@ from wiki.wiki_api_client.enums import ResponsibilityType
 from wiki.wiki_storage.deps import get_storage_client
 from wiki.wiki_storage.schemas import CommitMetadataScheme
 from wiki.wiki_storage.services.versioning import VersioningWikiStorageService
+from wiki.wiki_workspace.block.model import Block
 from wiki.wiki_workspace.block.repository import BlockRepository
+from wiki.wiki_workspace.block.schemas import CreateBlock
 from wiki.wiki_workspace.block.templates import get_template_first_block
 from wiki.wiki_workspace.document.model import Document
 from wiki.wiki_workspace.document.repository import DocumentRepository
@@ -27,6 +29,8 @@ from wiki.wiki_workspace.document.schemas import (
     DocumentInfoResponse,
     DocumentNodeInfoResponse
 )
+from wiki.wiki_workspace.document_template.model import DocumentTemplate
+from wiki.wiki_workspace.document_template.repository import DocumentTemplateRepository
 from wiki.wiki_workspace.model import Workspace
 from wiki.wiki_workspace.repository import WorkspaceRepository
 
@@ -37,10 +41,13 @@ document_router = APIRouter()
     "/",
     response_model=DocumentInfoResponse,
     status_code=status.HTTP_202_ACCEPTED,
-    summary="Create a document if parent_document_id=None then document is in the root."
+    summary="Create a document using a template, "
+            "if template_id=None then will be created empty document "
+            "if parent_document_id=None then document is in the root."
 )
 async def create_document(
         new_document: CreateDocument,
+        template_id: UUID = None,
         session: AsyncSession = Depends(get_db),
         storage_client: LakeFSClient = Depends(get_storage_client),
         user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER))
@@ -67,12 +74,39 @@ async def create_document(
 
     # You must create at least one block to create the first starting publication of a document
     block_repository: BlockRepository = BlockRepository(session)
-    block = await block_repository.create_block(get_template_first_block(document.id))
-    document_ids = await document_repository.get_list_ids_of_document_hierarchy(document)
-    storage_service.upload_document_block_in_workspace_storage(content=StringIO(""),
-                                                               workspace_id=document.workspace_id,
-                                                               document_ids=document_ids,
-                                                               block_id=block.id)
+    if template_id is None:
+        block = await block_repository.create_block(get_template_first_block(document.id))
+        document_ids = await document_repository.get_list_ids_of_document_hierarchy(document)
+        storage_service.upload_document_block_in_workspace_storage(content=StringIO(""),
+                                                                   workspace_id=document.workspace_id,
+                                                                   document_ids=document_ids,
+                                                                   block_id=block.id)
+    else:
+        document_template_repository: DocumentTemplateRepository = DocumentTemplateRepository(session)
+        template: DocumentTemplate = await document_template_repository.get_document_template_by_id(template_id)
+        document_template = await document_repository.get_document_by_id(template.document_id)
+        template_blocks = await block_repository.get_all_block_by_document_id(document_template.id)
+        for template_block in template_blocks:
+            block = await block_repository.create_block(CreateBlock(
+                    document_id=document.id,
+                    position=template_block.position,
+                    type_block=template_block.type_block
+                ))
+            document_template_ids = await document_repository.get_list_ids_of_document_hierarchy(document_template)
+            content = storage_service.get_content_document_block_in_workspace_storage(
+                workspace_id=document_template.workspace_id,
+                document_ids=document_template_ids,
+                block_id=template_block.id,
+                version_commit_id=template.orig_commit_id
+            )
+            document_ids = await document_repository.get_list_ids_of_document_hierarchy(document)
+            storage_service.upload_document_block_in_workspace_storage(
+                content=StringIO(content),
+                workspace_id=document.workspace_id,
+                document_ids=document_ids,
+                block_id=block.id
+            )
+
     # Commit the starting block
     resp: Commit = storage_service.commit_workspace_document_version(document.workspace_id,
                                                                      document.id,

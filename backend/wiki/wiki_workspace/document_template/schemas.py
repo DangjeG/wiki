@@ -9,8 +9,8 @@ class CreateDocumentTemplate(WikiBase):
     title: str
     description: str
     document_id: UUID
-    orig_commit_id: UUID
-    document_template_type: DocumentTemplateType
+    orig_commit_id: str
+    document_template_type: DocumentTemplateType = DocumentTemplateType.START
     creator_user_id: Optional[UUID] = None
 
 class DocumentTemplateInfoResponse(WikiBase):
@@ -18,7 +18,7 @@ class DocumentTemplateInfoResponse(WikiBase):
     title: str
     description: str
     document_id: UUID
-    document_template_type: DocumentTemplateType
+    document_template_type: DocumentTemplateType = DocumentTemplateType.START
     creator_user_id: Optional[UUID] = None
 
 class DocumentTemplateFilter(WikiBase):
