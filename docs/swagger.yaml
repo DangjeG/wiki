@@ -348,6 +348,10 @@ components:
           format: uuid
           title: Id
           type: string
+        is_have_children:
+          default: false
+          title: Is Have Children
+          type: boolean
         last_published_version_at:
           format: date-time
           title: Last Published Version At
@@ -361,6 +365,42 @@ components:
       - last_published_version_at
       title: DocumentNodeInfoResponse
       type: object
+    DocumentTemplateInfoResponse:
+      properties:
+        creator_user_id:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Creator User Id
+        description:
+          title: Description
+          type: string
+        document_id:
+          format: uuid
+          title: Document Id
+          type: string
+        document_template_type:
+          allOf:
+          - $ref: '#/components/schemas/DocumentTemplateType'
+          default: START
+        id:
+          format: uuid
+          title: Id
+          type: string
+        title:
+          title: Title
+          type: string
+      required:
+      - id
+      - title
+      - description
+      - document_id
+      title: DocumentTemplateInfoResponse
+      type: object
+    DocumentTemplateType:
+      const: START
+      title: DocumentTemplateType
     DomainPermissionMode:
       enum:
       - REFUSE
@@ -400,6 +440,42 @@ components:
           title: Status
           type: string
       title: HealthCheck
+      type: object
+    Page_DocumentTemplateInfoResponse_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/DocumentTemplateInfoResponse'
+          title: Items
+          type: array
+        page:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Page
+        pages:
+          anyOf:
+          - minimum: 0.0
+            type: integer
+          - type: 'null'
+          title: Pages
+        size:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Size
+        total:
+          minimum: 0.0
+          title: Total
+          type: integer
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[DocumentTemplateInfoResponse]
       type: object
     Page_PermissionDomainInfoResponse_:
       properties:
@@ -1668,6 +1744,14 @@ paths:
   /api/v1/document/:
     post:
       operationId: create_document_api_v1_document__post
+      parameters:
+      - in: query
+        name: template_id
+        required: false
+        schema:
+          format: uuid
+          title: Template Id
+          type: string
       requestBody:
         content:
           application/json:
@@ -1693,7 +1777,8 @@ paths:
       - WikiApiKey: []
       - WikiAccessToken: []
       - WikiBearer: []
-      summary: Create document if parent_document_id=None then document is in the
+      summary: Create a document using a template, if template_id=None then will be
+        created empty document if parent_document_id=None then document is in the
         root.
       tags:
       - WorkspaceDocument
@@ -1778,6 +1863,24 @@ paths:
           format: uuid
           title: Workspace Id
           type: string
+      - in: query
+        name: max_deep
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          default: 0
+          title: Max Deep
+      - in: query
+        name: root_document_id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Root Document Id
       responses:
         '200':
           content:
@@ -1801,7 +1904,9 @@ paths:
       - WikiApiKey: []
       - WikiAccessToken: []
       - WikiBearer: []
-      summary: Get all tree document by workspace id
+      summary: Get all tree document by workspace idIf root_document_id=None then
+        be the root workspaceIf max_deep=None or root_document_id=0 then will be returned
+        all document
       tags:
       - WorkspaceDocument
   /api/v1/document/{document_id}/publish:
@@ -1892,6 +1997,168 @@ paths:
       summary: Saving document
       tags:
       - WorkspaceDocument
+  /api/v1/document_template/:
+    get:
+      operationId: get_document_template_by_id_api_v1_document_template__get
+      parameters:
+      - in: query
+        name: document_template_id
+        required: true
+        schema:
+          format: uuid
+          title: Document Template Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentTemplateInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Add document template
+      tags:
+      - DocumentTemplate
+    post:
+      operationId: create_document_template_api_v1_document_template__post
+      parameters:
+      - in: query
+        name: title
+        required: true
+        schema:
+          title: Title
+          type: string
+      - in: query
+        name: description
+        required: true
+        schema:
+          title: Description
+          type: string
+      - in: query
+        name: document_id
+        required: true
+        schema:
+          format: uuid
+          title: Document Id
+          type: string
+      - in: query
+        name: orig_commit_id
+        required: true
+        schema:
+          title: Orig Commit Id
+          type: string
+      - in: query
+        name: document_template_type
+        required: false
+        schema:
+          allOf:
+          - $ref: '#/components/schemas/DocumentTemplateType'
+          default: START
+          title: Document Template Type
+      - in: query
+        name: creator_user_id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Creator User Id
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentTemplateInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Add template
+      tags:
+      - DocumentTemplate
+  /api/v1/document_template/all:
+    get:
+      operationId: get_all_document_templates_api_v1_document_template_all_get
+      parameters:
+      - in: query
+        name: title
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Title
+      - in: query
+        name: description
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      - in: query
+        name: document_template_type
+        required: false
+        schema:
+          anyOf:
+          - $ref: '#/components/schemas/DocumentTemplateType'
+          - type: 'null'
+          title: Document Template Type
+      - in: query
+        name: creator_user_id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Creator User Id
+      - description: Page number
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          description: Page number
+          minimum: 1
+          title: Page
+          type: integer
+      - description: Page size
+        in: query
+        name: size
+        required: false
+        schema:
+          default: 50
+          description: Page size
+          maximum: 100
+          minimum: 1
+          title: Size
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_DocumentTemplateInfoResponse_'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get all document templates
+      tags:
+      - DocumentTemplate
   /api/v1/permission/domain/:
     post:
       operationId: create_permission_domain_api_v1_permission_domain__post

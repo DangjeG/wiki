@@ -97,7 +97,7 @@ class WikiApiClientRepository(BaseRepository):
     async def create_wiki_api_client(self, create_api_client: CreateWikiApiClient) -> WikiApiClient:
         new_api_client = WikiApiClient(
             description=create_api_client.description,
-            responsibility=str(create_api_client.responsibility),
+            responsibility=create_api_client.responsibility,
             is_enabled=create_api_client.is_enabled
         )
 
