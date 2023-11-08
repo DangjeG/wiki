@@ -1,4 +1,5 @@
 from io import StringIO
+from typing import Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
@@ -271,20 +272,28 @@ async def get_document_info_by_id(
     response_model=list[DocumentNodeInfoResponse],
     status_code=status.HTTP_200_OK,
     summary="Get all tree document by workspace id"
+            "If root_document_id=None then be the root workspace"
+            "If max_deep=None or root_document_id=0 then will be returned all document"
 )
 async def get_tree_documents_by_workspace_id(
         workspace_id: UUID,
+        max_deep: Optional[int] = 0,
+        root_document_id: Optional[UUID] = None,
         session: AsyncSession = Depends(get_db),
         user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER))
 ):
     document_repository: DocumentRepository = DocumentRepository(session)
     documents = await document_repository.get_all_document_by_workspace_id(workspace_id)
-    result_docs: list[DocumentNodeInfoResponse] = get_children_document(documents)
+    result_docs: list[DocumentNodeInfoResponse] = get_children_document(
+        documents=documents,
+        document_id=root_document_id,
+        max_deep=max_deep,
+    )
 
     return result_docs
 
 
-def get_children_document(documents: list[Document], document_id: UUID = None) -> list[DocumentNodeInfoResponse]:
+def get_children_document(documents: list[Document], document_id: UUID = None, max_deep: int = None, current_deep: int = 0) -> list[DocumentNodeInfoResponse]:
     result_docs: list[DocumentNodeInfoResponse] = []
     for doc in documents:
         if doc.parent_document_id == document_id:
@@ -294,8 +303,18 @@ def get_children_document(documents: list[Document], document_id: UUID = None) -
                 last_published_version_at=doc.last_published_version_at
             )
             result_docs.append(new_doc)
-            children = get_children_document(documents, doc.id)
-            if len(children) > 0:
-                new_doc.children = children
+            current_deep += 1
+            if max_deep == 0 or current_deep < max_deep:
+                children = get_children_document(
+                    documents=documents,
+                    document_id=doc.id,
+                    max_deep=max_deep,
+                    current_deep=current_deep
+                )
+                if len(children) > 0:
+                    new_doc.is_have_children = True
+                current_deep -= 1
+                if len(children) > 0:
+                    new_doc.children = children
 
     return result_docs
