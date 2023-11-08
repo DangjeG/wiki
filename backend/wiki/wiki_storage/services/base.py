@@ -6,8 +6,10 @@ from lakefs_client.client import LakeFSClient
 from lakefs_client.model.repository_creation import RepositoryCreation
 
 from wiki.config import settings
-from wiki.wiki_storage.utils import forming_document_block_storage_path
-from wiki.wiki_workspace.versioning.utils import menage_lakefs_api_exception_method
+from wiki.wiki_storage.utils import (
+    forming_document_block_storage_path,
+    menage_lakefs_api_exception_method
+)
 
 
 class BaseWikiStorageService:

@@ -13,6 +13,52 @@ components:
       - responsibility
       title: ApproveUser
       type: object
+    AssetInfoResponse:
+      properties:
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        download_link:
+          anyOf:
+          - format: uri
+            maxLength: 2083
+            minLength: 1
+            type: string
+          - type: 'null'
+          title: Download Link
+        id:
+          format: uuid
+          title: Id
+          type: string
+        name:
+          title: Name
+          type: string
+        size_kb:
+          title: Size Kb
+          type: number
+        type:
+          $ref: '#/components/schemas/AssetType'
+        uploader_user:
+          $ref: '#/components/schemas/UserBaseInfoResponse'
+        workspace:
+          $ref: '#/components/schemas/WorkspaceInfoResponse'
+      required:
+      - id
+      - type
+      - name
+      - size_kb
+      - uploader_user
+      - workspace
+      - created_at
+      title: AssetInfoResponse
+      type: object
+    AssetType:
+      enum:
+      - IMAGE
+      - DOCUMENT
+      title: AssetType
+      type: string
     BaseResponse:
       properties:
         msg:
@@ -82,6 +128,16 @@ components:
       - type_block
       - created_at
       title: BlockInfoResponse
+      type: object
+    Body_create_and_upload_asset_api_v1_asset_storage_asset_upload_post:
+      properties:
+        file:
+          format: binary
+          title: File
+          type: string
+      required:
+      - file
+      title: Body_create_and_upload_asset_api_v1_asset_storage_asset_upload_post
       type: object
     CreateBlock:
       properties:
@@ -458,6 +514,21 @@ components:
       - VIDEO
       title: TypeBlock
       type: string
+    UpdateAsset:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        workspace_id:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Workspace Id
+      title: UpdateAsset
+      type: object
     UpdateBlockData:
       properties:
         block_id:
@@ -1037,6 +1108,211 @@ paths:
       summary: Deactivate wiki api key
       tags:
       - WikiApiClient
+  /api/v1/asset_storage/asset/upload:
+    post:
+      operationId: create_and_upload_asset_api_v1_asset_storage_asset_upload_post
+      parameters:
+      - in: query
+        name: workspace_id
+        required: true
+        schema:
+          format: uuid
+          title: Workspace Id
+          type: string
+      - in: query
+        name: asset_type
+        required: true
+        schema:
+          $ref: '#/components/schemas/AssetType'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_create_and_upload_asset_api_v1_asset_storage_asset_upload_post'
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Upload Asset
+      tags:
+      - AssetStorage
+  /api/v1/asset_storage/asset/wp/{workspace_id}/:
+    get:
+      operationId: get_assets_for_workspace_api_v1_asset_storage_asset_wp__workspace_id___get
+      parameters:
+      - in: path
+        name: workspace_id
+        required: true
+        schema:
+          format: uuid
+          title: Workspace Id
+          type: string
+      - in: query
+        name: is_added_download_link
+        required: false
+        schema:
+          default: false
+          title: Is Added Download Link
+          type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/AssetInfoResponse'
+                title: Response Get Assets For Workspace Api V1 Asset Storage Asset
+                  Wp  Workspace Id   Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get Assets info for workspace
+      tags:
+      - AssetStorage
+  /api/v1/asset_storage/asset/{asset_id}/:
+    delete:
+      operationId: delete_asset_api_v1_asset_storage_asset__asset_id___delete
+      parameters:
+      - in: path
+        name: asset_id
+        required: true
+        schema:
+          format: uuid
+          title: Asset Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Delete Asset
+      tags:
+      - AssetStorage
+    get:
+      operationId: get_asset_api_v1_asset_storage_asset__asset_id___get
+      parameters:
+      - in: path
+        name: asset_id
+        required: true
+        schema:
+          format: uuid
+          title: Asset Id
+          type: string
+      - in: query
+        name: is_added_download_link
+        required: false
+        schema:
+          default: false
+          title: Is Added Download Link
+          type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get Asset info
+      tags:
+      - AssetStorage
+    put:
+      operationId: update_asset_info_api_v1_asset_storage_asset__asset_id___put
+      parameters:
+      - in: path
+        name: asset_id
+        required: true
+        schema:
+          format: uuid
+          title: Asset Id
+          type: string
+      - in: query
+        name: is_added_download_link
+        required: false
+        schema:
+          default: false
+          title: Is Added Download Link
+          type: boolean
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAsset'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Update Asset info
+      tags:
+      - AssetStorage
   /api/v1/auth/login:
     post:
       description: '## Logging in to a user account

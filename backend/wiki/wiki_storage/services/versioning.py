@@ -12,8 +12,11 @@ from wiki.config import settings
 from wiki.database.utils import utcnow
 from wiki.wiki_storage.schemas import CommitMetadataScheme
 from wiki.wiki_storage.services.base import BaseWikiStorageService
-from wiki.wiki_storage.utils import forming_document_storage_path, forming_document_block_storage_path
-from wiki.wiki_workspace.versioning.utils import menage_lakefs_api_exception_method
+from wiki.wiki_storage.utils import (
+    forming_document_storage_path,
+    forming_document_block_storage_path,
+    menage_lakefs_api_exception_method
+)
 
 
 class VersioningWikiStorageService(BaseWikiStorageService):

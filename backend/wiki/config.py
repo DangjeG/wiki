@@ -107,6 +107,9 @@ class Settings(BaseSettings):
     LAKEFS_INSTALLATION_SECRET_ACCESS_KEY: str = "12345"
     LAKEFS_DOCUMENT_BLOCK_FILE_EXT: str = ".html"
 
+    YA_OAUTH_TOKEN: str
+    ASSET_SIZE_LIMIT_KB: int = 51200  # 50 MB
+
     def get_db_url(self):
         return (f"{self.DB_SCHEMA}+{self.DB_DRIVER}://{self.DB_USER}:{self.DB_PASSWORD}@"
                 f"{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}?ssl={self.DB_SSL}")

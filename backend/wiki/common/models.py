@@ -20,6 +20,9 @@ class TimeStampMixin:
         event.listen(cls, "before_update", cls._updated_at)
 
 
-class EnabledDeletedMixin(TimeStampMixin):
-    is_enabled = Column(Boolean, nullable=False, default=True)
+class DeletedMixin(TimeStampMixin):
     is_deleted = Column(Boolean, nullable=False, default=False)
+
+
+class EnabledDeletedMixin(DeletedMixin):
+    is_enabled = Column(Boolean, nullable=False, default=True)
