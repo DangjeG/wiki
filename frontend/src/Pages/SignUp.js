@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, Checkbox, FormControl, FormControlLabel, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
-import { api } from "../app.config";
-import { useSearchParams } from "react-router-dom";
+import { api } from "../Configs/app.config";
 import "../Styles/Login.css";
 
 export default function SignUp() {

@@ -1,5 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {api} from "./app.config";
+import {api} from "./Configs/app.config";
 import {useEffect, useState} from "react";
 import AppNavbar from "./Components/Navbar";
 import {HashRouter, Route, Routes} from "react-router-dom";

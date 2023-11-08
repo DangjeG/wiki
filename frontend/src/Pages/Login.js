@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import {Button, FormControl, InputLabel, Input, Typography, TextField, styled} from "@mui/material";
-import { api } from "../app.config";
+import { api } from "../Configs/app.config";
 import "../Styles/Login.css";
 import "../Styles/BaseColors.css";
 
@@ -13,10 +13,8 @@ const CustomTextField = styled(TextField)({
 export default function Login() {
     const [email, setEmail] = useState("");
 
-    const [inputValue, setInputValue] = useState('');
-
     const handleInputChange = (event) => {
-        setInputValue(event.target.value);
+        setEmail(event.target.value);
     };
 
     async function handleFormSubmit(event) {
@@ -38,14 +36,14 @@ export default function Login() {
                 <form onSubmit={handleFormSubmit}>
                     <FormControl fullWidth id="text-field">
                         <InputLabel htmlFor="email-input"
-                                    style={{ visibility: inputValue === '' ? 'visible' : 'hidden' }}
+                                    style={{ visibility: email === '' ? 'visible' : 'hidden' }}
                         >
                             name@example.com
                         </InputLabel>
                         <CustomTextField fullWidth
                                          variant="outlined"
                                          type="email"
-                                         value={inputValue}
+                                         value={email}
                                          onChange={handleInputChange}/>
                     </FormControl>
                     <Button id="accent-button" variant="outlined" type="submit">

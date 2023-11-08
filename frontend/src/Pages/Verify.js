@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {Button, Form} from "react-bootstrap";
 import "../Styles/Login.css"
-import {api} from "../app.config";
+import {api} from "../Configs/app.config";
 
 
 export default function Verify(){
@@ -11,7 +11,7 @@ export default function Verify(){
     async function handleFormSubmit(event) {
         event.preventDefault();
         try {
-             await api.verify(code);
+            await api.verify(code);
             window.location.href = '#';
             }
             catch (err){

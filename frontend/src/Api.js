@@ -1,4 +1,4 @@
-import {instance} from "./api.config";
+import {instance} from "./Configs/api.config";
 
 export default class Api {
     async login(email) {
@@ -10,7 +10,7 @@ export default class Api {
         })
     }
 
-    async signup(email, username, first_name, last_name, second_name,  organization_id, is_user_agreement_accepted) {
+    async signup(email, username, first_name, last_name, second_name, position, organization_id, is_user_agreement_accepted) {
         await instance.post(`/auth/signup`,
             {
                 "email": email,
@@ -18,6 +18,7 @@ export default class Api {
                 "first_name": first_name,
                 "last_name": last_name,
                 "second_name": second_name,
+                "position": position,
                 "is_user_agreement_accepted": is_user_agreement_accepted,
                 "organization_id": organization_id
             }).then((response) => {
@@ -84,6 +85,25 @@ export default class Api {
         } )
     }
 
+    async createApprovedUser(email, username, firstName, lastName, secondName,position, responsibility){
+        await instance.post(`/user/verified`, {
+            "email": email,
+            "first_name": firstName,
+            "is_enabled": true,
+            "is_user_agreement_accepted": true,
+            "is_verified_email": true,
+            "last_name": lastName,
+            "position": position,
+            "second_name": secondName,
+            "username": username,
+            "wiki_api_client": {
+                "description": "",
+                "is_enabled": true,
+                "responsibility": responsibility
+            }
+        } )
+    }
+
     async getWorkspaces(){
         let workspaces = []
         await instance.get(`/workspace/all`).then((resp)=>{
@@ -94,7 +114,7 @@ export default class Api {
        return workspaces
     }
 
-    async addWorkspaces(title){
+    async addWorkspace(title){
         await instance.post(`/workspace`,{
             "title" : title
         })
@@ -126,6 +146,23 @@ export default class Api {
         )
         return documents
     }
+
+    async getDocumentsInfo(document_id){
+        let document = null
+        await instance.get(`/document/info?workspace_id=${document_id}`).then((resp)=> {
+            document = resp.data
+        })
+        return document
+    }
+
+    async saveDocument(document_id){
+        await instance.post(`/document/${document_id}/save`)
+    }
+
+    async publishDocument(document_id){
+        await instance.post(`/document/${document_id}/publish`)
+    }
+
 
     async addBlock(document_id, position, type_block){
         await instance.post(`/blocks`,{

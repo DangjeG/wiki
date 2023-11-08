@@ -1,0 +1,20 @@
+#box-container{
+    padding: 100px 150px;
+}
+
+#button-add {
+    background: #cdf;
+    border: none;
+    width: 1%;
+    height: 20%;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#table-style{
+    background: #cdf;
+    border: none;
+}
+

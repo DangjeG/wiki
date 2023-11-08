@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {api} from "../app.config";
+import {api} from "../Configs/app.config";
 import {ListGroup} from "react-bootstrap";
 
 

@@ -1,20 +1,28 @@
-import Wysiwyg from "../Components/Wysiwyg";
-import {useState} from "react";
+import React from "react";
 import BlockComponent from "../Components/Block";
 
 
 export default function TestPage(){
 
-    const [blockData, setBlockData] = useState("<h1> Hello </h1> ");
+    const blocks =
+        [
+            {
+                id: "321",
+                content: "<p>Hello1</p>"
+            },
+            {
+                id: "123",
+                content: "<p>Hello2</p>"
+            }
+        ]
 
     return (
         <>
-            <BlockComponent content={blockData}/>
-            <Wysiwyg onChange={(data) => {
-                setBlockData(data)
-            }}/>
-        </>
+            {blocks.map((item) => {
+                return <BlockComponent block={item}/>
+            })}
 
+        </>
     )
 
 }

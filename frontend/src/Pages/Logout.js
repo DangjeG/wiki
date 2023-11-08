@@ -1,4 +1,4 @@
-import {api} from "../app.config";
+import {api} from "../Configs/app.config";
 import React from "react";
 import {Modal, Button} from "react-bootstrap";
 
