@@ -43,26 +43,3 @@ async def get_version_document_info_list(results: dict, document: Document, sess
         created_at=datetime.fromtimestamp(int(item.get("creation_date"))),
         is_published=item.get("id") == document.current_published_version_commit_id
     ) for item in results]
-
-
-def menage_lakefs_api_exception_method(e: Optional[WikiException] = None):
-    def decorator(f):
-        @wraps(f)
-        def wrapped_f(self, *args, **kwargs):
-            try:
-                result = f(self, *args, **kwargs)
-            except ApiException as exc:
-                if e is not None:
-                    raise e
-                else:
-                    raise WikiException(
-                        message=exc.body,
-                        error_code=WikiErrorCode.LAKEFS_API_EXCEPTION,
-                        http_status_code=status.HTTP_400_BAD_REQUEST
-                    )
-
-            return result
-
-        return wrapped_f
-
-    return decorator

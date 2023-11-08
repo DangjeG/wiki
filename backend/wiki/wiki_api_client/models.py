@@ -13,14 +13,14 @@ from wiki.wiki_api_client.enums import ResponsibilityType
 class WikiApiClient(Base, EnabledDeletedMixin):
     id = Column(Uuid, default=uuid7, primary_key=True, nullable=False)
     description = Column(String(256), nullable=True)
-    responsibility = Column(String, nullable=False, default=ResponsibilityType.VIEWER)
+    responsibility = Column(String, nullable=False, default=str(ResponsibilityType.VIEWER))
 
     def __init__(self,
                  description: Optional[str] = None,
                  responsibility: ResponsibilityType = ResponsibilityType.VIEWER,
                  is_enabled: bool = True):
         self.description = description
-        self.responsibility = responsibility
+        self.responsibility = str(responsibility)
         self.is_enabled = is_enabled
 
 

@@ -137,36 +137,37 @@ async def version_rollback_document(
     user_repository: UserRepository = UserRepository(session)
     user_db: User = await user_repository.get_user_by_id(user.id)
 
-    document_repository: DocumentRepository = DocumentRepository(session)
-    document = await document_repository.get_document_by_id(document_id)
-
-    storage_service: VersioningWikiStorageService = VersioningWikiStorageService(storage_client)
-    commit: Commit = storage_service.rollback_document(document.workspace_id,
-                                                       document.id,
-                                                       rollback_commit_id,
-                                                       CommitMetadataScheme(
-                                                           committer_user_id=str(user_db.id))
-                                                       )
-
-    # rollback_data_blocks = await get_data_blocks(session, document_id, rollback_commit_id, storage_client)
-    #
     # document_repository: DocumentRepository = DocumentRepository(session)
     # document = await document_repository.get_document_by_id(document_id)
-    # document_ids = await document_repository.get_list_ids_of_document_hierarchy(document)
-    # workspace_repository: WorkspaceRepository = WorkspaceRepository(session)
-    # workspace = await workspace_repository.get_workspace_by_id(document.workspace_id)
     #
     # storage_service: VersioningWikiStorageService = VersioningWikiStorageService(storage_client)
-    # for item in rollback_data_blocks:
-    #     storage_service.upload_document_block_in_workspace_storage(content=StringIO(item.content),
-    #                                                                workspace_id=workspace.id,
-    #                                                                document_ids=document_ids,
-    #                                                                block_id=item.id)
-    # resp: Commit = storage_service.commit_workspace_document_version(document.workspace_id,
-    #                                                                  document.id,
-    #                                                                  CommitMetadataScheme(
-    #                                                                      committer_user_id=str(user_db.id)))
-    return await get_data_blocks(session, document.id, commit.id, storage_client)
+    # commit: Commit = storage_service.rollback_document(document.workspace_id,
+    #                                                    document.id,
+    #                                                    rollback_commit_id,
+    #                                                    CommitMetadataScheme(
+    #                                                        committer_user_id=str(user_db.id))
+    #                                                    )
+
+    rollback_data_blocks = await get_data_blocks(session, document_id, rollback_commit_id, storage_client)
+
+    document_repository: DocumentRepository = DocumentRepository(session)
+    document = await document_repository.get_document_by_id(document_id)
+    document_ids = await document_repository.get_list_ids_of_document_hierarchy(document)
+    workspace_repository: WorkspaceRepository = WorkspaceRepository(session)
+    workspace = await workspace_repository.get_workspace_by_id(document.workspace_id)
+
+    storage_service: VersioningWikiStorageService = VersioningWikiStorageService(storage_client)
+    for item in rollback_data_blocks:
+        storage_service.upload_document_block_in_workspace_storage(content=StringIO(item.content),
+                                                                   workspace_id=workspace.id,
+                                                                   document_ids=document_ids,
+                                                                   block_id=item.id)
+    resp: Commit = storage_service.commit_workspace_document_version(document.workspace_id,
+                                                                     document.id,
+                                                                     CommitMetadataScheme(
+                                                                         committer_user_id=str(user_db.id)))
+    # return await get_data_blocks(session, document.id, commit.id, storage_client)
+    return rollback_data_blocks
 
 
 @versioning_workspace_router.get(

@@ -12,8 +12,11 @@ from wiki.config import settings
 from wiki.database.utils import utcnow
 from wiki.wiki_storage.schemas import CommitMetadataScheme
 from wiki.wiki_storage.services.base import BaseWikiStorageService
-from wiki.wiki_storage.utils import forming_document_storage_path, forming_document_block_storage_path
-from wiki.wiki_workspace.versioning.utils import menage_lakefs_api_exception_method
+from wiki.wiki_storage.utils import (
+    forming_document_storage_path,
+    forming_document_block_storage_path,
+    menage_lakefs_api_exception_method
+)
 
 
 class VersioningWikiStorageService(BaseWikiStorageService):
@@ -22,7 +25,7 @@ class VersioningWikiStorageService(BaseWikiStorageService):
     def commit_workspace_document_version(self,
                                           workspace_id: UUID,
                                           document_id: UUID,
-                                          metadata: CommitMetadataScheme) -> dict:
+                                          metadata: CommitMetadataScheme) -> Commit:
         api_instance = self.client.commits_api
         commit_creation = CommitCreation(
             message=str(utcnow()),

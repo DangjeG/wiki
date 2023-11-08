@@ -27,3 +27,4 @@ class DocumentNodeInfoResponse(WikiBase):
     title: str
     last_published_version_at: datetime
     children: Optional[list] = None
+    is_have_children: bool = False

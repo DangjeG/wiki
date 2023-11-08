@@ -16,6 +16,7 @@ class WikiErrorCode(IntEnum):
             5001-6000: permission errors
             6001-7000: workspace errors
             7001-8000: version errors
+            8001-9000: assets storage
         """
 
     # 0-1000: general errors
@@ -76,6 +77,11 @@ class WikiErrorCode(IntEnum):
     ROOT_VERSION_WORKSPACE_NOT_FOUND = 7002
 
     VERSION_DOCUMENT_NOT_FOUND = 7003
+
+    # 8001-9000: assets storage
+    ASSET_NOT_FOUND = 8001
+    ASSET_LIMIT_SIZE_EXCEEDED_EXCEPTION = 8002
+    YA_DISK_API_EXCEPTION = 8003
 
 
 class WikiException(Exception):
