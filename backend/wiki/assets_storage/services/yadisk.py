@@ -18,9 +18,7 @@ class YaDiskAssetsStorage(BaseAssetsStorage):
 
     @manage_ya_disk_storage_exception_method()
     async def download_asset(self, asset: Asset) -> str:
-        bytes_io = BytesIO()
-        resource = await self.session.download(self.get_asset_path(asset), bytes_io)
-        return await resource.get_download_link()
+        return await self.session.get_download_link(self.get_asset_path(asset))
 
     @manage_ya_disk_storage_exception_method()
     async def remove_asset(self, asset: Asset):
