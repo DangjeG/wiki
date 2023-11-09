@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
 import {Box, Grid, Tooltip, Typography} from "@mui/material";
 import DirectoryListItem from "./DirectoryListItem";
@@ -32,9 +31,10 @@ export default function Sidebar(props){
     };
     const handleShow = () => setShow(true);
 
-    const handleAdd = () => {
-        api.addDocument(newDocument, props.workspaceID)
+    const handleAdd = async () => {
+        await api.addDocument(newDocument, props.workspaceID)
         handleClose()
+        setSidebarData([])
         fetchData()
     }
 
@@ -62,7 +62,10 @@ export default function Sidebar(props){
                         Название проекта
                     </Typography>
                     <List>
-                        {getChildren(sidebarData)}
+                        {sidebarData.map((item) =>
+                        {
+                            return <DirectoryListItem onClick={handleClick} id={item.id} title={item.title} children={getChildren(item.children)} />
+                        })}
                     </List>
 
                     <Button id='accent-button'

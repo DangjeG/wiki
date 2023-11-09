@@ -38,9 +38,10 @@ export default function WorkspaceSelect (props) {
     };
     const handleShow = () => setShow(true);
 
-    const handleAdd = () => {
-        api.addWorkspace(newWorkspace)
+    const handleAdd = async () => {
+        await api.addWorkspace(newWorkspace)
         handleClose()
+        setWorkspaces([])
         fetchData()
     }
 

@@ -3,9 +3,9 @@ import {api} from "../Configs/app.config";
 import BlockComponent from "../Components/Block";
 import Button from "@mui/material/Button";
 import Sidebar from "../Components/Sidebar";
-import {Grid} from "@mui/material";
+import {Grid, Tooltip} from "@mui/material";
 import SaveAltIcon from "@mui/icons-material/SaveAlt";
-import {forEach} from "react-bootstrap/ElementChildren";
+import AddIcon from "@mui/icons-material/Add";
 
 export default function WorkspaceDocs (props){
 
@@ -15,7 +15,6 @@ export default function WorkspaceDocs (props){
     }, []);
 
     const [uncommented, setUncommented] = useState(false)
-    const [updateCounter, setUpdateCounter] = useState()
     const [sidebarOpen, setSidebarOpen] = React.useState(false);
     const [blocks, setBlocks] = useState([]);
     const [documentID, setDocumentID] = useState()
@@ -34,10 +33,10 @@ export default function WorkspaceDocs (props){
         }
     }
 
-    const handleSave = () => {
+    const handleSave = async () => {
         for (let item of blocks)
-            api.updateBlockData(item.id, item.content)
-        api.saveDocument(documentID)
+            await api.updateBlockData(item.id, item.content)
+        await api.saveDocument(documentID)
         setUncommented(false)
     }
 
@@ -53,18 +52,19 @@ export default function WorkspaceDocs (props){
     };
 
     const switchDocument = (ID) => {
+        setBlocks([])
         fetchData(ID);
     }
 
-    const handleAdd = () => {
-        api.addBlock(documentID,0 , "TEXT")
+    const handleAdd = async () => {
+        await api.addBlock(documentID,0 , "TEXT")
         fetchData(documentID)
         setUncommented(true)
     }
  
     return (
         <>
-            <Grid container spacing={0} style={{ height: '100vh' }}>
+            <Grid container spacing={0} style={{ marginTop:'70px', height: '100vh' }}>
                 <Grid item xs={3}>
                     <Sidebar onSelect={switchDocument} workspaceID={props.workspace_id} open={sidebarOpen} onClose={toggleSidebar}/>
                 </Grid>
@@ -72,6 +72,15 @@ export default function WorkspaceDocs (props){
                     <Button id="base-button" disabled={!uncommented} sx={{marginTop:'20px', marginBottom:'20px', marginLeft: '80%'}} onClick={handleSave}>
                         Сохранить
                         <SaveAltIcon/>
+                    </Button>
+                    <Button sx={{border: 'none', outline: 'none' }}
+                            variant="outlined" onClick={handleAdd}>
+                        <Tooltip sx={{width: '10px', height: '10px'}}
+                                 title="Добавить блок"
+                                 placement="top"
+                                 arrow>
+                            <AddIcon sx={{color: '#000000'}}/>
+                        </Tooltip>
                     </Button>
                     {blocks.map((item) =>{
                         return <BlockComponent onCange={handleChange} block={item}/>
