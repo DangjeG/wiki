@@ -12,6 +12,7 @@ import Admin from "./Pages/Admin";
 import Profile from "./Pages/Profile";
 import Workspace from "./Pages/Workspace";
 import TestPage from "./Pages/TestPage";
+import ProtectedRoute from "./Components/ProtectedRoute";
 
 export default function App() {
 
@@ -39,10 +40,18 @@ export default function App() {
                         <Route path={"/verify"} element={<Verify/>}/>
                         <Route path={"/signup"} element={<SignUp/>}/>
                         <Route path={"/logout"} element={<Logout/>}/>
-                        <Route path={"/admin"} element={<Admin/>}/>
-                        <Route path={"/profile"} element={<Profile/>}/>
-                        <Route path={"/workspace/*"} element={<Workspace/>}/>
-                        <Route path={"/test/*"} element={<TestPage/>}/>
+                        <Route element={<ProtectedRoute requirement={
+                            user !== null && user.wiki_api_client !== null && user.wiki_api_client.responsibility === 'ADMIN'
+                        }/>}>
+                            <Route path={"/admin"} element={<Admin/>}/>
+                        </Route>
+                        <Route element={<ProtectedRoute requirement={
+                            user !== null && user.wiki_api_client !== null
+                        }/>}>
+                            <Route path={"/profile"} element={<Profile/>}/>
+                            <Route path={"/workspace/*"} element={<Workspace/>}/>
+                            <Route path={"/test/*"} element={<TestPage/>}/>
+                        </Route>
                     </Routes>
                 </HashRouter>
         )

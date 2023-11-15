@@ -120,9 +120,9 @@ export default class Api {
         })
     }
 
-    async getWorkspace(id){
+    async getWorkspaceInfo(id){
         let workspace = null
-        await instance.get(`/workspace/all`).then((resp)=>{
+        await instance.get(`/workspace/info?workspace_id=${id}`).then((resp)=>{
             workspace=resp.data
            }
         )

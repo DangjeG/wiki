@@ -4,25 +4,14 @@ import Wysiwyg from "./Wysiwyg";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EditIcon from '@mui/icons-material/Edit';
 import {Box} from "@mui/system";
-import {api} from "../Configs/app.config";
-
 
 export default function BlockComponent(props) {
 
     const [content, setContent] = useState(props.block.content)
-    const [updateCounter, setUpdateCounter] = useState(20)
-    const block = props.block
-    const onChange = (data) =>
-    {
-        props.onCange()
-        setContent(data)
-        block.content = content
-        setUpdateCounter(updateCounter-1)
-        if (updateCounter === 0) api.updateBlockData(block.id, content)
-    }
+
     return (
-        <div>
-            <Accordion sx={{ width:'80%', borderRadius: '10px', marginLeft:'10%', marginBottom:'10px' }}>
+        <div style={{marginLeft:'10%', marginBottom:'10px' }}>
+            <Accordion sx={{ width:'80%', borderRadius: '10px' }}>
                 <AccordionSummary
                     expandIcon={<EditIcon />}
                     aria-controls="panel1a-content"
@@ -31,8 +20,8 @@ export default function BlockComponent(props) {
                     <Typography dangerouslySetInnerHTML={{ __html: content}} />
                 </AccordionSummary>
                 <AccordionDetails sx={{display: 'flex', justifyContent: 'center'}}>
-                    <Box sx={{width:'80%', borderRadius: '10px'}}>
-                        <Wysiwyg content={content} onChange={onChange}/>
+                    <Box sx={{width:'100%', borderRadius: '10px'}}>
+                        <Wysiwyg sx={{marginLeft:'10%'}} content={content} onChange={(data) => setContent(data)}/>
                     </Box>
 
                 </AccordionDetails>

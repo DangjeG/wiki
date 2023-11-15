@@ -3,7 +3,6 @@ import {api} from "../Configs/app.config";
 import {Box, List, ListItemButton, ListItemText, ListSubheader, Tooltip} from "@mui/material";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
-
 import {Form, Modal} from "react-bootstrap";
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 
@@ -33,7 +32,6 @@ export default function WorkspaceSelect (props) {
 
 
     const handleClose = () => {
-
         setShow(false)
     };
     const handleShow = () => setShow(true);

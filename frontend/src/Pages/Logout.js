@@ -21,9 +21,8 @@ export default function Logout() {
             <Modal.Body>
                 <p>You have successfully logged out of your account.</p>
             </Modal.Body>
-
             <Modal.Footer>
-                <Button href={"#"} variant="primary">Go back</Button>
+                <Button onClick={()=> window.location.href = "#"} variant="primary">Go back</Button>
             </Modal.Footer>
         </Modal.Dialog>
     </div>)

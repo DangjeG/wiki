@@ -3,6 +3,7 @@ import {Button, FormControl, InputLabel, Input, Typography, TextField, styled} f
 import { api } from "../Configs/app.config";
 import "../Styles/Login.css";
 import "../Styles/BaseColors.css";
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
 const CustomTextField = styled(TextField)({
     '& .MuiInputLabel-root.Mui-focused': {
@@ -12,7 +13,8 @@ const CustomTextField = styled(TextField)({
 
 export default function Login() {
     const [email, setEmail] = useState("");
-
+    const [isError, setIsError] = useState(false);
+    const [errorText, setErrorText] = useState("")
     const handleInputChange = (event) => {
         setEmail(event.target.value);
     };
@@ -21,9 +23,11 @@ export default function Login() {
         event.preventDefault();
         try {
             await api.login(email);
+            setIsError(false)
             window.location.href = "#verify";
         } catch (error) {
-            console.error(error);
+            setErrorText(error.response.data.message)
+            setIsError(true)
         }
     }
 
@@ -46,6 +50,11 @@ export default function Login() {
                                          value={email}
                                          onChange={handleInputChange}/>
                     </FormControl>
+                    {isError && (
+                        <p style={{ color: 'red', fontFamily: 'Inter', fontSize: '11px' }}>
+                            <ErrorOutlineIcon sx={{ height: '20px' }} /> {errorText}
+                        </p>
+                    )}
                     <Button id="accent-button" variant="outlined" type="submit">
                         ОТПРАВИТЬ КОД
                     </Button>

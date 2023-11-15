@@ -11,31 +11,46 @@ export default function Sidebar(props){
     const [show, setShow] = useState(false);
     const [sidebarData, setSidebarData] = useState([]);
     const [newDocument, setNewDocument] = useState()
+    const [disableAddButton, setDisableAddButton] = useState(false)
+    const [workspace, setWorkspace] = useState(null)
     const fetchData = async () => {
         try {
             const response = await api.getDocumentsTree(props.workspaceID)
             setSidebarData(response)
+            props.onSelect(response[0].id)
         }
         catch (e){
             console.log(e)
         }
     };
 
+    const fetchWorkspace = async () =>{
+        try{
+            const response = await api.getWorkspaceInfo(props.workspaceID)
+            setWorkspace(response)
+        }
+        catch (e){
+            console.log(e)
+        }
+    }
+
     useEffect(() => {
-        fetchData();
+        fetchWorkspace()
+        fetchData()
     }, []);
 
 
-    const handleClose = () => {
-        setShow(false)
-    };
+    const handleClose = () => setShow(false)
+
     const handleShow = () => setShow(true);
 
     const handleAdd = async () => {
+        setDisableAddButton(true)
         await api.addDocument(newDocument, props.workspaceID)
         handleClose()
         setSidebarData([])
         fetchData()
+        setDisableAddButton(false)
     }
 
     const handleClick = (id) => {
@@ -59,7 +74,7 @@ export default function Sidebar(props){
             >
                 <Grid item>
                     <Typography fontWeight="bold">
-                        Название проекта
+                        {workspace ? workspace.title: null}
                     </Typography>
                     <List>
                         {sidebarData.map((item) =>
@@ -106,7 +121,7 @@ export default function Sidebar(props){
                 <Modal.Footer>
                     <Button id="base-button" variant="outlined" onClick={handleClose}>Закрыть</Button>
                     <Box sx={{ marginLeft: '10px' }}></Box>
-                    <Button id="accent-button" variant="contained" onClick={handleAdd}>Сохранить</Button>
+                    <Button disabled={disableAddButton} id="accent-button" variant="contained" onClick={handleAdd}>Сохранить</Button>
                 </Modal.Footer>
             </Modal>
         </>

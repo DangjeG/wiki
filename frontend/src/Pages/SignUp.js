@@ -15,16 +15,6 @@ export default function SignUp() {
     const [organizations, setOrganizations] = useState([]);
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await api.getOrganizations();
-                setOrganizations(response);
-            } catch (error) {
-                console.log(error);
-            }
-        };
-
-        fetchData();
     }, []);
 
     async function handleFormSubmit(event) {
@@ -106,16 +96,6 @@ export default function SignUp() {
                     required={!isSecondNameExist}
                     sx={{background:'#FFFFFF'}}
                 />
-                <FormControl fullWidth margin="normal">
-                    <InputLabel>Организация</InputLabel>
-                    <Select value={organizationId} sx={{background:'#FFFFFF'}} onChange={(e) => setOrganizationId(e.target.value)} required>
-                        {organizations.map((organization) => (
-                            <MenuItem key={organization.id} value={organization.id} sx={{background:'#FFFFFF'}}>
-                                {organization.name}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
                 <FormControlLabel
                     control={
                         <Checkbox
