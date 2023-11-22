@@ -69,7 +69,7 @@ class UserRepository(BaseRepository):
         user_query = (await self.session.execute(st)).scalar()
         return user_query
 
-    async def get_all_users_filter(self, filter_user: UserFilter) -> list[User]:
+    async def get_all_users_filter(self, filter_user: UserFilter, is_only_existing: bool = True) -> list[User]:
         filters = []
         if filter_user.username is not None:
             filters.append(select(User.username.ilike(f'%{filter_user.username}%')))
@@ -79,6 +79,9 @@ class UserRepository(BaseRepository):
             filters.append(select(User.first_name.ilike(f'%{filter_user.first_name}%')))
         if filter_user.second_name is not None:
             filters.append(select(User.last_name.ilike(f'%{filter_user.second_name}%')))
+
+        if is_only_existing:
+            filters.append(select(User.is_deleted).where(User.is_deleted == False))
 
         result = await self.session.execute(select(User).where(and_(*filters)))
 

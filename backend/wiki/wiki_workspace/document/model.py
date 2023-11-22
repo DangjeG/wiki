@@ -7,9 +7,15 @@ from uuid_extensions import uuid7
 from wiki.common.models import EnabledDeletedMixin
 from wiki.database.core import Base
 from wiki.database.utils import utcnow
+from wiki.permissions.object.enums import ObjectPermissionMode
+from wiki.permissions.object.general.models import GeneralObjectPermissionMixin, GeneralDocumentPermission
+from wiki.permissions.object.group.models import GroupObjectPermissionMixin, GroupDocumentPermission
+from wiki.permissions.object.individual.models import IndividualObjectPermissionMixin, IndividualDocumentPermission
+from wiki.permissions.object.interfaces import IGenObjectPermission
+from wiki.wiki_api_client.enums import ResponsibilityType
 
 
-class Document(Base, EnabledDeletedMixin):
+class Document(Base, EnabledDeletedMixin, IGenObjectPermission):
     id = Column(Uuid, default=uuid7, primary_key=True, nullable=False)
 
     title = Column(String, nullable=False)
@@ -42,3 +48,30 @@ class Document(Base, EnabledDeletedMixin):
         self.creator_user_id = creator_user_id
         self.parent_document_id = parent_document_id
         self.current_published_version_commit_id = current_published_version_commit_id
+
+    def gen_general_object_permission(self,
+                                      mode: ObjectPermissionMode,
+                                      required_responsibility: ResponsibilityType) -> GeneralObjectPermissionMixin:
+        return GeneralDocumentPermission(
+            mode=str(mode),
+            required_responsibility=str(required_responsibility),
+            object_id=self.id
+        )
+
+    def gen_group_object_permission(self,
+                                    mode: ObjectPermissionMode,
+                                    group_id: UUID) -> GroupObjectPermissionMixin:
+        return GroupDocumentPermission(
+            mode=str(mode),
+            group_id=group_id,
+            object_id=self.id
+        )
+
+    def gen_individual_object_permission(self,
+                                         mode: ObjectPermissionMode,
+                                         user_id: UUID) -> IndividualObjectPermissionMixin:
+        return IndividualDocumentPermission(
+            mode=str(mode),
+            user_id=user_id,
+            object_id=self.id
+        )
