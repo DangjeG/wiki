@@ -176,6 +176,24 @@ components:
       - workspace_id
       title: CreateDocument
       type: object
+    CreateGroup:
+      properties:
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        is_members_can_add_to_group:
+          default: false
+          title: Is Members Can Add To Group
+          type: boolean
+        name:
+          title: Name
+          type: string
+      required:
+      - name
+      title: CreateGroup
+      type: object
     CreatePermissionDomain:
       properties:
         domain:
@@ -422,6 +440,97 @@ components:
           title: Username
       title: FrontendUserLogin
       type: object
+    GroupInfo:
+      properties:
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          format: uuid
+          title: Id
+          type: string
+        is_members_can_add_to_group:
+          title: Is Members Can Add To Group
+          type: boolean
+        name:
+          title: Name
+          type: string
+        updated_at:
+          format: date-time
+          title: Updated At
+          type: string
+      required:
+      - id
+      - name
+      - is_members_can_add_to_group
+      - created_at
+      - updated_at
+      title: GroupInfo
+      type: object
+    GroupInfoWithUsers:
+      properties:
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          format: uuid
+          title: Id
+          type: string
+        is_members_can_add_to_group:
+          title: Is Members Can Add To Group
+          type: boolean
+        members:
+          items:
+            $ref: '#/components/schemas/UserBaseInfoResponse'
+          title: Members
+          type: array
+        name:
+          title: Name
+          type: string
+        updated_at:
+          format: date-time
+          title: Updated At
+          type: string
+      required:
+      - id
+      - name
+      - is_members_can_add_to_group
+      - created_at
+      - updated_at
+      - members
+      title: GroupInfoWithUsers
+      type: object
+    GroupOptionalInfo:
+      properties:
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        is_members_can_add_to_group:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Members Can Add To Group
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      title: GroupOptionalInfo
+      type: object
     HTTPValidationError:
       properties:
         detail:
@@ -477,6 +586,78 @@ components:
       - size
       title: Page[DocumentTemplateInfoResponse]
       type: object
+    Page_GroupInfoWithUsers_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/GroupInfoWithUsers'
+          title: Items
+          type: array
+        page:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Page
+        pages:
+          anyOf:
+          - minimum: 0.0
+            type: integer
+          - type: 'null'
+          title: Pages
+        size:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Size
+        total:
+          minimum: 0.0
+          title: Total
+          type: integer
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[GroupInfoWithUsers]
+      type: object
+    Page_GroupInfo_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/GroupInfo'
+          title: Items
+          type: array
+        page:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Page
+        pages:
+          anyOf:
+          - minimum: 0.0
+            type: integer
+          - type: 'null'
+          title: Pages
+        size:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Size
+        total:
+          minimum: 0.0
+          title: Total
+          type: integer
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[GroupInfo]
+      type: object
     Page_PermissionDomainInfoResponse_:
       properties:
         items:
@@ -512,6 +693,42 @@ components:
       - page
       - size
       title: Page[PermissionDomainInfoResponse]
+      type: object
+    Page_UserBaseInfoResponse_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/UserBaseInfoResponse'
+          title: Items
+          type: array
+        page:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Page
+        pages:
+          anyOf:
+          - minimum: 0.0
+            type: integer
+          - type: 'null'
+          title: Pages
+        size:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Size
+        total:
+          minimum: 0.0
+          title: Total
+          type: integer
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[UserBaseInfoResponse]
       type: object
     Page_UserFullInfoResponse_:
       properties:
@@ -2642,6 +2859,689 @@ paths:
       summary: Create a verified user (has access to the system)
       tags:
       - User
+  /api/v1/user_group/:
+    delete:
+      operationId: delete_user_group_api_v1_user_group__delete
+      parameters:
+      - in: query
+        name: group_id
+        required: true
+        schema:
+          format: uuid
+          title: Group Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Delete group info by id
+      tags:
+      - UserGroup
+    post:
+      description: '## Create user group
+
+        Available for users starting from the EDITOR responsibility level'
+      operationId: create_user_group_api_v1_user_group__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGroup'
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupInfo'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Create user group
+      tags:
+      - UserGroup
+  /api/v1/user_group/all:
+    get:
+      operationId: get_all_groups_info_api_v1_user_group_all_get
+      parameters:
+      - in: query
+        name: name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      - in: query
+        name: description
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      - in: query
+        name: is_members_can_add_to_group
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Members Can Add To Group
+      - description: Page number
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          description: Page number
+          minimum: 1
+          title: Page
+          type: integer
+      - description: Page size
+        in: query
+        name: size
+        required: false
+        schema:
+          default: 50
+          description: Page size
+          maximum: 100
+          minimum: 1
+          title: Size
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_GroupInfo_'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all groups info
+      tags:
+      - UserGroup
+  /api/v1/user_group/all/full-info:
+    get:
+      operationId: get_all_groups_full_info_api_v1_user_group_all_full_info_get
+      parameters:
+      - in: query
+        name: name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      - in: query
+        name: description
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      - in: query
+        name: is_members_can_add_to_group
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Members Can Add To Group
+      - description: Page number
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          description: Page number
+          minimum: 1
+          title: Page
+          type: integer
+      - description: Page size
+        in: query
+        name: size
+        required: false
+        schema:
+          default: 50
+          description: Page size
+          maximum: 100
+          minimum: 1
+          title: Size
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_GroupInfoWithUsers_'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all groups info with members
+      tags:
+      - UserGroup
+  /api/v1/user_group/full-info:
+    get:
+      description: '## Get user group info with members by id
+
+        Get information about the group and all its members'
+      operationId: get_user_group_full_info_api_v1_user_group_full_info_get
+      parameters:
+      - in: query
+        name: group_id
+        required: true
+        schema:
+          format: uuid
+          title: Group Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupInfoWithUsers'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get user group info with members by id
+      tags:
+      - UserGroup
+  /api/v1/user_group/info:
+    get:
+      description: '## Get user group info by id
+
+        Get base information without group members'
+      operationId: get_user_group_info_api_v1_user_group_info_get
+      parameters:
+      - in: query
+        name: group_id
+        required: true
+        schema:
+          format: uuid
+          title: Group Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupInfo'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get user group info by id
+      tags:
+      - UserGroup
+    put:
+      operationId: update_user_group_info_api_v1_user_group_info_put
+      parameters:
+      - in: query
+        name: group_id
+        required: true
+        schema:
+          format: uuid
+          title: Group Id
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupOptionalInfo'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupInfo'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Update group info by id
+      tags:
+      - UserGroup
+  /api/v1/user_group/member:
+    delete:
+      operationId: remove_member_group_api_v1_user_group_member_delete
+      parameters:
+      - in: query
+        name: group_id
+        required: true
+        schema:
+          format: uuid
+          title: Group Id
+          type: string
+      - in: query
+        name: user_id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: User Id
+      - in: query
+        name: username
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+      - in: query
+        name: email
+        required: false
+        schema:
+          anyOf:
+          - format: email
+            type: string
+          - type: 'null'
+          title: Email
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Remove member user from group
+      tags:
+      - UserGroup
+    post:
+      operationId: add_member_group_api_v1_user_group_member_post
+      parameters:
+      - in: query
+        name: group_id
+        required: true
+        schema:
+          format: uuid
+          title: Group Id
+          type: string
+      - in: query
+        name: user_id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: User Id
+      - in: query
+        name: username
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+      - in: query
+        name: email
+        required: false
+        schema:
+          anyOf:
+          - format: email
+            type: string
+          - type: 'null'
+          title: Email
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Add member user for group
+      tags:
+      - UserGroup
+  /api/v1/user_group/members:
+    get:
+      operationId: get_members_user_group_api_v1_user_group_members_get
+      parameters:
+      - in: query
+        name: group_id
+        required: true
+        schema:
+          format: uuid
+          title: Group Id
+          type: string
+      - description: Page number
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          description: Page number
+          minimum: 1
+          title: Page
+          type: integer
+      - description: Page size
+        in: query
+        name: size
+        required: false
+        schema:
+          default: 50
+          description: Page size
+          maximum: 100
+          minimum: 1
+          title: Size
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_UserBaseInfoResponse_'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get members group by id
+      tags:
+      - UserGroup
+  /api/v1/user_group/user/full-info:
+    get:
+      operationId: get_groups_full_info_for_user_api_v1_user_group_user_full_info_get
+      parameters:
+      - in: query
+        name: user_id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: User Id
+      - in: query
+        name: username
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+      - in: query
+        name: email
+        required: false
+        schema:
+          anyOf:
+          - format: email
+            type: string
+          - type: 'null'
+          title: Email
+      - in: query
+        name: name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      - in: query
+        name: description
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      - in: query
+        name: is_members_can_add_to_group
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Members Can Add To Group
+      - description: Page number
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          description: Page number
+          minimum: 1
+          title: Page
+          type: integer
+      - description: Page size
+        in: query
+        name: size
+        required: false
+        schema:
+          default: 50
+          description: Page size
+          maximum: 100
+          minimum: 1
+          title: Size
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_GroupInfoWithUsers_'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get groups info for user with members
+      tags:
+      - UserGroup
+  /api/v1/user_group/user/info:
+    get:
+      operationId: get_groups_info_for_user_api_v1_user_group_user_info_get
+      parameters:
+      - in: query
+        name: user_id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: User Id
+      - in: query
+        name: username
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+      - in: query
+        name: email
+        required: false
+        schema:
+          anyOf:
+          - format: email
+            type: string
+          - type: 'null'
+          title: Email
+      - in: query
+        name: name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      - in: query
+        name: description
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      - in: query
+        name: is_members_can_add_to_group
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Members Can Add To Group
+      - description: Page number
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          description: Page number
+          minimum: 1
+          title: Page
+          type: integer
+      - description: Page size
+        in: query
+        name: size
+        required: false
+        schema:
+          default: 50
+          description: Page size
+          maximum: 100
+          minimum: 1
+          title: Size
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_GroupInfo_'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get groups info for user
+      tags:
+      - UserGroup
   /api/v1/versioning/block/{block_id}/diff:
     get:
       description: Find the difference between the contents of the block versions
