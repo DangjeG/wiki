@@ -7,6 +7,7 @@ import Toolbar from '@mui/material/Toolbar';
 import AppBar from '@mui/material/AppBar';
 import Typography from '@mui/material/Typography';
 import {Box} from "@mui/system";
+import PersonIcon from '@mui/icons-material/Person';
 import "../Styles/BaseColors.css"
 import "../Styles/Navbar.css"
 
@@ -47,11 +48,11 @@ export default function AppNavbar(props) {
                     <Stack direction="row" alignItems="center" spacing={2}>
                         {base}
                         {props.user.wiki_api_client.responsibility === 'ADMIN' ? (
-                            <Button id="notaccent-button" href="#admin">
+                            <Button id="typography-home" href="#admin">
                                 ИНСТРУМЕНТЫ АДМИНА
                             </Button>
                         ) : null}
-                        <Button id="notaccent-button" href="#workspace/select">
+                        <Button id="typography-home" href="#workspace/select">
                             ПРОЕКТЫ
                         </Button>
                     </Stack>
@@ -80,9 +81,10 @@ export default function AppNavbar(props) {
                     <Button
                         variant="contained"
                         onClick={handleMenuOpen}
-                        id="user-dropdown"
+                        id="accent-button"
                         sx={{background:'#103070', color: '#b4cbfa', ':hover': {backgroundColor: '#001847'}}}
                     >
+                        <PersonIcon/>
                         {props.user.username}
                     </Button>
                     <Menu
@@ -119,7 +121,7 @@ export default function AppNavbar(props) {
     return (
         <>
             <Box sx={{flexGrow: 1}}>
-                <AppBar position="static">
+                <AppBar position="fixed">
                     <Toolbar id="main-background">
                         {getLeftPanel()}
                         {getRightPanel()}

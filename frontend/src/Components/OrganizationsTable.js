@@ -1,7 +1,9 @@
-import {Button, Form, Modal, Table} from "react-bootstrap";
-import {useEffect, useState} from "react"
-import {api} from "../app.config";
+import {Table} from "react-bootstrap";
+import React, {useEffect, useState} from "react"
+import {api} from "../Configs/app.config";
 import {Box} from "@mui/system";
+import {Tooltip} from "@mui/material";
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 
 export default function OrganizationsTable() {
@@ -56,61 +58,55 @@ export default function OrganizationsTable() {
     }
 
     return (
-        <div style={{"padding": "10px 70px", margin: '20px', background: '#cdf',  borderRadius: '8px'}}>
-            <Box sx={{width: '100%', margin: '10px', padding: '50px 50px', background: '#cdf',  borderRadius: '8px'}}>
-                <Table style={{background: '#cdf'}}>
+        <div style={{display: 'flex'}}>
+
+            <Box sx={{ container:'true', margin: '10px', padding: '50px 50px', background: '#cdf',  borderRadius: '10px', width:'100%'}}>
+                <Table sx={{borderCollapse: 'collapse', width: '100%'}}>
                     <thead >
                     <tr key="header">
-                        <th style={{ background: '#cdf', border: 'none' }}>Name</th>
-                        <th style={{ background: '#cdf', border: 'none' }}>Description</th>
-                        <th style={{ background: '#cdf', border: 'none' }}>Access</th>
+                        <th id="table-style">
+                            <Tooltip sx={{width:'15px', height:'15px', marginBottom: '5px', marginRight:'5px'}}
+                                     title="Название группы"
+                                     placement="top"
+                                     arrow>
+                                <InfoOutlinedIcon />
+                            </Tooltip>
+                            Название
+                        </th>
+                        <th  id="table-style">
+                            <Tooltip sx={{width:'15px', height:'15px', marginBottom: '5px', marginRight:'5px'}}
+                                     title="Описание группы"
+                                     placement="top"
+                                     arrow>
+                                <InfoOutlinedIcon />
+                            </Tooltip>
+                            Описание
+                        </th>
+                        <th  id="table-style">
+                            <Tooltip sx={{width:'15px', height:'15px', marginBottom: '5px', marginRight:'5px'}}
+                                     title={<span><strong>FULL_ACCESS</strong> - будет описание.<br/>
+                                            <strong>WEB_ONLY</strong> - будет описание.<br/>
+                                            <strong>LOCKED</strong> - будет описание.
+                                            </span>}
+                                     placement="top"
+                                     arrow>
+                                <InfoOutlinedIcon />
+                            </Tooltip>
+                            Права доступа
+                        </th>
 
                     </tr>
                     </thead>
                     <tbody>
                     {Array.from(organizations).map((organization) => (
                         <tr key={organization.name}>
-                            <td style={{ background: '#cdf', border: 'none' }}>{organization.name}</td>
-                            <td style={{ background: '#cdf', border: 'none' }}>{organization.description}</td>
-                            <td style={{ background: '#cdf', border: 'none' }}>{organization.access}</td>
+                            <td  id="table-style" >{organization.name}</td>
+                            <td  id="table-style">{organization.description}</td>
+                            <td  id="table-style">{organization.access}</td>
                         </tr>))}
                     </tbody>
                 </Table>
-                <Modal show={show} onHide={handleClose}>
-                    <Modal.Header>
-                        <Modal.Title>Add organization</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <Form>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Name</Form.Label>
-                                <Form.Control value={name} onChange={(event) => (setName(event.target.value))}/>
-                            </Form.Group>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Description</Form.Label>
-                                <Form.Control value={description} onChange={(event) => (setDescription(event.target.value))}
-                                              as="textarea" rows={3}/>
-                            </Form.Group>
-                            <Form.Group className="mb-3">
-                                <Form.Check inline type="radio" label={`FULL_ACCESS`} name={"group"}
-                                            onClick={() => setAccess("FULL_ACCESS")}/>
-                                <Form.Check inline type="radio" label={`WEB_ONLY`} name={"group"}
-                                            onClick={() => setAccess("WEB_ONLY")}/>
-                                <Form.Check inline type="radio" label={`LOCKED`} name={"group"}
-                                            onClick={() => setAccess("LOCKED")}/>
-                            </Form.Group>
-                        </Form>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button variant="secondary" onClick={handleClose}>
-                            Close
-                        </Button>
-                        <Button variant="primary" onClick={handleSubmit}>
-                            Save Changes
-                        </Button>
-                    </Modal.Footer>
-                </Modal>
-                <Button style={{ background: '#cdf', border: 'none' }} variant="light" onClick={handleShow}>+</Button>
+
             </Box>
         </div>)
 }

@@ -1,22 +1,25 @@
-import { convertToHTML } from 'draft-convert';
+import {convertToHTML} from 'draft-convert';
 import React, { useState, useEffect } from 'react';
-import {Editor, EditorState } from 'draft-js';
-import 'draft-js/dist/Draft.css';
+import {EditorState, ContentState, convertFromHTML} from 'draft-js';
+import {Editor}  from 'react-draft-wysiwyg';
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+import {toolbar} from "../Configs/wysiwyg.toolbar.config";
 
 export default function Wysiwyg(props){
 
-    const handleChange = () => {
-        props.onChange(convertedContent)
+    const handleChange = (html) => {
+        props.onChange(html)
     }
 
     const [editorState, setEditorState] = React.useState(
-        () => EditorState.createEmpty(),
-    ) ;
-    const [convertedContent, setConvertedContent] = useState();
+        () => EditorState.createWithContent(
+            ContentState.createFromBlockArray(
+                convertFromHTML(props.content)
+        )
+    ))
 
     useEffect(() => {
         let html = convertToHTML(editorState.getCurrentContent());
-        setConvertedContent(html);
         handleChange(html)
     }, [editorState]);
 
@@ -24,8 +27,9 @@ export default function Wysiwyg(props){
     return (
         <>
             <Editor
+                toolbar={toolbar}
                 editorState={editorState}
-                onChange={(data) =>{setEditorState(data)}}/>
+                onEditorStateChange={setEditorState}/>
         </>
     )
 }

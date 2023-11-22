@@ -1,4 +1,4 @@
-import {api} from "../app.config";
+import {api} from "../Configs/app.config";
 import React from "react";
 import {Modal, Button} from "react-bootstrap";
 
@@ -21,9 +21,8 @@ export default function Logout() {
             <Modal.Body>
                 <p>You have successfully logged out of your account.</p>
             </Modal.Body>
-
             <Modal.Footer>
-                <Button href={"#"} variant="primary">Go back</Button>
+                <Button onClick={()=> window.location.href = "#"} variant="primary">Go back</Button>
             </Modal.Footer>
         </Modal.Dialog>
     </div>)
