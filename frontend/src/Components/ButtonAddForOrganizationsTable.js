@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import "../Styles/AdminTools.css";
 import AddIcon from "@mui/icons-material/Add";
 import {Box, Button, Tooltip} from "@mui/material";
-import {api} from "../Configs/app.config";
+import {api} from "../Config/app.config";
 import {Form, Modal} from "react-bootstrap";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 

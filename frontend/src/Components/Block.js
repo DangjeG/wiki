@@ -7,8 +7,29 @@ import {Box} from "@mui/system";
 
 export default function BlockComponent(props) {
 
+    const block = props.block
     const [content, setContent] = useState(props.block.content)
-
+    
+    const handleChange = (data) => {
+        setContent(data)
+        props.onCange(block)
+    }
+    const handleAddAbove = () => {
+        //props.onAddAbove(block)
+    }
+    const handleAddBelow = () => {
+        //props.onAddBelow(block)
+    }
+    const handleMoveDown = () => {
+        //props.onMoveDown(block)
+    }
+    const handleMoveUp = () => {
+        //props.onMoveUp(block)
+    }
+    const handleDelete = () => {
+        //props.onDelete(block)
+    }
+    
     return (
         <div style={{marginLeft:'10%', marginBottom:'10px' }}>
             <Accordion sx={{ width:'80%', borderRadius: '10px' }}>
@@ -21,9 +42,8 @@ export default function BlockComponent(props) {
                 </AccordionSummary>
                 <AccordionDetails sx={{display: 'flex', justifyContent: 'center'}}>
                     <Box sx={{width:'100%', borderRadius: '10px'}}>
-                        <Wysiwyg sx={{marginLeft:'10%'}} content={content} onChange={(data) => setContent(data)}/>
+                        <Wysiwyg sx={{marginLeft:'10%'}} content={content} onChange={handleChange}/>
                     </Box>
-
                 </AccordionDetails>
             </Accordion>
             {/*<Accordion sx={{ marginTop: '70px', marginBottom: '0', marginLeft: '20px', marginRight: '20px', borderRadius: '10px' }}>

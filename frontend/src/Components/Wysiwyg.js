@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import {EditorState, ContentState, convertFromHTML} from 'draft-js';
 import {Editor}  from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
-import {toolbar} from "../Configs/wysiwyg.toolbar.config";
+import {toolbar} from "../Config/wysiwyg.toolbar.config";
 
 export default function Wysiwyg(props){
 
