@@ -1,4 +1,4 @@
-import {instance} from "./Configs/api.config";
+import {instance} from "./Config/api.config";
 
 export default class Api {
     async login(email) {

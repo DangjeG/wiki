@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import {Button, FormControl, InputLabel, Input, Typography, TextField, styled} from "@mui/material";
-import { api } from "../Configs/app.config";
+import { api } from "../Config/app.config";
 import "../Styles/Login.css";
 import "../Styles/BaseColors.css";
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';

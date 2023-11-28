@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {api} from "../Configs/app.config";
+import {api} from "../Config/app.config";
 import {Box, List, ListItemButton, ListItemText, ListSubheader, Tooltip} from "@mui/material";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";

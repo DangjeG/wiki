@@ -1,6 +1,6 @@
 import {Table} from "react-bootstrap";
 import React, {useEffect, useState} from "react"
-import {api} from "../Configs/app.config";
+import {api} from "../Config/app.config";
 import {Box} from "@mui/system";
 import {Tooltip} from "@mui/material";
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';

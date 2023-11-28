@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {api} from "../Configs/app.config";
+import {api} from "../Config/app.config";
 import BlockComponent from "../Components/Block";
 import Button from "@mui/material/Button";
 import Sidebar from "../Components/Sidebar";
@@ -9,19 +9,26 @@ import AddIcon from "@mui/icons-material/Add";
 
 export default function WorkspaceDocs (props){
 
+    const [uncommented, setUncommented] = useState(false)
+    const [blocks, setBlocks] = useState(null);
+    const [documentID, setDocumentID] = useState(null)
+    /*let interval = setInterval(() => console.log("hello"), 1000)*/
+
     useEffect(() => {
         if (props.workspace_id === "")
             window.location.hash = "#workspace/select"
+
     }, []);
 
-    const [uncommented, setUncommented] = useState(false)
-    const [sidebarOpen, setSidebarOpen] = React.useState(false);
-    const [blocks, setBlocks] = useState([]);
-    const [documentID, setDocumentID] = useState()
-    /*let interval = setInterval(() => console.log("hello"), 1000)*/
-
-    const toggleSidebar = () => {
-        setSidebarOpen(!sidebarOpen);
+    const fetchBlocks = async (ID) => {
+        try {
+            const response = await api.getBlocks(ID)
+            setBlocks(response)
+            setDocumentID(ID)
+        }
+        catch (e){
+            console.log(e)
+        }
     };
 
 
@@ -29,6 +36,7 @@ export default function WorkspaceDocs (props){
         if (!uncommented) {
             {
                 setUncommented(true)
+                setTimeout(handleSave, 3000)
             }
         }
     }
@@ -40,33 +48,22 @@ export default function WorkspaceDocs (props){
         setUncommented(false)
     }
 
-    const fetchData = async (ID) => {
-        try {
-            const response = await api.getBlocks(ID)
-            setBlocks(response)
-            setDocumentID(ID)
-        }
-        catch (e){
-            console.log(e)
-        }
-    };
-
     const switchDocument = (ID) => {
         setBlocks([])
-        fetchData(ID);
+        fetchBlocks(ID);
     }
 
     const handleAdd = async () => {
         await api.addBlock(documentID,0 , "TEXT")
-        fetchData(documentID)
+        fetchBlocks(documentID)
         setUncommented(true)
     }
- 
+
     return (
         <>
             <Grid container spacing={0} style={{ marginTop:'70px', height: '100vh' }}>
                 <Grid item xs={3}>
-                    <Sidebar onSelect={switchDocument} workspaceID={props.workspace_id} open={sidebarOpen} onClose={toggleSidebar}/>
+                    <Sidebar onSelect={switchDocument} workspaceID={props.workspace_id}/>
                 </Grid>
                 <Grid item xs={9} sx={{ borderLeft: '1px solid #443C69', marginTop:'10px' }}>
                     <Button id="base-button" disabled={!uncommented} sx={{marginTop:'20px', marginBottom:'20px', marginLeft: '80%'}} onClick={handleSave}>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -14,10 +14,12 @@ import "../Styles/Navbar.css"
 
 export default function AppNavbar(props) {
     const [anchorEl, setAnchorEl] = React.useState(null);
+    const user = useContext()
 
     const handleMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
     };
+
 
     const handleMenuClose = () => {
         setAnchorEl(null);

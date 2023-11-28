@@ -19,7 +19,7 @@ export default function TestPage(){
     return (
         <>
             {blocks.map((item) => {
-                return <BlockComponent block={item}/>
+                return <BlockComponent block={item} onCange={()=>{}}/>
             })}
 
         </>

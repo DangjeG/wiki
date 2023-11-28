@@ -8,7 +8,7 @@ import ButtonAddUser from "../Components/ButtonAddForUserTable";
 import ButtonAddOrganization from "../Components/ButtonAddForOrganizationsTable";
 import OrganizationsTable from '../Components/OrganizationsTable';
 import {Grid} from "@mui/material";
-import {api} from "../Configs/app.config";
+import {api} from "../Config/app.config";
 
 export default function Admin() {
     const [activeTab, setActiveTab] = useState('users');
