@@ -2,10 +2,8 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
-from pydantic import constr
-
 from wiki.models import WikiBase
-from wiki.wiki_workspace.block.model import TypeBlock
+from wiki.wiki_workspace.block.enums import TypeBlock
 
 
 class CreateBlock(WikiBase):

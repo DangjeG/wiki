@@ -88,8 +88,7 @@ class GroupRepository(BaseRepository):
         return result
 
     @menage_db_commit_method(CommitMode.FLUSH)
-    async def add_user_in_group(self, group_id: UUID, user: User):
-        group = await self.get_group_by_id(group_id)
+    async def add_user_in_group(self, group: Group, user: User):
         user_group = await self.get_user_group(group, user)
         if user_group is not None:
             raise self._user_already_member_group_exception

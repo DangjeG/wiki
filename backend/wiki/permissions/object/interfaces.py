@@ -1,28 +1,31 @@
 from abc import abstractmethod
-from uuid import UUID
 
-from wiki.permissions.object.enums import ObjectPermissionMode
-from wiki.permissions.object.general.models import GeneralObjectPermissionMixin
-from wiki.permissions.object.group.models import GroupObjectPermissionMixin
-from wiki.permissions.object.individual.models import IndividualObjectPermissionMixin
-from wiki.wiki_api_client.enums import ResponsibilityType
+from wiki.permissions.object.schemas import (
+    CreateGeneralObjectPermission,
+    CreateGroupObjectPermission,
+    CreateIndividualObjectPermission, BaseObjectPermissionInfo
+)
+from wiki.wiki_workspace.block.schemas import BlockInfoResponse
+from wiki.wiki_workspace.document.schemas import DocumentInfoResponse
+from wiki.wiki_workspace.schemas import WorkspaceInfoResponse
 
 
 class IGenObjectPermission:
     @abstractmethod
     def gen_general_object_permission(self,
-                                      mode: ObjectPermissionMode,
-                                      required_responsibility: ResponsibilityType) -> GeneralObjectPermissionMixin:
+                                      create_permission: CreateGeneralObjectPermission):
         pass
 
     @abstractmethod
-    def gen_group_object_permission(self,
-                                    mode: ObjectPermissionMode,
-                                    group_id: UUID) -> GroupObjectPermissionMixin:
+    def gen_group_object_permission(self, create_permission: CreateGroupObjectPermission):
         pass
 
     @abstractmethod
-    def gen_individual_object_permission(self,
-                                         mode: ObjectPermissionMode,
-                                         user_id: UUID) -> IndividualObjectPermissionMixin:
+    def gen_individual_object_permission(self, create_permission: CreateIndividualObjectPermission):
+        pass
+
+
+class IGetPermissionInfo:
+    @abstractmethod
+    def get_permission_info(self) -> BaseObjectPermissionInfo:
         pass
