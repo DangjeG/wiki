@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from sqlalchemy import Column, Uuid, String, ForeignKey, Float
 from uuid_extensions import uuid7
 
@@ -14,3 +16,4 @@ class Asset(Base, DeletedMixin):
 
     uploader_user_id = Column(ForeignKey("user.id"), nullable=False)
     workspace_id = Column(ForeignKey("workspace.id"), nullable=False)
+

@@ -14,7 +14,7 @@ import "../Styles/Navbar.css"
 
 export default function AppNavbar(props) {
     const [anchorEl, setAnchorEl] = React.useState(null);
-    const user = useContext()
+    /*const user = useContext()*/
 
     const handleMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);

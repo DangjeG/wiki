@@ -88,6 +88,11 @@ components:
           format: uuid
           title: Id
           type: string
+        link:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Link
         position:
           title: Position
           type: integer
@@ -138,6 +143,16 @@ components:
       required:
       - file
       title: Body_create_and_upload_asset_api_v1_asset_storage_asset_upload_post
+      type: object
+    Body_update_block_data_api_v1_blocks_data_file_put:
+      properties:
+        file:
+          format: binary
+          title: File
+          type: string
+      required:
+      - file
+      title: Body_update_block_data_api_v1_blocks_data_file_put
       type: object
     CreateBlock:
       properties:
@@ -986,20 +1001,6 @@ components:
           - $ref: '#/components/schemas/ObjectPermissionMode'
           - type: 'null'
       title: UpdateBaseObjectPermission
-      type: object
-    UpdateBlockData:
-      properties:
-        block_id:
-          format: uuid
-          title: Block Id
-          type: string
-        content:
-          title: Content
-          type: string
-      required:
-      - block_id
-      - content
-      title: UpdateBlockData
       type: object
     UpdateBlockInfo:
       properties:
@@ -1984,37 +1985,7 @@ paths:
       - WikiApiKey: []
       - WikiAccessToken: []
       - WikiBearer: []
-      summary: Get data block by id block
-      tags:
-      - WorkspaceBlocks
-    put:
-      operationId: update_block_data_api_v1_blocks_data_put
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateBlockData'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BlockDataResponse'
-          description: Successful Response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-          description: Validation Error
-      security:
-      - WikiRootApiKey: []
-      - WikiApiKey: []
-      - WikiApiKey: []
-      - WikiAccessToken: []
-      - WikiBearer: []
-      summary: Update data document block
+      summary: Get data block by id
       tags:
       - WorkspaceBlocks
   /api/v1/blocks/data/all:
@@ -2068,6 +2039,97 @@ paths:
       - WikiAccessToken: []
       - WikiBearer: []
       summary: Get all data blocks by id document
+      tags:
+      - WorkspaceBlocks
+  /api/v1/blocks/data/file:
+    put:
+      operationId: update_block_data_api_v1_blocks_data_file_put
+      parameters:
+      - in: query
+        name: block_id
+        required: true
+        schema:
+          format: uuid
+          title: Block Id
+          type: string
+      - in: query
+        name: type_block
+        required: false
+        schema:
+          allOf:
+          - $ref: '#/components/schemas/TypeBlock'
+          default: FILE
+          title: Type Block
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_update_block_data_api_v1_blocks_data_file_put'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockDataResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Update file data document block
+      tags:
+      - WorkspaceBlocks
+  /api/v1/blocks/data/text:
+    put:
+      operationId: update_block_data_api_v1_blocks_data_text_put
+      parameters:
+      - in: query
+        name: block_id
+        required: true
+        schema:
+          format: uuid
+          title: Block Id
+          type: string
+      - in: query
+        name: type_block
+        required: true
+        schema:
+          $ref: '#/components/schemas/TypeBlock'
+      - in: query
+        name: content
+        required: true
+        schema:
+          title: Content
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockDataResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Update text data document block
       tags:
       - WorkspaceBlocks
   /api/v1/blocks/info:
@@ -2556,6 +2618,38 @@ paths:
       summary: Get all document templates
       tags:
       - DocumentTemplate
+  /api/v1/export_document/:
+    get:
+      operationId: download_docx_api_v1_export_document__get
+      parameters:
+      - in: query
+        name: document_id
+        required: true
+        schema:
+          format: uuid
+          title: Document Id
+          type: string
+      responses:
+        '202':
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Export Docx
+      tags:
+      - ExportDocument
   /api/v1/permission_domain/:
     post:
       operationId: create_permission_domain_api_v1_permission_domain__post

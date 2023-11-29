@@ -1,4 +1,5 @@
 from wiki.wiki_storage.services.base import BaseWikiStorageService
+from wiki.wiki_workspace.block.model import TypeBlock
 from wiki.wiki_workspace.block.repository import BlockRepository
 from wiki.wiki_workspace.block.schemas import BlockDataResponse
 from wiki.wiki_workspace.document.repository import DocumentRepository

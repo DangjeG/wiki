@@ -18,6 +18,8 @@ stackprinter = "^0.2.10"
 lakefs-client = "^1.0.0"
 fastapi-pagination = "^0.12.11"
 yadisk-async = "^1.4.4"
+spire = "^0.4.2"
+spire-doc = "^11.10.0"
 
 [build-system]
 requires = ["poetry-core"]

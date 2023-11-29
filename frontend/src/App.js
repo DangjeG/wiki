@@ -31,12 +31,12 @@ export default function App() {
         fetchData();
     }, []);
 
-    const UserContext = React.createContext()
+   /* const UserContext = React.createContext()*/
 
         return (
-            <UserContext.Provider value={user}>
+           /* <UserContext.Provider value={user}>*/
                 <HashRouter>
-                    <AppNavbar/>
+                    <AppNavbar user={user}/>
                     <Routes>
                         <Route path={"/"} element={<Home/>}/>
                         <Route path={"/login"} element={<Login/>}/>
@@ -57,6 +57,6 @@ export default function App() {
                         <Route path={"/test/*"} element={<TestPage/>}/>
                     </Routes>
                 </HashRouter>
-            </UserContext.Provider>
+           /* </UserContext.Provider>*/
         )
 }

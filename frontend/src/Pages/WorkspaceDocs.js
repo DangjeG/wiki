@@ -10,15 +10,37 @@ import AddIcon from "@mui/icons-material/Add";
 export default function WorkspaceDocs (props){
 
     const [uncommented, setUncommented] = useState(false)
-    const [blocks, setBlocks] = useState(null);
+    const [blocks, setBlocks] = useState([]);
     const [documentID, setDocumentID] = useState(null)
     /*let interval = setInterval(() => console.log("hello"), 1000)*/
+
+    const [blockVersions, setBlockVersions] = useState([])
 
     useEffect(() => {
         if (props.workspace_id === "")
             window.location.hash = "#workspace/select"
 
     }, []);
+
+    const fetchVersions = async (block_id) => {
+        let versionsInfo = []
+        let versions = []
+        try {
+            versionsInfo = await api.getBlockVersions(block_id)
+        }
+        catch (e){
+            console.log(e)
+        }
+        for (let version of versionsInfo){
+            try {
+                version.push(api.getBlockData(block_id, version.commit_id))
+            }
+            catch (e){
+                console.log(e)
+            }
+        }
+        setBlockVersions(versions)
+    }
 
     const fetchBlocks = async (ID) => {
         try {
@@ -31,26 +53,26 @@ export default function WorkspaceDocs (props){
         }
     };
 
-
     const handleChange = () => {
         if (!uncommented) {
             {
                 setUncommented(true)
-                setTimeout(handleSave, 3000)
             }
         }
     }
 
     const handleSave = async () => {
+        setUncommented(false)
         for (let item of blocks)
             await api.updateBlockData(item.id, item.content)
         await api.saveDocument(documentID)
-        setUncommented(false)
     }
 
     const switchDocument = (ID) => {
         setBlocks([])
         fetchBlocks(ID);
+        fetchVersions(blocks[0].id)
+        alert(blockVersions.length)
     }
 
     const handleAdd = async () => {
@@ -80,11 +102,10 @@ export default function WorkspaceDocs (props){
                         </Tooltip>
                     </Button>
                     {blocks.map((item) =>{
-                        return <BlockComponent onCange={handleChange} block={item}/>
+                        return <BlockComponent onChange={handleChange} block={item}/>
                     })}
                 </Grid>
             </Grid>
-
         </>
     )
 }

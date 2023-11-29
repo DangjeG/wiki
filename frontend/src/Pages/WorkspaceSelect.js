@@ -5,13 +5,14 @@ import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
 import {Form, Modal} from "react-bootstrap";
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
+import ButtonAddWorkspace from "../Components/ModalButton/ButtonAddWorkspace";
 
 export default function WorkspaceSelect (props) {
 
     const [workspaces, setWorkspaces] = useState([]);
-    const [newWorkspace, setNewWorkspace] = useState([]);
-    const [show, setShow] = useState(false);
-    const fetchData = async () => {
+
+
+    const fetchWorkspaces = async () => {
         try {
             const response = await api.getWorkspaces();
             setWorkspaces(response);
@@ -22,7 +23,7 @@ export default function WorkspaceSelect (props) {
 
     useEffect(() => {
         props.onSelect("")
-        fetchData();
+        fetchWorkspaces();
     }, []);
 
     const handleClick = (id) => {
@@ -30,17 +31,10 @@ export default function WorkspaceSelect (props) {
         window.location.hash = "#workspace/docs"
     }
 
-
-    const handleClose = () => {
-        setShow(false)
-    };
-    const handleShow = () => setShow(true);
-
-    const handleAdd = async () => {
+    const handleSubmit = async (newWorkspace) => {
         await api.addWorkspace(newWorkspace)
-        handleClose()
         setWorkspaces([])
-        fetchData()
+        fetchWorkspaces()
     }
 
     return (
@@ -56,17 +50,7 @@ export default function WorkspaceSelect (props) {
                 subheader={
                     <ListSubheader component="div" id="nested-list-subheader"  sx={{display: 'flex', justifyContent: 'space-between', marginTop: '10px'}}>
                         Список проектов
-
-                        <Button sx={{border: 'none', outline: 'none' }}
-                                variant="outlined" onClick={handleShow}>
-                            <Tooltip sx={{width: '10px', height: '10px'}}
-                                     title="Добавить проект"
-                                     placement="top"
-                                     arrow>
-                                <AddIcon sx={{color: '#000000'}}/>
-                            </Tooltip>
-                        </Button>
-
+                        <ButtonAddWorkspace onSubmit={handleSubmit}/>
                     </ListSubheader>
                 }
             >
@@ -79,32 +63,6 @@ export default function WorkspaceSelect (props) {
                     </ListItemButton>
                 )}
             </List>
-
-            <Modal show={show} onHide={handleClose}
-                   style={{overflow: 'auto', width: '400px', height: '550px', position: 'absolute',
-                       left: '50%',
-                       top: '55%',
-                       transform: 'translate(-50%, -50%)',
-                       display: 'flex',
-                       justifyContent: 'center',
-                       alignItems: 'center',}}>
-                <Modal.Header>
-                    <Modal.Title>Добавить проект</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Название</Form.Label>
-                            <Form.Control value={newWorkspace} onChange={(event) => setNewWorkspace(event.target.value)}/>
-                        </Form.Group>
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button id="base-button" variant="outlined" onClick={handleClose}>Закрыть</Button>
-                    <Box sx={{ marginLeft: '10px' }}></Box>
-                    <Button id="accent-button" variant="contained" onClick={handleAdd}>Сохранить</Button>
-                </Modal.Footer>
-            </Modal>
         </>
     )
 }

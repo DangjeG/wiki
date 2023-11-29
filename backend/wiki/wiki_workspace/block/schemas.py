@@ -19,6 +19,7 @@ class UpdateBlockInfo(WikiBase):
 
 class UpdateBlockData(WikiBase):
     block_id: UUID
+    type_block: TypeBlock
     content: str  # WYSIWYG
 
 
@@ -32,3 +33,4 @@ class BlockInfoResponse(WikiBase):
 
 class BlockDataResponse(BlockInfoResponse):
     content: str  # WYSIWYG
+    link: Optional[str] = None

@@ -1,23 +1,17 @@
 import React, {useState} from 'react';
-import "../Styles/AdminTools.css";
+import "../../Styles/AdminTools.css";
 import AddIcon from "@mui/icons-material/Add";
-import {Box, Button, Checkbox, FormControlLabel, FormLabel, Radio, RadioGroup, Tooltip} from "@mui/material";
+import {Box, Button, FormControlLabel, FormLabel, Radio, RadioGroup, Tooltip} from "@mui/material";
 import {Form, Modal} from "react-bootstrap";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import {api} from "../Config/app.config";
+import {api} from "../../Config/app.config";
 
 
-export default function ButtonAddUser() {
+export default function ButtonApproveUser(props) {
 
     const [show, setShow] = useState(false);
-    const [isSecondNameExist, setExist] = useState(true);
-    const [email, setEmail] = useState("");
-    const [username, setUsername] = useState("");
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [secondName, setSecondName] = useState("");
+    const [description, setDescription] = useState("")
     const [responsibility, setResponsibility] = useState('');
-    const [position, setPosition] = useState("")
 
     const handleClose = () => {
         setShow(false);
@@ -27,16 +21,16 @@ export default function ButtonAddUser() {
         setShow(true);
     };
 
-    const handleCreate = () => {
+    const handleApprove = () => {
         const fetchData = async () => {
             try {
-                await api.createApprovedUser(email, username, firstName, lastName, secondName,position, responsibility)
+                await api.approveUser(props.username, responsibility, description)
             } catch (error) {
                 console.log(error);
             }
         };
         fetchData()
-        setShow(false);
+        setShow(false)
     };
 
     return (
@@ -44,7 +38,7 @@ export default function ButtonAddUser() {
             <Button id="button-add"
                     variant="outlined"
                     onClick={handleShow}>
-                <Tooltip sx={{width:'15px', height:'15px', marginBottom: '5px', marginRight:'5px'}}
+                <Tooltip sx={{width: '8%', height: '-5%', marginBottom: '2%', marginRight: '1%'}}
                          title="Добавить пользователя"
                          placement="top"
                          arrow>
@@ -62,70 +56,15 @@ export default function ButtonAddUser() {
                        alignItems: 'center',
                    }}>
                 <Modal.Header>
-                    <Modal.Title>Добавить пользователя</Modal.Title>
+                    <Modal.Title>Описание</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
                         <Form.Group className="mb-3">
                             <Form.Label>Email</Form.Label>
                             <Form.Control
-                                onChange={(event) => setEmail(event.target.value)}
+                                onChange={(event) => setDescription(event.target.value)}
                                 as="textarea"
-                                rows={1}
-                            />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Логин</Form.Label>
-                            <Form.Control
-                                onChange={(event) => setUsername(event.target.value)}
-                                as="textarea"
-                                rows={1}
-                            />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Имя</Form.Label>
-                            <Form.Control
-                                onChange={(event) => setFirstName(event.target.value)}
-                                as="textarea"
-                                rows={1}
-                            />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Фамилия</Form.Label>
-                            <Form.Control
-                                onChange={(event) => setLastName(event.target.value)}
-                                as="textarea"
-                                rows={1}
-                            />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Отчество</Form.Label>
-                            <Form.Control
-                                onChange={(event) => setSecondName(event.target.value)}
-                                disabled={isSecondNameExist}
-                                required={!isSecondNameExist}
-                                as="textarea"
-                                rows={1}
-                            />
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={!isSecondNameExist}
-                                        onClick={() => {
-                                            setExist(!isSecondNameExist);
-                                            setSecondName("");
-                                        }}
-                                    />
-                                }
-                                label="Отчество существует"
-                            />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Должность</Form.Label>
-                            <Form.Control
-                                onChange={(event) => setPosition(event.target.value)}
-                                as="textarea"
-                                rows={1}
                             />
                         </Form.Group>
                         <Form.Group className="mb-3">
@@ -135,7 +74,12 @@ export default function ButtonAddUser() {
                                 <FormControlLabel value="VIEWER" control={<Radio/>}
                                                   label={
                                                       <span>ЗРИТЕЛЬ
-                                                          <Tooltip sx={{width:'15px', height:'15px', marginBottom: '5px', marginRight:'5px'}}
+                                                          <Tooltip sx={{
+                                                              width: '15%',
+                                                              marginBottom: '4%',
+                                                              marginLeft: '3%',
+                                                              color: '#3b3f42'
+                                                          }}
                                                                    title="лох"
                                                                    placement="top"
                                                                    arrow>
@@ -146,7 +90,12 @@ export default function ButtonAddUser() {
                                 <FormControlLabel value="EDITOR" control={<Radio/>}
                                                   label={
                                                       <span>РЕДАКТОР
-                                                          <Tooltip sx={{width:'15px', height:'15px', marginBottom: '5px', marginRight:'5px'}}
+                                                          <Tooltip sx={{
+                                                              width: '15%',
+                                                              marginBottom: '4%',
+                                                              marginLeft: '3%',
+                                                              color: '#3b3f42'
+                                                          }}
                                                                    title="не лох"
                                                                    placement="top"
                                                                    arrow>
@@ -157,7 +106,12 @@ export default function ButtonAddUser() {
                                 <FormControlLabel value="ADMIN" control={<Radio/>}
                                                   label={
                                                       <span>АДМИН
-                                                          <Tooltip sx={{width:'15px', height:'15px', marginBottom: '5px', marginRight:'5px'}}
+                                                          <Tooltip sx={{
+                                                              width: '15%',
+                                                              marginBottom: '4%',
+                                                              marginLeft: '3%',
+                                                              color: '#3b3f42'
+                                                          }}
                                                                    title="крутой чел"
                                                                    placement="top"
                                                                    arrow>
@@ -172,7 +126,7 @@ export default function ButtonAddUser() {
                 <Modal.Footer>
                     <Button id="base-button" variant="outlined" onClick={handleClose}>Закрыть</Button>
                     <Box sx={{marginLeft: '10px'}}></Box>
-                    <Button id="accent-button" variant="contained" onClick={handleCreate}>Сохранить</Button>
+                    <Button id="accent-button" variant="contained" onClick={handleApprove}>Сохранить</Button>
                 </Modal.Footer>
             </Modal>
         </div>

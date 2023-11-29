@@ -9,6 +9,7 @@ from wiki.permissions.object.general.models import GeneralObjectPermissionMixin,
 from wiki.permissions.object.group.models import GroupObjectPermissionMixin, GroupBlockPermission
 from wiki.permissions.object.individual.models import IndividualObjectPermissionMixin, IndividualBlockPermission
 from wiki.permissions.object.interfaces import IGenObjectPermission
+
 from wiki.permissions.object.schemas import (
     CreateGeneralObjectPermission,
     CreateGroupObjectPermission,
