@@ -15,5 +15,5 @@ async def get_workspace_info(workspace: UUID, session: AsyncSession):
     return WorkspaceInfoResponse(
         id=workspace_db.id,
         title=workspace_db.title,
-        owner_user=await get_user_info(workspace_db.owner_user_id, session, is_full=False)
+        owner_user=await get_user_info(workspace_db.owner_user_id, session, is_full=False),
     )

@@ -19,7 +19,6 @@ from wiki.wiki_api_client.enums import ResponsibilityType
 from wiki.wiki_storage.deps import get_storage_client
 from wiki.wiki_storage.schemas import CommitMetadataScheme
 from wiki.wiki_storage.services.versioning import VersioningWikiStorageService
-from wiki.wiki_workspace.block.model import Block
 from wiki.wiki_workspace.block.repository import BlockRepository
 from wiki.wiki_workspace.block.schemas import CreateBlock
 from wiki.wiki_workspace.block.templates import get_template_first_block

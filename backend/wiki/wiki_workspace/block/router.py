@@ -142,7 +142,7 @@ async def delete_block(
 
 
 @block_router.get(
-    "/data",
+    "/data/all",
     response_model=list[BlockDataResponse],
     status_code=status.HTTP_200_OK,
     summary="Get all data blocks by id document"
@@ -165,10 +165,10 @@ async def get_blocks(
 
 
 @block_router.get(
-    "/{block_id}/data",
+    "/data",
     response_model=BlockDataResponse,
     status_code=status.HTTP_200_OK,
-    summary="Get data block by id document"
+    summary="Get data block by id block"
 )
 async def get_block_by_id(
         block_id: UUID,

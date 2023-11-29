@@ -1346,10 +1346,13 @@ components:
           type: string
         owner_user:
           $ref: '#/components/schemas/UserBaseInfoResponse'
+        permission_mode:
+          $ref: '#/components/schemas/ObjectPermissionMode'
         title:
           title: Title
           type: string
       required:
+      - permission_mode
       - id
       - title
       - owner_user
@@ -1943,21 +1946,14 @@ paths:
       - WorkspaceBlocks
   /api/v1/blocks/data:
     get:
-      description: '## Getting document blocks data
-
-
-        :param document_id: Document Identifier
-
-        :param version_commit_id: Specify the commit identifier of a particular version.
-        If None, get the latest version of the data.'
-      operationId: get_blocks_api_v1_blocks_data_get
+      operationId: get_block_by_id_api_v1_blocks_data_get
       parameters:
       - in: query
-        name: document_id
+        name: block_id
         required: true
         schema:
           format: uuid
-          title: Document Id
+          title: Block Id
           type: string
       - in: query
         name: version_commit_id
@@ -1974,10 +1970,7 @@ paths:
           content:
             application/json:
               schema:
-                items:
-                  $ref: '#/components/schemas/BlockDataResponse'
-                title: Response Get Blocks Api V1 Blocks Data Get
-                type: array
+                $ref: '#/components/schemas/BlockDataResponse'
           description: Successful Response
         '422':
           content:
@@ -1991,7 +1984,7 @@ paths:
       - WikiApiKey: []
       - WikiAccessToken: []
       - WikiBearer: []
-      summary: Get all data blocks by id document
+      summary: Get data block by id block
       tags:
       - WorkspaceBlocks
     put:
@@ -2022,6 +2015,59 @@ paths:
       - WikiAccessToken: []
       - WikiBearer: []
       summary: Update data document block
+      tags:
+      - WorkspaceBlocks
+  /api/v1/blocks/data/all:
+    get:
+      description: '## Getting document blocks data
+
+
+        :param document_id: Document Identifier
+
+        :param version_commit_id: Specify the commit identifier of a particular version.
+        If None, get the latest version of the data.'
+      operationId: get_blocks_api_v1_blocks_data_all_get
+      parameters:
+      - in: query
+        name: document_id
+        required: true
+        schema:
+          format: uuid
+          title: Document Id
+          type: string
+      - in: query
+        name: version_commit_id
+        required: false
+        schema:
+          anyOf:
+          - maxLength: 64
+            minLength: 64
+            type: string
+          - type: 'null'
+          title: Version Commit Id
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/BlockDataResponse'
+                title: Response Get Blocks Api V1 Blocks Data All Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all data blocks by id document
       tags:
       - WorkspaceBlocks
   /api/v1/blocks/info:
@@ -2090,49 +2136,6 @@ paths:
       - WikiAccessToken: []
       - WikiBearer: []
       summary: Get all publish data blocks by id document
-      tags:
-      - WorkspaceBlocks
-  /api/v1/blocks/{block_id}/data:
-    get:
-      operationId: get_block_by_id_api_v1_blocks__block_id__data_get
-      parameters:
-      - in: path
-        name: block_id
-        required: true
-        schema:
-          format: uuid
-          title: Block Id
-          type: string
-      - in: query
-        name: version_commit_id
-        required: false
-        schema:
-          anyOf:
-          - maxLength: 64
-            minLength: 64
-            type: string
-          - type: 'null'
-          title: Version Commit Id
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BlockDataResponse'
-          description: Successful Response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-          description: Validation Error
-      security:
-      - WikiRootApiKey: []
-      - WikiApiKey: []
-      - WikiApiKey: []
-      - WikiAccessToken: []
-      - WikiBearer: []
-      summary: Get data block by id document
       tags:
       - WorkspaceBlocks
   /api/v1/document/:

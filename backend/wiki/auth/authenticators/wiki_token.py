@@ -10,6 +10,7 @@ from wiki.auth.schemas import AccessTokenData
 from wiki.common.exceptions import WikiException, WikiErrorCode
 from wiki.common.schemas import WikiUserHandlerData
 from wiki.config import settings
+from wiki.wiki_api_client.schemas import WikiApiClientInfoResponse
 
 
 class WikiTokenAuthenticatorInterface(BaseTokenAuthenticatorInterface):
@@ -59,5 +60,5 @@ class WikiTokenAuthenticatorInterface(BaseTokenAuthenticatorInterface):
             last_name=user.last_name,
             second_name=user.second_name,
             position=user.position,
-            wiki_api_client=api_client
+            wiki_api_client=api_client.get_response_info()
         )

@@ -7,7 +7,7 @@ from wiki.auth.enums import AuthorizationMode
 from wiki.common.exceptions import WikiErrorCode
 from wiki.models import WikiBase
 from wiki.wiki_api_client.enums import ResponsibilityType
-from wiki.wiki_api_client.models import WikiApiClient
+from wiki.wiki_api_client.schemas import WikiApiClientInfoResponse
 
 
 class WikiErrorResponse(BaseModel):
@@ -48,4 +48,4 @@ class WikiUserHandlerData(ExternalUserHandlerData):
     last_name: str
     second_name: Optional[str] = None
     position: Optional[str] = None
-    wiki_api_client: Optional[WikiApiClient | FakeWikiApiClient]
+    wiki_api_client: Optional[WikiApiClientInfoResponse | FakeWikiApiClient]
