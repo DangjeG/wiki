@@ -1,7 +1,7 @@
 from typing import Optional
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import select, and_
 from starlette import status
 
 from wiki.common.exceptions import WikiException, WikiErrorCode
@@ -28,8 +28,14 @@ class DocumentRepository(BaseRepository):
     )
 
     @menage_db_not_found_result_method(NotFoundResultMode.EXCEPTION, ex=_document_not_found_exception)
-    async def get_document_by_id(self, document_id: UUID) -> Document:
-        return await self.session.get(Document, document_id)
+    async def get_document_by_id(self, document_id: UUID, is_only_existing: bool = True) -> Document:
+        whereclause = [Document.id == document_id]
+        if is_only_existing:
+            whereclause.append(Document.is_deleted == False)
+
+        select_document = select(Document).where(and_(*whereclause))
+        document_query = (await self.session.execute(select_document)).scalar()
+        return document_query
 
     @menage_db_commit_method(CommitMode.FLUSH)
     async def create_document(self,

@@ -3,22 +3,19 @@ from uuid import UUID
 from sqlalchemy import Column, Uuid, ForeignKey, String, Integer
 from uuid_extensions import uuid7
 
-from wiki.common.enums import WikiBaseEnum
 from wiki.common.models import EnabledDeletedMixin
 from wiki.database.core import Base
-from wiki.permissions.object.enums import ObjectPermissionMode
 from wiki.permissions.object.general.models import GeneralObjectPermissionMixin, GeneralBlockPermission
 from wiki.permissions.object.group.models import GroupObjectPermissionMixin, GroupBlockPermission
 from wiki.permissions.object.individual.models import IndividualObjectPermissionMixin, IndividualBlockPermission
 from wiki.permissions.object.interfaces import IGenObjectPermission
-from wiki.wiki_api_client.enums import ResponsibilityType
 
-
-class TypeBlock(WikiBaseEnum):
-    IMG = "IMG"
-    TEXT = "TEXT"
-    FILE = "FILE"
-    VIDEO = "VIDEO"
+from wiki.permissions.object.schemas import (
+    CreateGeneralObjectPermission,
+    CreateGroupObjectPermission,
+    CreateIndividualObjectPermission
+)
+from wiki.wiki_workspace.block.enums import TypeBlock
 
 
 class Block(Base, EnabledDeletedMixin, IGenObjectPermission):
@@ -37,29 +34,23 @@ class Block(Base, EnabledDeletedMixin, IGenObjectPermission):
         self.position = position
         self.type_block = str(type_block)
 
-    def gen_general_object_permission(self,
-                                      mode: ObjectPermissionMode,
-                                      required_responsibility: ResponsibilityType) -> GeneralObjectPermissionMixin:
+    def gen_general_object_permission(self, create_permission: CreateGeneralObjectPermission) -> GeneralObjectPermissionMixin:
         return GeneralBlockPermission(
-            mode=str(mode),
-            required_responsibility=str(required_responsibility),
+            mode=str(create_permission.mode),
+            required_responsibility=str(create_permission.required_responsibility),
             object_id=self.id
         )
 
-    def gen_group_object_permission(self,
-                                    mode: ObjectPermissionMode,
-                                    group_id: UUID) -> GroupObjectPermissionMixin:
+    def gen_group_object_permission(self, create_permission: CreateGroupObjectPermission) -> GroupObjectPermissionMixin:
         return GroupBlockPermission(
-            mode=str(mode),
-            group_id=group_id,
+            mode=str(create_permission.mode),
+            group_id=create_permission.group_id,
             object_id=self.id
         )
 
-    def gen_individual_object_permission(self,
-                                         mode: ObjectPermissionMode,
-                                         user_id: UUID) -> IndividualObjectPermissionMixin:
+    def gen_individual_object_permission(self, create_permission: CreateIndividualObjectPermission) -> IndividualObjectPermissionMixin:
         return IndividualBlockPermission(
-            mode=str(mode),
-            user_id=user_id,
+            mode=str(create_permission.mode),
+            user_id=create_permission.user_id,
             object_id=self.id
         )

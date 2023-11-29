@@ -176,6 +176,18 @@ components:
       - workspace_id
       title: CreateDocument
       type: object
+    CreateGeneralObjectPermission:
+      properties:
+        mode:
+          allOf:
+          - $ref: '#/components/schemas/ObjectPermissionMode'
+          default: HIDDEN_INACCESSIBLE
+        required_responsibility:
+          $ref: '#/components/schemas/ResponsibilityType'
+      required:
+      - required_responsibility
+      title: CreateGeneralObjectPermission
+      type: object
     CreateGroup:
       properties:
         description:
@@ -193,6 +205,34 @@ components:
       required:
       - name
       title: CreateGroup
+      type: object
+    CreateGroupObjectPermission:
+      properties:
+        group_id:
+          format: uuid
+          title: Group Id
+          type: string
+        mode:
+          allOf:
+          - $ref: '#/components/schemas/ObjectPermissionMode'
+          default: HIDDEN_INACCESSIBLE
+      required:
+      - group_id
+      title: CreateGroupObjectPermission
+      type: object
+    CreateIndividualObjectPermission:
+      properties:
+        mode:
+          allOf:
+          - $ref: '#/components/schemas/ObjectPermissionMode'
+          default: HIDDEN_INACCESSIBLE
+        user_id:
+          format: uuid
+          title: User Id
+          type: string
+      required:
+      - user_id
+      title: CreateIndividualObjectPermission
       type: object
     CreatePermissionDomain:
       properties:
@@ -440,6 +480,37 @@ components:
           title: Username
       title: FrontendUserLogin
       type: object
+    GeneralObjectPermissionInfo:
+      properties:
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        id:
+          format: uuid
+          title: Id
+          type: string
+        mode:
+          $ref: '#/components/schemas/ObjectPermissionMode'
+        object_id:
+          format: uuid
+          title: Object Id
+          type: string
+        required_responsibility:
+          $ref: '#/components/schemas/ResponsibilityType'
+        updated_at:
+          format: date-time
+          title: Updated At
+          type: string
+      required:
+      - id
+      - mode
+      - object_id
+      - created_at
+      - updated_at
+      - required_responsibility
+      title: GeneralObjectPermissionInfo
+      type: object
     GroupInfo:
       properties:
         created_at:
@@ -512,6 +583,37 @@ components:
       - members
       title: GroupInfoWithUsers
       type: object
+    GroupObjectPermissionInfo:
+      properties:
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        group:
+          $ref: '#/components/schemas/GroupInfo'
+        id:
+          format: uuid
+          title: Id
+          type: string
+        mode:
+          $ref: '#/components/schemas/ObjectPermissionMode'
+        object_id:
+          format: uuid
+          title: Object Id
+          type: string
+        updated_at:
+          format: date-time
+          title: Updated At
+          type: string
+      required:
+      - id
+      - mode
+      - object_id
+      - created_at
+      - updated_at
+      - group
+      title: GroupObjectPermissionInfo
+      type: object
     GroupOptionalInfo:
       properties:
         description:
@@ -550,6 +652,61 @@ components:
           type: string
       title: HealthCheck
       type: object
+    IndividualObjectPermissionInfo:
+      properties:
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        id:
+          format: uuid
+          title: Id
+          type: string
+        mode:
+          $ref: '#/components/schemas/ObjectPermissionMode'
+        object_id:
+          format: uuid
+          title: Object Id
+          type: string
+        updated_at:
+          format: date-time
+          title: Updated At
+          type: string
+        user:
+          $ref: '#/components/schemas/UserBaseInfoResponse'
+      required:
+      - id
+      - mode
+      - object_id
+      - created_at
+      - updated_at
+      - user
+      title: IndividualObjectPermissionInfo
+      type: object
+    ObjectPermissionMode:
+      enum:
+      - HIDDEN_INACCESSIBLE
+      - INACCESSIBLE
+      - VIEW_AND_EXPORT
+      - ABILITY_USE_TEMPLATE
+      - EDITING
+      - DELETION
+      title: ObjectPermissionMode
+      type: string
+    ObjectPermissionType:
+      enum:
+      - General
+      - Group
+      - Individual
+      title: ObjectPermissionType
+      type: string
+    ObjectType:
+      enum:
+      - Workspace
+      - Document
+      - Block
+      title: ObjectType
+      type: string
     Page_DocumentTemplateInfoResponse_:
       properties:
         items:
@@ -822,6 +979,14 @@ components:
           title: Workspace Id
       title: UpdateAsset
       type: object
+    UpdateBaseObjectPermission:
+      properties:
+        mode:
+          anyOf:
+          - $ref: '#/components/schemas/ObjectPermissionMode'
+          - type: 'null'
+      title: UpdateBaseObjectPermission
+      type: object
     UpdateBlockData:
       properties:
         block_id:
@@ -850,6 +1015,18 @@ components:
       required:
       - block_id
       title: UpdateBlockInfo
+      type: object
+    UpdateGeneralObjectPermission:
+      properties:
+        mode:
+          anyOf:
+          - $ref: '#/components/schemas/ObjectPermissionMode'
+          - type: 'null'
+        required_responsibility:
+          anyOf:
+          - $ref: '#/components/schemas/ResponsibilityType'
+          - type: 'null'
+      title: UpdateGeneralObjectPermission
       type: object
     UpdatePermissionDomain:
       properties:
@@ -2376,7 +2553,7 @@ paths:
       summary: Get all document templates
       tags:
       - DocumentTemplate
-  /api/v1/permission/domain/:
+  /api/v1/permission_domain/:
     post:
       operationId: create_permission_domain_api_v1_permission_domain__post
       requestBody:
@@ -2406,7 +2583,7 @@ paths:
       - WikiBearer: []
       summary: Create a new domain permission for signup
       tags:
-      - Permissions
+      - PermissionsDomain
     put:
       operationId: update_permission_domain_api_v1_permission_domain__put
       parameters:
@@ -2454,8 +2631,8 @@ paths:
       - WikiBearer: []
       summary: Update permission domain by id or domain name
       tags:
-      - Permissions
-  /api/v1/permission/domain/all:
+      - PermissionsDomain
+  /api/v1/permission_domain/all:
     get:
       operationId: get_permission_domains_api_v1_permission_domain_all_get
       parameters:
@@ -2525,8 +2702,8 @@ paths:
       - WikiBearer: []
       summary: Get all permission domain
       tags:
-      - Permissions
-  /api/v1/permission/domain/info:
+      - PermissionsDomain
+  /api/v1/permission_domain/info:
     get:
       operationId: get_permission_domain_info_api_v1_permission_domain_info_get
       parameters:
@@ -2568,7 +2745,250 @@ paths:
       - WikiBearer: []
       summary: Get permission domain by id or domain name
       tags:
-      - Permissions
+      - PermissionsDomain
+  /api/v1/permission_object/admin/permission_type/{permission_type}/object_type/{object_type}/{object_id}:
+    post:
+      operationId: create_object_permission_api_v1_permission_object_admin_permission_type__permission_type__object_type__object_type___object_id__post
+      parameters:
+      - in: path
+        name: permission_type
+        required: true
+        schema:
+          $ref: '#/components/schemas/ObjectPermissionType'
+      - in: path
+        name: object_type
+        required: true
+        schema:
+          $ref: '#/components/schemas/ObjectType'
+      - in: path
+        name: object_id
+        required: true
+        schema:
+          format: uuid
+          title: Object Id
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              anyOf:
+              - $ref: '#/components/schemas/CreateGeneralObjectPermission'
+              - $ref: '#/components/schemas/CreateGroupObjectPermission'
+              - $ref: '#/components/schemas/CreateIndividualObjectPermission'
+              title: Create Permission
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/GeneralObjectPermissionInfo'
+                - $ref: '#/components/schemas/GroupObjectPermissionInfo'
+                - $ref: '#/components/schemas/IndividualObjectPermissionInfo'
+                title: Response Create Object Permission Api V1 Permission Object
+                  Admin Permission Type  Permission Type  Object Type  Object Type   Object
+                  Id  Post
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Create object permission
+      tags:
+      - PermissionsObject
+  /api/v1/permission_object/admin/permission_type/{permission_type}/object_type/{object_type}/{permission_id}:
+    put:
+      operationId: update_object_permission_api_v1_permission_object_admin_permission_type__permission_type__object_type__object_type___permission_id__put
+      parameters:
+      - in: path
+        name: permission_type
+        required: true
+        schema:
+          $ref: '#/components/schemas/ObjectPermissionType'
+      - in: path
+        name: object_type
+        required: true
+        schema:
+          $ref: '#/components/schemas/ObjectType'
+      - in: path
+        name: permission_id
+        required: true
+        schema:
+          format: uuid
+          title: Permission Id
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              anyOf:
+              - $ref: '#/components/schemas/UpdateBaseObjectPermission'
+              - $ref: '#/components/schemas/UpdateGeneralObjectPermission'
+              title: Update Permission
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/GeneralObjectPermissionInfo'
+                - $ref: '#/components/schemas/GroupObjectPermissionInfo'
+                - $ref: '#/components/schemas/IndividualObjectPermissionInfo'
+                title: Response Update Object Permission Api V1 Permission Object
+                  Admin Permission Type  Permission Type  Object Type  Object Type   Permission
+                  Id  Put
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Create object permission
+      tags:
+      - PermissionsObject
+  /api/v1/permission_object/general/object_type/{object_type}/object_id/:
+    get:
+      operationId: get_object_permissions_general_api_v1_permission_object_general_object_type__object_type__object_id__get
+      parameters:
+      - in: path
+        name: object_type
+        required: true
+        schema:
+          $ref: '#/components/schemas/ObjectType'
+      - in: query
+        name: object_id
+        required: true
+        schema:
+          format: uuid
+          title: Object Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/GeneralObjectPermissionInfo'
+                title: Response Get Object Permissions General Api V1 Permission Object
+                  General Object Type  Object Type  Object Id  Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all general permission by object type
+      tags:
+      - PermissionsObject
+  /api/v1/permission_object/group/{group_id}/object_type/{object_type}/:
+    get:
+      operationId: get_object_permissions_for_group_api_v1_permission_object_group__group_id__object_type__object_type___get
+      parameters:
+      - in: path
+        name: group_id
+        required: true
+        schema:
+          format: uuid
+          title: Group Id
+          type: string
+      - in: path
+        name: object_type
+        required: true
+        schema:
+          $ref: '#/components/schemas/ObjectType'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/GroupObjectPermissionInfo'
+                title: Response Get Object Permissions For Group Api V1 Permission
+                  Object Group  Group Id  Object Type  Object Type   Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all permission from group by object type
+      tags:
+      - PermissionsObject
+  /api/v1/permission_object/user/{user_id}/object_type/{object_type}/:
+    get:
+      operationId: get_object_permissions_for_user_api_v1_permission_object_user__user_id__object_type__object_type___get
+      parameters:
+      - in: path
+        name: user_id
+        required: true
+        schema:
+          format: uuid
+          title: User Id
+          type: string
+      - in: path
+        name: object_type
+        required: true
+        schema:
+          $ref: '#/components/schemas/ObjectType'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/IndividualObjectPermissionInfo'
+                title: Response Get Object Permissions For User Api V1 Permission
+                  Object User  User Id  Object Type  Object Type   Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all individual permission for user by object type
+      tags:
+      - PermissionsObject
   /api/v1/user/:
     delete:
       operationId: delete_user_api_v1_user__delete

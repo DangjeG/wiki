@@ -5,6 +5,7 @@ from fastapi_pagination import Page, paginate
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
+from wiki.common.exceptions import WikiException, WikiErrorCode
 from wiki.common.schemas import WikiUserHandlerData, BaseResponse
 from wiki.database.deps import get_db
 from wiki.permissions.base import BasePermission
@@ -239,7 +240,15 @@ async def add_member_group(
     user_db = await get_user_db_by_user_identifiers(user_identifiers, user_repository)
 
     group_repository = GroupRepository(session)
-    await group_repository.add_user_in_group(group_id, user_db)
+    group = await group_repository.get_group_by_id(group_id)
+    if user.wiki_api_client.responsibility >= ResponsibilityType.EDITOR or group.is_members_can_add_to_group:
+        await group_repository.add_user_in_group(group, user_db)
+    else:
+        raise WikiException(
+            message="You can't add a member to the group",
+            error_code=WikiErrorCode.USER_ADD_MEMBER_GROUP_FORBIDDEN,
+            http_status_code=status.HTTP_403_FORBIDDEN
+        )
 
     return BaseResponse(msg="Member has been added to the group")
 
@@ -253,7 +262,7 @@ async def add_member_group(
 async def remove_member_group(
         group_id: UUID,
         user_identifiers: UserIdentifiers = Depends(),
-        user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER)),
+        user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.EDITOR)),
         session: AsyncSession = Depends(get_db)
 ):
     user_repository: UserRepository = UserRepository(session)

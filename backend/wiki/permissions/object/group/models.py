@@ -1,11 +1,33 @@
-from sqlalchemy import Column, ForeignKey
+from sqlalchemy import Column, ForeignKey, Boolean, UniqueConstraint
 
 from wiki.database.core import Base
 from wiki.permissions.object.base import BaseObjectPermissionMixin
+from wiki.permissions.object.schemas import GroupObjectPermissionInfo
+from wiki.wiki_workspace.block.schemas import BlockInfoResponse
+from wiki.wiki_workspace.document.schemas import DocumentInfoResponse
+from wiki.wiki_workspace.schemas import WorkspaceInfoResponse
 
 
 class GroupObjectPermissionMixin(BaseObjectPermissionMixin):
     group_id = Column(ForeignKey("group.id"), nullable=False)
+
+    # For each object there can be only one permission for each group
+    __table_args__ = tuple(
+        UniqueConstraint(
+            "object_id",
+            "group_id",
+            name="group_object_permission_uc")
+    )
+
+    def get_permission_info(self) -> GroupObjectPermissionInfo:
+        return GroupObjectPermissionInfo(
+            id=self.id,
+            mode=self.mode,
+            object=self.object_id,
+            created_at=self.created_at,
+            updated_at=self.updated_at,
+            group_id=self.group_id
+        )
 
 
 class GroupWorkspacePermission(Base, GroupObjectPermissionMixin):

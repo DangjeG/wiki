@@ -2,10 +2,8 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
-from pydantic import constr
-
 from wiki.models import WikiBase
-from wiki.wiki_workspace.block.model import TypeBlock
+from wiki.wiki_workspace.block.enums import TypeBlock
 
 
 class CreateBlock(WikiBase):
@@ -21,6 +19,7 @@ class UpdateBlockInfo(WikiBase):
 
 class UpdateBlockData(WikiBase):
     block_id: UUID
+    type_block: TypeBlock
     content: str  # WYSIWYG
 
 
@@ -34,3 +33,4 @@ class BlockInfoResponse(WikiBase):
 
 class BlockDataResponse(BlockInfoResponse):
     content: str  # WYSIWYG
+    link: Optional[str] = None

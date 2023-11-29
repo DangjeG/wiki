@@ -1,12 +1,33 @@
-from sqlalchemy import Column, ForeignKey, Boolean
+from sqlalchemy import Column, ForeignKey, Boolean, UniqueConstraint
 
 from wiki.database.core import Base
 from wiki.permissions.object.base import BaseObjectPermissionMixin
+from wiki.permissions.object.schemas import IndividualObjectPermissionInfo
+from wiki.wiki_workspace.block.schemas import BlockInfoResponse
+from wiki.wiki_workspace.document.schemas import DocumentInfoResponse
+from wiki.wiki_workspace.schemas import WorkspaceInfoResponse
 
 
 class IndividualObjectPermissionMixin(BaseObjectPermissionMixin):
-    is_able_delegate_access = Column(Boolean, nullable=False, default=False)
     user_id = Column(ForeignKey("user.id"), nullable=False)
+
+    # For each object there can be only one permission for each user
+    __table_args__ = tuple(
+        UniqueConstraint(
+            "object_id",
+            "user_id",
+            name="individual_object_permission_uc")
+    )
+
+    def get_permission_info(self) -> IndividualObjectPermissionInfo:
+        return IndividualObjectPermissionInfo(
+            id=self.id,
+            mode=self.mode,
+            object=self.object_id,
+            created_at=self.created_at,
+            updated_at=self.updated_at,
+            user=self.user_id
+        )
 
 
 class IndividualWorkspacePermission(Base, IndividualObjectPermissionMixin):
