@@ -3,6 +3,7 @@ from enum import IntEnum
 from functools import wraps
 from typing import Optional
 
+from sqlalchemy.exc import DatabaseError
 from starlette import status
 
 from wiki.common.exceptions import WikiException, WikiErrorCode
@@ -53,6 +54,19 @@ class NotFoundResultMode(IntEnum):
 
     NONE = 0
     EXCEPTION = 1
+
+
+def manage_db_exception_method(ex: type[DatabaseError], raise_ex: Optional[WikiException] = None):
+    def decorator(f):
+        @wraps(f)
+        async def wrapped_f(self, *args, **kwargs):
+            try:
+                return await f(self, *args, **kwargs)
+            except ex:
+                if raise_ex is not None:
+                    raise raise_ex
+        return wrapped_f
+    return decorator
 
 
 def menage_db_not_found_result_method(

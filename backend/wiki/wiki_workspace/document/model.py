@@ -7,12 +7,15 @@ from uuid_extensions import uuid7
 from wiki.common.models import EnabledDeletedMixin
 from wiki.database.core import Base
 from wiki.database.utils import utcnow
-from wiki.permissions.object.enums import ObjectPermissionMode
 from wiki.permissions.object.general.models import GeneralObjectPermissionMixin, GeneralDocumentPermission
 from wiki.permissions.object.group.models import GroupObjectPermissionMixin, GroupDocumentPermission
 from wiki.permissions.object.individual.models import IndividualObjectPermissionMixin, IndividualDocumentPermission
 from wiki.permissions.object.interfaces import IGenObjectPermission
-from wiki.wiki_api_client.enums import ResponsibilityType
+from wiki.permissions.object.schemas import (
+    CreateGeneralObjectPermission,
+    CreateGroupObjectPermission,
+    CreateIndividualObjectPermission
+)
 
 
 class Document(Base, EnabledDeletedMixin, IGenObjectPermission):
@@ -49,29 +52,23 @@ class Document(Base, EnabledDeletedMixin, IGenObjectPermission):
         self.parent_document_id = parent_document_id
         self.current_published_version_commit_id = current_published_version_commit_id
 
-    def gen_general_object_permission(self,
-                                      mode: ObjectPermissionMode,
-                                      required_responsibility: ResponsibilityType) -> GeneralObjectPermissionMixin:
+    def gen_general_object_permission(self, create_permission: CreateGeneralObjectPermission) -> GeneralObjectPermissionMixin:
         return GeneralDocumentPermission(
-            mode=str(mode),
-            required_responsibility=str(required_responsibility),
+            mode=str(create_permission.mode),
+            required_responsibility=str(create_permission.required_responsibility),
             object_id=self.id
         )
 
-    def gen_group_object_permission(self,
-                                    mode: ObjectPermissionMode,
-                                    group_id: UUID) -> GroupObjectPermissionMixin:
+    def gen_group_object_permission(self, create_permission: CreateGroupObjectPermission) -> GroupObjectPermissionMixin:
         return GroupDocumentPermission(
-            mode=str(mode),
-            group_id=group_id,
+            mode=str(create_permission.mode),
+            group_id=create_permission.group_id,
             object_id=self.id
         )
 
-    def gen_individual_object_permission(self,
-                                         mode: ObjectPermissionMode,
-                                         user_id: UUID) -> IndividualObjectPermissionMixin:
+    def gen_individual_object_permission(self, create_permission: CreateIndividualObjectPermission) -> IndividualObjectPermissionMixin:
         return IndividualDocumentPermission(
-            mode=str(mode),
-            user_id=user_id,
+            mode=str(create_permission.mode),
+            user_id=create_permission.user_id,
             object_id=self.id
         )

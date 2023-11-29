@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {Button, Form} from "react-bootstrap";
 import "../Styles/Login.css"
-import {api} from "../Configs/app.config";
+import {api} from "../Config/app.config";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
 

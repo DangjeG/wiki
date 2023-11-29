@@ -2,11 +2,13 @@ from typing import Optional
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette import status
 
+from wiki.common.exceptions import WikiException, WikiErrorCode
 from wiki.common.schemas import WikiUserHandlerData
 from wiki.user.models import User
 from wiki.user.repository import UserRepository
-from wiki.user.schemas import UserFullInfoResponse, UserBaseInfoResponse
+from wiki.user.schemas import UserFullInfoResponse, UserBaseInfoResponse, UserIdentifiers
 from wiki.wiki_api_client.models import WikiApiClient
 from wiki.wiki_api_client.repository import WikiApiClientRepository
 from wiki.wiki_api_client.schemas import WikiApiClientInfoResponse
@@ -57,3 +59,20 @@ async def get_user_info(
         )
     else:
         return UserBaseInfoResponse(**kwargs)
+
+
+async def get_user_db_by_user_identifiers(user_identifiers: UserIdentifiers, user_repository: UserRepository) -> User:
+    if user_identifiers.user_id is not None:
+        user_db = await user_repository.get_user_by_id(user_identifiers.user_id)
+    elif user_identifiers.username is not None:
+        user_db = await user_repository.get_user_by_username(user_identifiers.username)
+    elif user_identifiers.email is not None:
+        user_db = await user_repository.get_user_by_email(user_identifiers.email)
+    else:
+        raise WikiException(
+            message=f"User not found",
+            error_code=WikiErrorCode.USER_NOT_FOUND,
+            http_status_code=status.HTTP_404_NOT_FOUND
+        )
+
+    return user_db

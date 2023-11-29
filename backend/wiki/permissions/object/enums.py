@@ -10,3 +10,15 @@ class ObjectPermissionMode(WikiBaseEnum):
     ABILITY_USE_TEMPLATE = "ABILITY_USE_TEMPLATE"
     EDITING = "EDITING"
     DELETION = "DELETION"
+
+
+class ObjectPermissionType(WikiBaseEnum):
+    GENERAL = "General"
+    GROUP = "Group"
+    INDIVIDUAL = "Individual"
+
+
+class ObjectType(WikiBaseEnum):
+    WORKSPACE = "Workspace"
+    DOCUMENT = "Document"
+    BLOCK = "Block"

@@ -4,7 +4,7 @@ import AddIcon from "@mui/icons-material/Add";
 import {Box, Button, Checkbox, FormControlLabel, FormLabel, Radio, RadioGroup, Tooltip} from "@mui/material";
 import {Form, Modal} from "react-bootstrap";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import {api} from "../Configs/app.config";
+import {api} from "../Config/app.config";
 
 
 export default function ButtonAddUser() {

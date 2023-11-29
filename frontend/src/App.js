@@ -1,5 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {api} from "./Configs/app.config";
+import React from "react";
+import {api} from "./Config/app.config";
 import {useEffect, useState} from "react";
 import AppNavbar from "./Components/Navbar";
 import {HashRouter, Route, Routes} from "react-router-dom";
@@ -30,10 +31,12 @@ export default function App() {
         fetchData();
     }, []);
 
+    const UserContext = React.createContext()
 
         return (
-            <HashRouter>
-                <AppNavbar user={user}/>
+            <UserContext.Provider value={user}>
+                <HashRouter>
+                    <AppNavbar/>
                     <Routes>
                         <Route path={"/"} element={<Home/>}/>
                         <Route path={"/login"} element={<Login/>}/>
@@ -50,9 +53,10 @@ export default function App() {
                         }/>}>
                             <Route path={"/profile"} element={<Profile/>}/>
                             <Route path={"/workspace/*"} element={<Workspace/>}/>
-                            <Route path={"/test/*"} element={<TestPage/>}/>
                         </Route>
+                        <Route path={"/test/*"} element={<TestPage/>}/>
                     </Routes>
                 </HashRouter>
+            </UserContext.Provider>
         )
 }

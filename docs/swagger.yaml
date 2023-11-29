@@ -176,6 +176,64 @@ components:
       - workspace_id
       title: CreateDocument
       type: object
+    CreateGeneralObjectPermission:
+      properties:
+        mode:
+          allOf:
+          - $ref: '#/components/schemas/ObjectPermissionMode'
+          default: HIDDEN_INACCESSIBLE
+        required_responsibility:
+          $ref: '#/components/schemas/ResponsibilityType'
+      required:
+      - required_responsibility
+      title: CreateGeneralObjectPermission
+      type: object
+    CreateGroup:
+      properties:
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        is_members_can_add_to_group:
+          default: false
+          title: Is Members Can Add To Group
+          type: boolean
+        name:
+          title: Name
+          type: string
+      required:
+      - name
+      title: CreateGroup
+      type: object
+    CreateGroupObjectPermission:
+      properties:
+        group_id:
+          format: uuid
+          title: Group Id
+          type: string
+        mode:
+          allOf:
+          - $ref: '#/components/schemas/ObjectPermissionMode'
+          default: HIDDEN_INACCESSIBLE
+      required:
+      - group_id
+      title: CreateGroupObjectPermission
+      type: object
+    CreateIndividualObjectPermission:
+      properties:
+        mode:
+          allOf:
+          - $ref: '#/components/schemas/ObjectPermissionMode'
+          default: HIDDEN_INACCESSIBLE
+        user_id:
+          format: uuid
+          title: User Id
+          type: string
+      required:
+      - user_id
+      title: CreateIndividualObjectPermission
+      type: object
     CreatePermissionDomain:
       properties:
         domain:
@@ -422,6 +480,159 @@ components:
           title: Username
       title: FrontendUserLogin
       type: object
+    GeneralObjectPermissionInfo:
+      properties:
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        id:
+          format: uuid
+          title: Id
+          type: string
+        mode:
+          $ref: '#/components/schemas/ObjectPermissionMode'
+        object_id:
+          format: uuid
+          title: Object Id
+          type: string
+        required_responsibility:
+          $ref: '#/components/schemas/ResponsibilityType'
+        updated_at:
+          format: date-time
+          title: Updated At
+          type: string
+      required:
+      - id
+      - mode
+      - object_id
+      - created_at
+      - updated_at
+      - required_responsibility
+      title: GeneralObjectPermissionInfo
+      type: object
+    GroupInfo:
+      properties:
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          format: uuid
+          title: Id
+          type: string
+        is_members_can_add_to_group:
+          title: Is Members Can Add To Group
+          type: boolean
+        name:
+          title: Name
+          type: string
+        updated_at:
+          format: date-time
+          title: Updated At
+          type: string
+      required:
+      - id
+      - name
+      - is_members_can_add_to_group
+      - created_at
+      - updated_at
+      title: GroupInfo
+      type: object
+    GroupInfoWithUsers:
+      properties:
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          format: uuid
+          title: Id
+          type: string
+        is_members_can_add_to_group:
+          title: Is Members Can Add To Group
+          type: boolean
+        members:
+          items:
+            $ref: '#/components/schemas/UserBaseInfoResponse'
+          title: Members
+          type: array
+        name:
+          title: Name
+          type: string
+        updated_at:
+          format: date-time
+          title: Updated At
+          type: string
+      required:
+      - id
+      - name
+      - is_members_can_add_to_group
+      - created_at
+      - updated_at
+      - members
+      title: GroupInfoWithUsers
+      type: object
+    GroupObjectPermissionInfo:
+      properties:
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        group:
+          $ref: '#/components/schemas/GroupInfo'
+        id:
+          format: uuid
+          title: Id
+          type: string
+        mode:
+          $ref: '#/components/schemas/ObjectPermissionMode'
+        object_id:
+          format: uuid
+          title: Object Id
+          type: string
+        updated_at:
+          format: date-time
+          title: Updated At
+          type: string
+      required:
+      - id
+      - mode
+      - object_id
+      - created_at
+      - updated_at
+      - group
+      title: GroupObjectPermissionInfo
+      type: object
+    GroupOptionalInfo:
+      properties:
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        is_members_can_add_to_group:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Members Can Add To Group
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      title: GroupOptionalInfo
+      type: object
     HTTPValidationError:
       properties:
         detail:
@@ -441,6 +652,61 @@ components:
           type: string
       title: HealthCheck
       type: object
+    IndividualObjectPermissionInfo:
+      properties:
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        id:
+          format: uuid
+          title: Id
+          type: string
+        mode:
+          $ref: '#/components/schemas/ObjectPermissionMode'
+        object_id:
+          format: uuid
+          title: Object Id
+          type: string
+        updated_at:
+          format: date-time
+          title: Updated At
+          type: string
+        user:
+          $ref: '#/components/schemas/UserBaseInfoResponse'
+      required:
+      - id
+      - mode
+      - object_id
+      - created_at
+      - updated_at
+      - user
+      title: IndividualObjectPermissionInfo
+      type: object
+    ObjectPermissionMode:
+      enum:
+      - HIDDEN_INACCESSIBLE
+      - INACCESSIBLE
+      - VIEW_AND_EXPORT
+      - ABILITY_USE_TEMPLATE
+      - EDITING
+      - DELETION
+      title: ObjectPermissionMode
+      type: string
+    ObjectPermissionType:
+      enum:
+      - General
+      - Group
+      - Individual
+      title: ObjectPermissionType
+      type: string
+    ObjectType:
+      enum:
+      - Workspace
+      - Document
+      - Block
+      title: ObjectType
+      type: string
     Page_DocumentTemplateInfoResponse_:
       properties:
         items:
@@ -477,6 +743,78 @@ components:
       - size
       title: Page[DocumentTemplateInfoResponse]
       type: object
+    Page_GroupInfoWithUsers_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/GroupInfoWithUsers'
+          title: Items
+          type: array
+        page:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Page
+        pages:
+          anyOf:
+          - minimum: 0.0
+            type: integer
+          - type: 'null'
+          title: Pages
+        size:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Size
+        total:
+          minimum: 0.0
+          title: Total
+          type: integer
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[GroupInfoWithUsers]
+      type: object
+    Page_GroupInfo_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/GroupInfo'
+          title: Items
+          type: array
+        page:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Page
+        pages:
+          anyOf:
+          - minimum: 0.0
+            type: integer
+          - type: 'null'
+          title: Pages
+        size:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Size
+        total:
+          minimum: 0.0
+          title: Total
+          type: integer
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[GroupInfo]
+      type: object
     Page_PermissionDomainInfoResponse_:
       properties:
         items:
@@ -512,6 +850,42 @@ components:
       - page
       - size
       title: Page[PermissionDomainInfoResponse]
+      type: object
+    Page_UserBaseInfoResponse_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/UserBaseInfoResponse'
+          title: Items
+          type: array
+        page:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Page
+        pages:
+          anyOf:
+          - minimum: 0.0
+            type: integer
+          - type: 'null'
+          title: Pages
+        size:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Size
+        total:
+          minimum: 0.0
+          title: Total
+          type: integer
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[UserBaseInfoResponse]
       type: object
     Page_UserFullInfoResponse_:
       properties:
@@ -605,6 +979,14 @@ components:
           title: Workspace Id
       title: UpdateAsset
       type: object
+    UpdateBaseObjectPermission:
+      properties:
+        mode:
+          anyOf:
+          - $ref: '#/components/schemas/ObjectPermissionMode'
+          - type: 'null'
+      title: UpdateBaseObjectPermission
+      type: object
     UpdateBlockData:
       properties:
         block_id:
@@ -633,6 +1015,18 @@ components:
       required:
       - block_id
       title: UpdateBlockInfo
+      type: object
+    UpdateGeneralObjectPermission:
+      properties:
+        mode:
+          anyOf:
+          - $ref: '#/components/schemas/ObjectPermissionMode'
+          - type: 'null'
+        required_responsibility:
+          anyOf:
+          - $ref: '#/components/schemas/ResponsibilityType'
+          - type: 'null'
+      title: UpdateGeneralObjectPermission
       type: object
     UpdatePermissionDomain:
       properties:
@@ -2159,7 +2553,7 @@ paths:
       summary: Get all document templates
       tags:
       - DocumentTemplate
-  /api/v1/permission/domain/:
+  /api/v1/permission_domain/:
     post:
       operationId: create_permission_domain_api_v1_permission_domain__post
       requestBody:
@@ -2189,7 +2583,7 @@ paths:
       - WikiBearer: []
       summary: Create a new domain permission for signup
       tags:
-      - Permissions
+      - PermissionsDomain
     put:
       operationId: update_permission_domain_api_v1_permission_domain__put
       parameters:
@@ -2237,8 +2631,8 @@ paths:
       - WikiBearer: []
       summary: Update permission domain by id or domain name
       tags:
-      - Permissions
-  /api/v1/permission/domain/all:
+      - PermissionsDomain
+  /api/v1/permission_domain/all:
     get:
       operationId: get_permission_domains_api_v1_permission_domain_all_get
       parameters:
@@ -2308,8 +2702,8 @@ paths:
       - WikiBearer: []
       summary: Get all permission domain
       tags:
-      - Permissions
-  /api/v1/permission/domain/info:
+      - PermissionsDomain
+  /api/v1/permission_domain/info:
     get:
       operationId: get_permission_domain_info_api_v1_permission_domain_info_get
       parameters:
@@ -2351,7 +2745,250 @@ paths:
       - WikiBearer: []
       summary: Get permission domain by id or domain name
       tags:
-      - Permissions
+      - PermissionsDomain
+  /api/v1/permission_object/admin/permission_type/{permission_type}/object_type/{object_type}/{object_id}:
+    post:
+      operationId: create_object_permission_api_v1_permission_object_admin_permission_type__permission_type__object_type__object_type___object_id__post
+      parameters:
+      - in: path
+        name: permission_type
+        required: true
+        schema:
+          $ref: '#/components/schemas/ObjectPermissionType'
+      - in: path
+        name: object_type
+        required: true
+        schema:
+          $ref: '#/components/schemas/ObjectType'
+      - in: path
+        name: object_id
+        required: true
+        schema:
+          format: uuid
+          title: Object Id
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              anyOf:
+              - $ref: '#/components/schemas/CreateGeneralObjectPermission'
+              - $ref: '#/components/schemas/CreateGroupObjectPermission'
+              - $ref: '#/components/schemas/CreateIndividualObjectPermission'
+              title: Create Permission
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/GeneralObjectPermissionInfo'
+                - $ref: '#/components/schemas/GroupObjectPermissionInfo'
+                - $ref: '#/components/schemas/IndividualObjectPermissionInfo'
+                title: Response Create Object Permission Api V1 Permission Object
+                  Admin Permission Type  Permission Type  Object Type  Object Type   Object
+                  Id  Post
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Create object permission
+      tags:
+      - PermissionsObject
+  /api/v1/permission_object/admin/permission_type/{permission_type}/object_type/{object_type}/{permission_id}:
+    put:
+      operationId: update_object_permission_api_v1_permission_object_admin_permission_type__permission_type__object_type__object_type___permission_id__put
+      parameters:
+      - in: path
+        name: permission_type
+        required: true
+        schema:
+          $ref: '#/components/schemas/ObjectPermissionType'
+      - in: path
+        name: object_type
+        required: true
+        schema:
+          $ref: '#/components/schemas/ObjectType'
+      - in: path
+        name: permission_id
+        required: true
+        schema:
+          format: uuid
+          title: Permission Id
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              anyOf:
+              - $ref: '#/components/schemas/UpdateBaseObjectPermission'
+              - $ref: '#/components/schemas/UpdateGeneralObjectPermission'
+              title: Update Permission
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/GeneralObjectPermissionInfo'
+                - $ref: '#/components/schemas/GroupObjectPermissionInfo'
+                - $ref: '#/components/schemas/IndividualObjectPermissionInfo'
+                title: Response Update Object Permission Api V1 Permission Object
+                  Admin Permission Type  Permission Type  Object Type  Object Type   Permission
+                  Id  Put
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Create object permission
+      tags:
+      - PermissionsObject
+  /api/v1/permission_object/general/object_type/{object_type}/object_id/:
+    get:
+      operationId: get_object_permissions_general_api_v1_permission_object_general_object_type__object_type__object_id__get
+      parameters:
+      - in: path
+        name: object_type
+        required: true
+        schema:
+          $ref: '#/components/schemas/ObjectType'
+      - in: query
+        name: object_id
+        required: true
+        schema:
+          format: uuid
+          title: Object Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/GeneralObjectPermissionInfo'
+                title: Response Get Object Permissions General Api V1 Permission Object
+                  General Object Type  Object Type  Object Id  Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all general permission by object type
+      tags:
+      - PermissionsObject
+  /api/v1/permission_object/group/{group_id}/object_type/{object_type}/:
+    get:
+      operationId: get_object_permissions_for_group_api_v1_permission_object_group__group_id__object_type__object_type___get
+      parameters:
+      - in: path
+        name: group_id
+        required: true
+        schema:
+          format: uuid
+          title: Group Id
+          type: string
+      - in: path
+        name: object_type
+        required: true
+        schema:
+          $ref: '#/components/schemas/ObjectType'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/GroupObjectPermissionInfo'
+                title: Response Get Object Permissions For Group Api V1 Permission
+                  Object Group  Group Id  Object Type  Object Type   Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all permission from group by object type
+      tags:
+      - PermissionsObject
+  /api/v1/permission_object/user/{user_id}/object_type/{object_type}/:
+    get:
+      operationId: get_object_permissions_for_user_api_v1_permission_object_user__user_id__object_type__object_type___get
+      parameters:
+      - in: path
+        name: user_id
+        required: true
+        schema:
+          format: uuid
+          title: User Id
+          type: string
+      - in: path
+        name: object_type
+        required: true
+        schema:
+          $ref: '#/components/schemas/ObjectType'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/IndividualObjectPermissionInfo'
+                title: Response Get Object Permissions For User Api V1 Permission
+                  Object User  User Id  Object Type  Object Type   Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all individual permission for user by object type
+      tags:
+      - PermissionsObject
   /api/v1/user/:
     delete:
       operationId: delete_user_api_v1_user__delete
@@ -2642,6 +3279,689 @@ paths:
       summary: Create a verified user (has access to the system)
       tags:
       - User
+  /api/v1/user_group/:
+    delete:
+      operationId: delete_user_group_api_v1_user_group__delete
+      parameters:
+      - in: query
+        name: group_id
+        required: true
+        schema:
+          format: uuid
+          title: Group Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Delete group info by id
+      tags:
+      - UserGroup
+    post:
+      description: '## Create user group
+
+        Available for users starting from the EDITOR responsibility level'
+      operationId: create_user_group_api_v1_user_group__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGroup'
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupInfo'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Create user group
+      tags:
+      - UserGroup
+  /api/v1/user_group/all:
+    get:
+      operationId: get_all_groups_info_api_v1_user_group_all_get
+      parameters:
+      - in: query
+        name: name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      - in: query
+        name: description
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      - in: query
+        name: is_members_can_add_to_group
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Members Can Add To Group
+      - description: Page number
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          description: Page number
+          minimum: 1
+          title: Page
+          type: integer
+      - description: Page size
+        in: query
+        name: size
+        required: false
+        schema:
+          default: 50
+          description: Page size
+          maximum: 100
+          minimum: 1
+          title: Size
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_GroupInfo_'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all groups info
+      tags:
+      - UserGroup
+  /api/v1/user_group/all/full-info:
+    get:
+      operationId: get_all_groups_full_info_api_v1_user_group_all_full_info_get
+      parameters:
+      - in: query
+        name: name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      - in: query
+        name: description
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      - in: query
+        name: is_members_can_add_to_group
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Members Can Add To Group
+      - description: Page number
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          description: Page number
+          minimum: 1
+          title: Page
+          type: integer
+      - description: Page size
+        in: query
+        name: size
+        required: false
+        schema:
+          default: 50
+          description: Page size
+          maximum: 100
+          minimum: 1
+          title: Size
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_GroupInfoWithUsers_'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all groups info with members
+      tags:
+      - UserGroup
+  /api/v1/user_group/full-info:
+    get:
+      description: '## Get user group info with members by id
+
+        Get information about the group and all its members'
+      operationId: get_user_group_full_info_api_v1_user_group_full_info_get
+      parameters:
+      - in: query
+        name: group_id
+        required: true
+        schema:
+          format: uuid
+          title: Group Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupInfoWithUsers'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get user group info with members by id
+      tags:
+      - UserGroup
+  /api/v1/user_group/info:
+    get:
+      description: '## Get user group info by id
+
+        Get base information without group members'
+      operationId: get_user_group_info_api_v1_user_group_info_get
+      parameters:
+      - in: query
+        name: group_id
+        required: true
+        schema:
+          format: uuid
+          title: Group Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupInfo'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get user group info by id
+      tags:
+      - UserGroup
+    put:
+      operationId: update_user_group_info_api_v1_user_group_info_put
+      parameters:
+      - in: query
+        name: group_id
+        required: true
+        schema:
+          format: uuid
+          title: Group Id
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupOptionalInfo'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupInfo'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Update group info by id
+      tags:
+      - UserGroup
+  /api/v1/user_group/member:
+    delete:
+      operationId: remove_member_group_api_v1_user_group_member_delete
+      parameters:
+      - in: query
+        name: group_id
+        required: true
+        schema:
+          format: uuid
+          title: Group Id
+          type: string
+      - in: query
+        name: user_id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: User Id
+      - in: query
+        name: username
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+      - in: query
+        name: email
+        required: false
+        schema:
+          anyOf:
+          - format: email
+            type: string
+          - type: 'null'
+          title: Email
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Remove member user from group
+      tags:
+      - UserGroup
+    post:
+      operationId: add_member_group_api_v1_user_group_member_post
+      parameters:
+      - in: query
+        name: group_id
+        required: true
+        schema:
+          format: uuid
+          title: Group Id
+          type: string
+      - in: query
+        name: user_id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: User Id
+      - in: query
+        name: username
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+      - in: query
+        name: email
+        required: false
+        schema:
+          anyOf:
+          - format: email
+            type: string
+          - type: 'null'
+          title: Email
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Add member user for group
+      tags:
+      - UserGroup
+  /api/v1/user_group/members:
+    get:
+      operationId: get_members_user_group_api_v1_user_group_members_get
+      parameters:
+      - in: query
+        name: group_id
+        required: true
+        schema:
+          format: uuid
+          title: Group Id
+          type: string
+      - description: Page number
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          description: Page number
+          minimum: 1
+          title: Page
+          type: integer
+      - description: Page size
+        in: query
+        name: size
+        required: false
+        schema:
+          default: 50
+          description: Page size
+          maximum: 100
+          minimum: 1
+          title: Size
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_UserBaseInfoResponse_'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get members group by id
+      tags:
+      - UserGroup
+  /api/v1/user_group/user/full-info:
+    get:
+      operationId: get_groups_full_info_for_user_api_v1_user_group_user_full_info_get
+      parameters:
+      - in: query
+        name: user_id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: User Id
+      - in: query
+        name: username
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+      - in: query
+        name: email
+        required: false
+        schema:
+          anyOf:
+          - format: email
+            type: string
+          - type: 'null'
+          title: Email
+      - in: query
+        name: name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      - in: query
+        name: description
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      - in: query
+        name: is_members_can_add_to_group
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Members Can Add To Group
+      - description: Page number
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          description: Page number
+          minimum: 1
+          title: Page
+          type: integer
+      - description: Page size
+        in: query
+        name: size
+        required: false
+        schema:
+          default: 50
+          description: Page size
+          maximum: 100
+          minimum: 1
+          title: Size
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_GroupInfoWithUsers_'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get groups info for user with members
+      tags:
+      - UserGroup
+  /api/v1/user_group/user/info:
+    get:
+      operationId: get_groups_info_for_user_api_v1_user_group_user_info_get
+      parameters:
+      - in: query
+        name: user_id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: User Id
+      - in: query
+        name: username
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+      - in: query
+        name: email
+        required: false
+        schema:
+          anyOf:
+          - format: email
+            type: string
+          - type: 'null'
+          title: Email
+      - in: query
+        name: name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      - in: query
+        name: description
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      - in: query
+        name: is_members_can_add_to_group
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Members Can Add To Group
+      - description: Page number
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          description: Page number
+          minimum: 1
+          title: Page
+          type: integer
+      - description: Page size
+        in: query
+        name: size
+        required: false
+        schema:
+          default: 50
+          description: Page size
+          maximum: 100
+          minimum: 1
+          title: Size
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_GroupInfo_'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get groups info for user
+      tags:
+      - UserGroup
   /api/v1/versioning/block/{block_id}/diff:
     get:
       description: Find the difference between the contents of the block versions

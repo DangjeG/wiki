@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Button,Table, Tooltip } from '@mui/material';
-import { api } from "../Configs/app.config";
+import { api } from "../Config/app.config";
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import "../Styles/AdminTools.css";
 import "../Styles/BaseColors.css"

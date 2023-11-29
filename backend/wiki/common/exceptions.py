@@ -13,7 +13,6 @@ class WikiErrorCode(IntEnum):
             3000-3500: wiki_email error
             3501-3999: permission error
             4000-5000: user errors
-            5001-6000: permission errors
             6001-7000: workspace errors
             7001-8000: version errors
             8001-9000: assets storage
@@ -48,6 +47,14 @@ class WikiErrorCode(IntEnum):
 
     # 3501-3999: permission error
     PERMISSION_DOMAIN_ERROR = 3501
+    PERMISSION_DOMAIN_NOT_FOUND = 3502
+    PERMISSION_DOMAIN_NOT_SPECIFIED = 3503
+
+    OBJECT_PERMISSION_NOT_FOUND = 3504
+    OBJECT_TYPE_FOR_PERMISSION_NOT_AVAILABLE = 3505
+    OBJECT_TYPE_DATA_FOR_PERMISSION_INCORRECT = 3506
+    OBJECT_PERMISSION_ALREADY_EXIST = 3507
+    OBJECT_PERMISSION_FORBIDDEN = 3508
 
     # 4000-5000: user errors
     USER_NOT_SPECIFIED = 4000
@@ -55,13 +62,12 @@ class WikiErrorCode(IntEnum):
     USER_NOT_FOUND = 4002
 
     USER_GROUP_NOT_FOUND = 4101
+    USER_ALREADY_MEMBER_GROUP = 4102
+    USER_NOT_MEMBER_GROUP = 4103
+    USER_ADD_MEMBER_GROUP_FORBIDDEN = 4104
 
     API_CLIENT_NOT_FOUND = 4501
     API_KEY_NOT_FOUND = 4502
-
-    # 5001-6000: permission errors
-    PERMISSION_DOMAIN_NOT_FOUND = 5001
-    PERMISSION_DOMAIN_NOT_SPECIFIED = 5001
 
     # 6001-7000: workspace errors
     WORKSPACE_NOT_FOUND = 6001

@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import List from '@mui/material/List';
 import {Box, Grid, Tooltip, Typography} from "@mui/material";
 import DirectoryListItem from "./DirectoryListItem";
-import {api} from "../Configs/app.config";
+import {api} from "../Config/app.config";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
 import {Form, Modal} from "react-bootstrap";
@@ -13,7 +13,7 @@ export default function Sidebar(props){
     const [newDocument, setNewDocument] = useState()
     const [disableAddButton, setDisableAddButton] = useState(false)
     const [workspace, setWorkspace] = useState(null)
-    const fetchData = async () => {
+    const fetchDocs = async () => {
         try {
             const response = await api.getDocumentsTree(props.workspaceID)
             setSidebarData(response)
@@ -36,7 +36,7 @@ export default function Sidebar(props){
 
     useEffect(() => {
         fetchWorkspace()
-        fetchData()
+        fetchDocs()
     }, []);
 
 
@@ -49,7 +49,7 @@ export default function Sidebar(props){
         await api.addDocument(newDocument, props.workspaceID)
         handleClose()
         setSidebarData([])
-        fetchData()
+        fetchDocs()
         setDisableAddButton(false)
     }
 

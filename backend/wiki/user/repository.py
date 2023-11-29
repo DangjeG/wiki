@@ -81,7 +81,7 @@ class UserRepository(BaseRepository):
             filters.append(select(User.last_name.ilike(f'%{filter_user.second_name}%')))
 
         if is_only_existing:
-            filters.append(select(User.is_deleted).where(User.is_deleted == False))
+            filters.append(User.is_deleted == False)
 
         result = await self.session.execute(select(User).where(and_(*filters)))
 
