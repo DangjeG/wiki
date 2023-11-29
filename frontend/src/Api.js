@@ -182,10 +182,32 @@ export default class Api {
             "content": content
         })
     }
+    async getBlockData(block_id, commit_id){
+        let url = `/blocks/data?block_id=${block_id}${commit_id !== null
+            ?`&version_commit_id=${commit_id}`
+            :``}`
+        let workspace = null
+        await instance.get(url).then((resp)=>{
+                workspace=resp.data
+            }
+
+        )
+        return workspace
+    }
 
     async getBlocks(document_id){
         let res = []
-        await instance.get(`/blocks/data?document_id=${document_id}`).then((resp)=>{
+        await instance.get(`/blocks/data/all?document_id=${document_id}`).then((resp)=>{
+            resp.data.forEach((item) => {
+                res.push(item)
+            })}
+        )
+        return res
+    }
+
+    async getBlockVersions(block_id){
+        let res = []
+        await instance.get(`/versioning/block/${block_id}/info`).then((resp)=>{
             resp.data.forEach((item) => {
                 res.push(item)
             })}

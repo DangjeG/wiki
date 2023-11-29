@@ -4,7 +4,7 @@ import { api } from "../Config/app.config";
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import "../Styles/AdminTools.css";
 import "../Styles/BaseColors.css"
-import ButtonApproveUser from "./ButtonApproveUser";
+import ButtonApproveUser from "./ModalButton/ButtonApproveUser";
 
 export default function UsersTable() {
     const [users, setUsers] = useState([]);
