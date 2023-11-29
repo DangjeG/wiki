@@ -18,7 +18,7 @@ class TypeBlock(WikiBaseEnum):
     IMG = "IMG"
     TEXT = "TEXT"
     FILE = "FILE"
-    VIDEO = "VIDEO"
+    # VIDEO = "VIDEO"
 
 
 class Block(Base, EnabledDeletedMixin, IGenObjectPermission):

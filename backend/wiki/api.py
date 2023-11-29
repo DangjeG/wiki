@@ -3,6 +3,7 @@ from starlette.responses import JSONResponse
 
 from wiki.admins.router import admins_router
 from wiki.auth.routers import auth_router
+from wiki.export_document.router import export_document_router
 from wiki.permissions.domain.router import permission_domain_router
 from wiki.wiki_api_client.api_client_router import wiki_api_client_router
 from wiki.wiki_api_client.api_key_router import wiki_api_key_router
@@ -31,3 +32,4 @@ api_router.include_router(document_template_router, prefix="/document_template",
 api_router.include_router(block_router, prefix="/blocks", tags=["WorkspaceBlocks"])
 api_router.include_router(versioning_workspace_router, prefix="/versioning", tags=["WorkspaceVersioning"])
 api_router.include_router(asset_storage_router, prefix="/asset_storage", tags=["AssetStorage"])
+api_router.include_router(export_document_router, prefix="/export_document", tags=["ExportDocument"])

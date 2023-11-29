@@ -1,3 +1,4 @@
+from io import StringIO
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
@@ -14,6 +15,12 @@ from wiki.user.utils import get_user_info
 from wiki.wiki_api_client.enums import ResponsibilityType
 from wiki.wiki_storage.deps import get_storage_client
 from wiki.wiki_storage.services.base import BaseWikiStorageService
+from wiki.wiki_storage.services.versioning import VersioningWikiStorageService
+from wiki.wiki_workspace.block.repository import BlockRepository
+from wiki.wiki_workspace.block.templates import get_template_first_block
+from wiki.wiki_workspace.document.repository import DocumentRepository
+from wiki.wiki_workspace.document.router import create_document
+from wiki.wiki_workspace.document.schemas import CreateDocument
 from wiki.wiki_workspace.model import Workspace
 from wiki.wiki_workspace.repository import WorkspaceRepository
 from wiki.wiki_workspace.schemas import CreateWorkspace, WorkspaceInfoResponse
@@ -41,6 +48,33 @@ async def create_workspace(
 
     storage_service: BaseWikiStorageService = BaseWikiStorageService(storage_client)
     storage_service.create_workspace_storage(workspace.id)
+
+    # Create Empty document
+
+    new_document = CreateDocument(
+        title="New document",
+        workspace_id=workspace.id,
+        parent_document_id=None
+    )
+
+    document_repository: DocumentRepository = DocumentRepository(session)
+
+    document = await document_repository.create_document(new_document.title,
+                                                         new_document.workspace_id,
+                                                         user_db.id,
+                                                         new_document.parent_document_id)
+
+    storage_service: VersioningWikiStorageService = VersioningWikiStorageService(storage_client)
+    storage_service.create_branch_for_workspace_document(workspace.id, document.id)
+
+    block_repository: BlockRepository = BlockRepository(session)
+    block = await block_repository.create_block(get_template_first_block(document.id))
+    document_ids = await document_repository.get_list_ids_of_document_hierarchy(document)
+    storage_service.upload_document_block_in_workspace_storage(content=StringIO(""),
+                                                               workspace_id=document.workspace_id,
+                                                               document_ids=document_ids,
+                                                               block_id=block.id)
+
 
     return WorkspaceInfoResponse(
         id=workspace.id,

@@ -85,7 +85,7 @@ async def create_document(
     else:
         document_template_repository: DocumentTemplateRepository = DocumentTemplateRepository(session)
         template: DocumentTemplate = await document_template_repository.get_document_template_by_id(template_id)
-        document_template = await document_repository.get_document_by_id(template.document_id)
+        document_template = await document_repository.get_document_by_id(document_id=template.document_id, is_only_existing=False)
         template_blocks = await block_repository.get_all_block_by_document_id(document_template.id)
         for template_block in template_blocks:
             block = await block_repository.create_block(CreateBlock(
