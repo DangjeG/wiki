@@ -89,7 +89,7 @@ class VerificationCodeAuthenticatorInterface(BaseTokenAuthenticatorInterface):
                     last_name=user.last_name,
                     second_name=user.second_name,
                     position=user.position,
-                    wiki_api_client=api_client.get_response_info()
+                    wiki_api_client=api_client.get_response_info() if api_client is not None else None
                 )
 
         raise WikiException(

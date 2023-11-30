@@ -12,6 +12,8 @@ from wiki.common.exceptions import WikiException, WikiErrorCode
 from wiki.common.schemas import WikiUserHandlerData, BaseResponse
 from wiki.database.deps import get_db
 from wiki.permissions.base import BasePermission
+from wiki.permissions.object.enums import ObjectPermissionMode
+from wiki.permissions.object.transporter import PermissionTransporter
 from wiki.user.models import User
 from wiki.user.repository import UserRepository
 from wiki.user.utils import get_user_info
@@ -31,8 +33,8 @@ from wiki.wiki_workspace.document.schemas import (
 )
 from wiki.wiki_workspace.document_template.model import DocumentTemplate
 from wiki.wiki_workspace.document_template.repository import DocumentTemplateRepository
-from wiki.wiki_workspace.model import Workspace
 from wiki.wiki_workspace.repository import WorkspaceRepository
+
 
 document_router = APIRouter()
 
@@ -64,11 +66,23 @@ async def create_document(
                 http_status_code=status.HTTP_400_BAD_REQUEST
             )
     workspace_repository: WorkspaceRepository = WorkspaceRepository(session)
-    workspace: Workspace = await workspace_repository.get_workspace_by_id(new_document.workspace_id)
+    workspace = await workspace_repository.get_workspace_with_permission_by_id(user.id, new_document.workspace_id)
+
+    if ObjectPermissionMode(workspace.permission_mode) < ObjectPermissionMode.EDITING:
+        raise WikiException(
+            message="You can't create documents in this workspace. You must have permission to edit the workspace to create a document.",
+            error_code=WikiErrorCode.DOCUMENT_CREATE_FORBIDDEN,
+            http_status_code=status.HTTP_403_FORBIDDEN
+        )
+
     document = await document_repository.create_document(new_document.title,
                                                          new_document.workspace_id,
                                                          user_db.id,
                                                          new_document.parent_document_id)
+
+    permission_transporter = PermissionTransporter(session)
+    await permission_transporter.transfer_to_document(document, workspace)
+
     storage_service: VersioningWikiStorageService = VersioningWikiStorageService(storage_client)
     storage_service.create_branch_for_workspace_document(workspace.id, document.id)
 
