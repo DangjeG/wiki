@@ -176,23 +176,29 @@ export default class Api {
         await instance.delete(`/blocks?block_id=${block_id}`)
     }
 
-    async updateBlockData(block_id, content){
-        await instance.put(`/blocks/data`,{
+    async updateTextBlockData(block_id, content){
+        await instance.put(`/blocks/data/text`,{
             "block_id": block_id,
             "content": content
+        })
+    }
+    async updateFileBlockData(block_id, content){
+        await instance.put(`/blocks/data/file?block_id=${block_id}`, content, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
         })
     }
     async getBlockData(block_id, commit_id){
         let url = `/blocks/data?block_id=${block_id}${commit_id !== null
             ?`&version_commit_id=${commit_id}`
             :``}`
-        let workspace = null
+        let block = null
         await instance.get(url).then((resp)=>{
-                workspace=resp.data
+                block=resp.data
             }
-
         )
-        return workspace
+        return block
     }
 
     async getBlocks(document_id){
