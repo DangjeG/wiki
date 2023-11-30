@@ -1,11 +1,8 @@
-from sqlalchemy import Column, ForeignKey, Boolean, UniqueConstraint
+from sqlalchemy import Column, ForeignKey, UniqueConstraint
 
 from wiki.database.core import Base
 from wiki.permissions.object.base import BaseObjectPermissionMixin
 from wiki.permissions.object.schemas import IndividualObjectPermissionInfo
-from wiki.wiki_workspace.block.schemas import BlockInfoResponse
-from wiki.wiki_workspace.document.schemas import DocumentInfoResponse
-from wiki.wiki_workspace.schemas import WorkspaceInfoResponse
 
 
 class IndividualObjectPermissionMixin(BaseObjectPermissionMixin):

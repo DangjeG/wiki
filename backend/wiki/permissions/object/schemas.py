@@ -7,9 +7,6 @@ from wiki.permissions.object.enums import ObjectPermissionMode
 from wiki.user.schemas import UserBaseInfoResponse
 from wiki.user_group.schemas import GroupInfo
 from wiki.wiki_api_client.enums import ResponsibilityType
-from wiki.wiki_workspace.block.schemas import BlockInfoResponse
-from wiki.wiki_workspace.document.schemas import DocumentInfoResponse
-from wiki.wiki_workspace.schemas import WorkspaceInfoResponse
 
 
 class BaseCreateObjectPermission(WikiBase):

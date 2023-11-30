@@ -1,14 +1,9 @@
-from uuid import UUID
-
 from sqlalchemy import Column, String, ForeignKey, UniqueConstraint
 
 from wiki.database.core import Base
 from wiki.permissions.object.base import BaseObjectPermissionMixin
 from wiki.permissions.object.schemas import GeneralObjectPermissionInfo
 from wiki.wiki_api_client.enums import ResponsibilityType
-from wiki.wiki_workspace.block.schemas import BlockInfoResponse
-from wiki.wiki_workspace.document.schemas import DocumentInfoResponse
-from wiki.wiki_workspace.schemas import WorkspaceInfoResponse
 
 
 class GeneralObjectPermissionMixin(BaseObjectPermissionMixin):

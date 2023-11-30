@@ -2,7 +2,7 @@ from io import StringIO
 from typing import Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, UploadFile
+from fastapi import APIRouter, Depends, UploadFile, File
 from lakefs_client.client import LakeFSClient
 from pydantic import constr
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -19,6 +19,7 @@ from wiki.common.schemas import WikiUserHandlerData, BaseResponse
 from wiki.config import settings
 from wiki.database.deps import get_db
 from wiki.permissions.base import BasePermission
+from wiki.permissions.object.transporter import PermissionTransporter
 from wiki.wiki_api_client.enums import ResponsibilityType
 from wiki.wiki_storage.deps import get_storage_client
 from wiki.wiki_storage.services.base import BaseWikiStorageService
@@ -58,6 +59,9 @@ async def create_block(
     block_repository: BlockRepository = BlockRepository(session)
     block = await block_repository.create_block(new_block)
 
+    permission_transporter = PermissionTransporter(session)
+    await permission_transporter.transfer_to_block(block, document)
+
     storage_service: BaseWikiStorageService = BaseWikiStorageService(storage_client)
     storage_service.upload_document_block_in_workspace_storage(content=StringIO(""),
                                                                workspace_id=document.workspace_id,
@@ -80,9 +84,8 @@ async def create_block(
     summary="Update file data document block"
 )
 async def update_block_data(
-        file: UploadFile,
         block_id: UUID,
-        type_block: TypeBlock = TypeBlock.FILE,
+        file: UploadFile = File(),
         session: AsyncSession = Depends(get_db),
         ya_disk: YaDisk = Depends(get_ya_disk_session_storage),
         storage_client: LakeFSClient = Depends(get_storage_client),
@@ -90,6 +93,12 @@ async def update_block_data(
 ):
     block_repository: BlockRepository = BlockRepository(session)
     block = await block_repository.update_block(block_id)
+    if TypeBlock(block.type_block) == TypeBlock.TEXT:
+        raise WikiException(
+            message="Doesn't match block type.",
+            error_code=WikiErrorCode.BLOCK_NOT_SPECIFIED,
+            http_status_code=status.HTTP_409_CONFLICT
+        )
     document_repository: DocumentRepository = DocumentRepository(session)
     document = await document_repository.get_document_by_id(block.document_id)
     document_ids = await document_repository.get_list_ids_of_document_hierarchy(document)
@@ -105,7 +114,7 @@ async def update_block_data(
 
     asset_repository = AssetRepository(session)
     asset_type = AssetType.DOCUMENT
-    if type_block == TypeBlock.IMG:
+    if TypeBlock(block.type_block) == TypeBlock.IMG:
         asset_type = AssetType.IMAGE
 
     asset: Asset = await asset_repository.create_asset(
@@ -116,8 +125,6 @@ async def update_block_data(
         workspace_id=workspace.id
     )
 
-    ya_storage = YaDiskAssetsStorage(ya_disk)
-    await ya_storage.upload_asset(asset, file.file)
     content = str(asset.id)
 
     storage_service: BaseWikiStorageService = BaseWikiStorageService(storage_client)
@@ -126,14 +133,19 @@ async def update_block_data(
                                                                document_ids=document_ids,
                                                                block_id=block.id)
 
+    ya_storage = YaDiskAssetsStorage(ya_disk)
+    await ya_storage.upload_asset(asset, file.file)
+
     return BlockDataResponse(
         id=block.id,
         document_id=block.document_id,
         position=block.position,
         type_block=block.type_block,
         content=content,
-        created_at=block.created_at
+        created_at=block.created_at,
+        link=await ya_storage.download_asset(asset)
     )
+
 
 @block_router.put(
     "/data/text",
@@ -142,13 +154,19 @@ async def update_block_data(
     summary="Update text data document block"
 )
 async def update_block_data(
-        update_data_block: UpdateBlockData = Depends(),
+        update_data_block: UpdateBlockData,
         session: AsyncSession = Depends(get_db),
         storage_client: LakeFSClient = Depends(get_storage_client),
         user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER))
 ):
     block_repository: BlockRepository = BlockRepository(session)
-    block = await block_repository.update_block(update_data_block.block_id)
+    block = await block_repository.get_block_by_id(update_data_block.block_id)
+    if TypeBlock(block.type_block) != TypeBlock.TEXT:
+        raise WikiException(
+            message="Doesn't match block type.",
+            error_code=WikiErrorCode.BLOCK_NOT_SPECIFIED,
+            http_status_code=status.HTTP_409_CONFLICT
+        )
     document_repository: DocumentRepository = DocumentRepository(session)
     document = await document_repository.get_document_by_id(block.document_id)
     document_ids = await document_repository.get_list_ids_of_document_hierarchy(document)
@@ -221,9 +239,10 @@ async def delete_block(
 )
 async def get_blocks(
         document_id: UUID,
-        version_commit_id: Optional[constr(min_length=64, max_length=64)] = None,
         session: AsyncSession = Depends(get_db),
         storage_client: LakeFSClient = Depends(get_storage_client),
+        ya_disk: YaDisk = Depends(get_ya_disk_session_storage),
+        version_commit_id: Optional[constr(min_length=64, max_length=64)] = None,
         user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER))
 ):
     """
@@ -233,7 +252,10 @@ async def get_blocks(
     :param version_commit_id: Specify the commit identifier of a particular version. If None, get the latest version of the data.
     """
 
-    return await get_data_blocks(session, document_id, version_commit_id, storage_client)
+    res = await get_data_blocks(session, document_id, version_commit_id, storage_client)
+    ya_storage = YaDiskAssetsStorage(ya_disk)
+    asset_repository = AssetRepository(session)
+    return await set_asset_link_for_block(res, asset_repository, ya_storage)
 
 
 @block_router.get(
@@ -252,11 +274,11 @@ async def get_block_by_id(
 ):
 
     block: BlockDataResponse = await get_block_data_by_id(session,
-                                      block_id,
-                                      storage_client,
-                                      version_commit_id)
+                                                          block_id,
+                                                          storage_client,
+                                                          version_commit_id)
 
-    if block.type_block != TypeBlock.TEXT:
+    if block.type_block != TypeBlock.TEXT and block.content != "":
         asset_repository = AssetRepository(session)
         asset: Asset = await asset_repository.get_asset_by_id(
             UUID(block.content)
@@ -278,6 +300,7 @@ async def get_publish_blocks(
         document_id: UUID,
         session: AsyncSession = Depends(get_db),
         storage_client: LakeFSClient = Depends(get_storage_client),
+        ya_disk: YaDisk = Depends(get_ya_disk_session_storage),
         user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER))
 ):
     """
@@ -286,7 +309,21 @@ async def get_publish_blocks(
 
     document_repository: DocumentRepository = DocumentRepository(session)
     document = await document_repository.get_document_by_id(document_id)
-    return await get_data_blocks(session,
-                                 document_id,
-                                 document.current_published_version_commit_id,
-                                 storage_client)
+    res = await get_data_blocks(session,
+                                document_id,
+                                document.current_published_version_commit_id,
+                                storage_client)
+    ya_storage = YaDiskAssetsStorage(ya_disk)
+    asset_repository = AssetRepository(session)
+    return await set_asset_link_for_block(res, asset_repository, ya_storage)
+
+
+async def set_asset_link_for_block(data: list[BlockDataResponse],
+                                   asset_repository: AssetRepository,
+                                   ya_storage: YaDiskAssetsStorage):
+    for r in data:
+        if r.type_block != TypeBlock.TEXT and r.content != "":
+            asset = await asset_repository.get_asset_by_id(UUID(r.content))
+            r.link = await ya_storage.download_asset(asset)
+
+    return data
