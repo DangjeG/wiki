@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from wiki.common.exceptions import WikiException, WikiErrorCode
-from wiki.permissions.object.enums import ObjectType, ObjectPermissionType
+from wiki.permissions.object.enums import ObjectType, ObjectPermissionType, ObjectPermissionMode
 from wiki.permissions.object.general.models import (
     GeneralWorkspacePermission,
     GeneralDocumentPermission,
@@ -20,6 +20,7 @@ from wiki.permissions.object.individual.models import (
     IndividualDocumentPermission,
     IndividualBlockPermission
 )
+from wiki.wiki_api_client.enums import ResponsibilityType
 from wiki.wiki_workspace.block.repository import BlockRepository
 from wiki.wiki_workspace.document.repository import DocumentRepository
 from wiki.wiki_workspace.repository import WorkspaceRepository
@@ -42,6 +43,10 @@ async def get_object_for_permission(object_type: ObjectType, object_id: UUID, se
                 error_code=WikiErrorCode.OBJECT_TYPE_FOR_PERMISSION_NOT_AVAILABLE,
                 http_status_code=status.HTTP_400_BAD_REQUEST
             )
+
+
+def get_permission_mode_by_responsibility(mode: ObjectPermissionMode, responsibility: ResponsibilityType):
+    return ObjectPermissionMode.DELETION if responsibility == ResponsibilityType.ADMIN else mode
 
 
 _permission_bd_classes = [GeneralWorkspacePermission, GeneralDocumentPermission, GeneralBlockPermission,

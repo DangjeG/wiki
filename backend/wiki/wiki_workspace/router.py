@@ -12,6 +12,7 @@ from wiki.permissions.base import BasePermission
 from wiki.permissions.object.enums import ObjectPermissionMode
 from wiki.permissions.object.repository import ObjectPermissionRepository
 from wiki.permissions.object.schemas import CreateIndividualObjectPermission
+from wiki.permissions.object.utils import get_permission_mode_by_responsibility
 from wiki.user.models import User
 from wiki.user.repository import UserRepository
 from wiki.user.utils import get_user_info
@@ -114,7 +115,7 @@ async def get_workspaces(
                 id=ws.id,
                 title=ws.title,
                 owner_user=await get_user_info(ws.owner_user_id, session, is_full=False),
-                permission_mode=ObjectPermissionMode.DELETION if user.wiki_api_client.responsibility == ResponsibilityType.ADMIN else ws.permission_mode
+                permission_mode=get_permission_mode_by_responsibility(ws.permission_mode, user.wiki_api_client.responsibility)
             )
             result_workspace.append(append_workspace)
 
@@ -135,12 +136,13 @@ async def get_workspace_info(
     workspace_repository: WorkspaceRepository = WorkspaceRepository(session)
     workspace = await workspace_repository.get_workspace_with_permission_by_id(user.id, workspace_id)
 
-    if ObjectPermissionMode(workspace.permission_mode) > ObjectPermissionMode.HIDDEN_INACCESSIBLE:
+    if (user.wiki_api_client.responsibility == ResponsibilityType.ADMIN or
+            ObjectPermissionMode(workspace.permission_mode) > ObjectPermissionMode.HIDDEN_INACCESSIBLE):
         return WorkspaceInfoResponse(
             id=workspace.id,
             title=workspace.title,
             owner_user=await get_user_info(workspace.owner_user_id, session, is_full=False),
-            permission_mode=workspace.workspace
+            permission_mode=get_permission_mode_by_responsibility(workspace.permission_mode, user.wiki_api_client.responsibility)
         )
     else:
         raise workspace_repository.workspace_not_found_exception

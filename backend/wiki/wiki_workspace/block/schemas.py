@@ -4,6 +4,7 @@ from uuid import UUID
 
 from wiki.models import WikiBase
 from wiki.wiki_workspace.block.enums import TypeBlock
+from wiki.wiki_workspace.schemas import ObjectPermissionInfoMixin
 
 
 class CreateBlock(WikiBase):
@@ -22,7 +23,7 @@ class UpdateBlockData(WikiBase):
     content: str  # WYSIWYG
 
 
-class BlockInfoResponse(WikiBase):
+class BlockInfoResponse(WikiBase, ObjectPermissionInfoMixin):
     id: UUID
     document_id: UUID
     position: int
