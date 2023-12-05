@@ -2,7 +2,11 @@
 
 
 
-export default function FileUploader(){
+export default function FileUploader({onChange}){
 
-    return(<input type="file"/>)
+    const handleChange = (e) => {
+        onChange(e)
+    }
+
+    return(<input type="file" onChange={handleChange}/>)
 }

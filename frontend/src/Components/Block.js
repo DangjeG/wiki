@@ -1,11 +1,8 @@
-import React, {useEffect, useState} from 'react';
-import {Accordion, AccordionDetails, AccordionSummary, Paper, Typography} from '@mui/material';
-import Wysiwyg from "./Wysiwyg";
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import EditIcon from '@mui/icons-material/Edit';
-import {Box} from "@mui/system";
 import TextBlock from "./TextBlock";
 import ImageBlock from "../ImageBlock";
+import {IconButton} from "@mui/material";
+import {Delete} from "@mui/icons-material";
+import HistoryIcon from '@mui/icons-material/History';
 
 export default function BlockComponent(props) {
 
@@ -17,6 +14,28 @@ export default function BlockComponent(props) {
             return <TextBlock block={block} onChange={props.onChange}/>
             case 'IMG':  // if (x === 'value2')
                 return <ImageBlock block={block} onChange={props.onChange}/>
+        }
+    }
+    const getTools = () => {
+        switch(props.mode) {
+            case 'edit':
+                return(
+                    <div style={{float: 'right'}}>
+                        <IconButton onClick={handleDelete}>
+                            <Delete/>
+                        </IconButton>
+                        <IconButton onClick={handleShowHistory}>
+                            <HistoryIcon/>
+                        </IconButton>
+                    </div>
+            /*case 'version':
+                return (
+                    <div style={{float: 'right'}}>
+                        <IconButton onClick={handleDelete}>
+                            <Delete/>
+                        </IconButton>
+                    </div>*/
+                )
         }
     }
 
@@ -33,10 +52,16 @@ export default function BlockComponent(props) {
         //props.onMoveUp(block)
     }
     const handleDelete = () => {
-        //props.onDelete(block)
+        props.onDelete(block)
     }
-    
+    const handleShowHistory = () => {
+        props.onShowHistory(block)
+    }
+
     return (
-        getBlockView()
+        <div>
+            {getBlockView()}
+            {getTools()}
+        </div>
     )
 }

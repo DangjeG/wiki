@@ -6,6 +6,8 @@ import Sidebar from "../Components/Sidebar";
 import {Grid, Tooltip} from "@mui/material";
 import SaveAltIcon from "@mui/icons-material/SaveAlt";
 import AddIcon from "@mui/icons-material/Add";
+import ImageIcon from '@mui/icons-material/Image';
+
 
 export default function WorkspaceDocs (props){
 
@@ -21,26 +23,6 @@ export default function WorkspaceDocs (props){
             window.location.hash = "#workspace/select"
 
     }, []);
-
-    const fetchVersions = async (block_id) => {
-        let versionsInfo = []
-        let versions = []
-        try {
-            versionsInfo = await api.getBlockVersions(block_id)
-        }
-        catch (e){
-            console.log(e)
-        }
-        for (let version of versionsInfo){
-            try {
-                version.push(api.getBlockData(block_id, version.commit_id))
-            }
-            catch (e){
-                console.log(e)
-            }
-        }
-        setBlockVersions(versions)
-    }
 
     const fetchBlocks = async (ID) => {
         try {
@@ -64,21 +46,37 @@ export default function WorkspaceDocs (props){
     const handleSave = async () => {
         setUncommented(false)
         for (let item of blocks)
-            await api.updateBlockData(item.id, item.content)
+            if (item.type_block === "TEXT")
+                await api.updateTextBlockData(item.id, item.content)
         await api.saveDocument(documentID)
     }
 
     const switchDocument = (ID) => {
         setBlocks([])
         fetchBlocks(ID);
-        fetchVersions(blocks[0].id)
-        alert(blockVersions.length)
     }
 
-    const handleAdd = async () => {
+    const handleDelete = async (block) => {
+        await api.deleteBlock(block.id)
+        setBlocks([])
+        fetchBlocks(documentID);
+        setUncommented(true)
+    }
+
+    const handleAddText = async () => {
         await api.addBlock(documentID,0 , "TEXT")
         fetchBlocks(documentID)
         setUncommented(true)
+    }
+    const handleAddImage = async () => {
+        await api.addBlock(documentID,0 , "IMG")
+        fetchBlocks(documentID)
+        setUncommented(true)
+    }
+
+    const handleShowHistory= async (block) => {
+        props.setHistoryBlock(block)
+        window.location.href="#workspace/block_history"
     }
 
     return (
@@ -93,16 +91,25 @@ export default function WorkspaceDocs (props){
                         <SaveAltIcon/>
                     </Button>
                     <Button sx={{border: 'none', outline: 'none' }}
-                            variant="outlined" onClick={handleAdd}>
+                            variant="outlined" onClick={handleAddText}>
                         <Tooltip sx={{width: '10px', height: '10px'}}
-                                 title="Добавить блок"
+                                 title="Добавить text блок"
                                  placement="top"
                                  arrow>
                             <AddIcon sx={{color: '#000000'}}/>
                         </Tooltip>
                     </Button>
+                    <Button sx={{border: 'none', outline: 'none' }}
+                            variant="outlined" onClick={handleAddImage}>
+                        <Tooltip sx={{width: '10px', height: '10px'}}
+                                 title="Добавить image блок"
+                                 placement="top"
+                                 arrow>
+                            <ImageIcon  sx={{color: '#000000'}}/>
+                        </Tooltip>
+                    </Button>
                     {blocks.map((item) =>{
-                        return <BlockComponent onChange={handleChange} block={item}/>
+                        return <BlockComponent mode={"edit"} onShowHistory={handleShowHistory} onDelete={handleDelete} onChange={handleChange} block={item}/>
                     })}
                 </Grid>
             </Grid>

@@ -21,8 +21,7 @@ export default function TextBlock({block, onChange}){
                 <AccordionSummary
                     expandIcon={<EditIcon />}
                     aria-controls="panel1a-content"
-                    id="panel1a-header"
-                >
+                    id="panel1a-header">
                     <Typography dangerouslySetInnerHTML={{ __html: content}} />
                 </AccordionSummary>
                 <AccordionDetails sx={{display: 'flex', justifyContent: 'center'}}>
