@@ -45,6 +45,8 @@ async def export_document(file_name: str, list_document_content: list[str]):
     html += """</body>
         </html>"""
 
+    os.mkdir("temp_export")
+
     with open("temp_export/" + file_name + ".html", "w", encoding="utf-8") as file:
         file.write(html)
 
