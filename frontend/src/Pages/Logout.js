@@ -3,10 +3,11 @@ import React from "react";
 import {Modal, Button} from "react-bootstrap";
 
 
-export default function Logout() {
+export default function Logout({onRefresh}) {
     React.useEffect( () => {
         async function fetch(){
             await api.logout()
+            onRefresh()
         }
         fetch()
     })

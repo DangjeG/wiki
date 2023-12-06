@@ -1,9 +1,8 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {api} from "./Config/app.config";
-import {useEffect, useState} from "react";
 import AppNavbar from "./Components/Navbar";
-import {HashRouter, Route, Routes} from "react-router-dom";
+import {BrowserRouter, Route, Routes} from "react-router-dom";
 import Home from "./Pages/Home";
 import Login from "./Pages/Login";
 import Verify from "./Pages/Verify";
@@ -18,31 +17,42 @@ import ProtectedRoute from "./Components/ProtectedRoute";
 export default function App() {
 
     const [user, setUser] = useState(null)
+    const [userLoading, setUserLoading] = useState()
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await api.getMe();
-                setUser(response);
-            } catch (error) {
-                console.log(error)
-            }
-        };
-        fetchData();
+
+        fetchUser();
+
     }, []);
 
-   /* const UserContext = React.createContext()*/
+    const handleRefresh = () => {
+        fetchUser()
+    }
+
+    const fetchUser = async () => {
+        setUserLoading(true)
+        try {
+            const response = await api.getMe();
+            setUser(response);
+            setUserLoading(false)
+        } catch (error) {
+            console.log(error)
+        }
+    };
+
+
 
         return (
-           /* <UserContext.Provider value={user}>*/
-                <HashRouter>
+            /*<UserContext.Provider value={user}>*/
+            userLoading ? <></> :
+                <BrowserRouter basename={"/wiki/demo"}>
                     <AppNavbar user={user}/>
                     <Routes>
                         <Route path={"/"} element={<Home/>}/>
                         <Route path={"/login"} element={<Login/>}/>
-                        <Route path={"/verify"} element={<Verify/>}/>
+                        <Route path={"/verify"} element={<Verify onRefresh={handleRefresh}/>}/>
                         <Route path={"/signup"} element={<SignUp/>}/>
-                        <Route path={"/logout"} element={<Logout/>}/>
+                        <Route path={"/logout"} element={<Logout onRefresh={handleRefresh}/>}/>
                         <Route element={<ProtectedRoute requirement={
                             user !== null && user.wiki_api_client !== null && user.wiki_api_client.responsibility === 'ADMIN'
                         }/>}>
@@ -56,7 +66,8 @@ export default function App() {
                         </Route>
                         <Route path={"/test/*"} element={<TestPage/>}/>
                     </Routes>
-                </HashRouter>
+                </BrowserRouter>
+
            /* </UserContext.Provider>*/
         )
 }

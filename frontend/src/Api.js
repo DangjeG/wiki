@@ -183,11 +183,15 @@ export default class Api {
         })
     }
     async updateFileBlockData(block_id, content){
+        let link = ""
         await instance.put(`/blocks/data/file?block_id=${block_id}`, content, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
+        }).then((resp)=>{
+            link = resp.data.link
         })
+        return link
     }
     async getBlockData(block_id, commit_id){
         let url = `/blocks/data?block_id=${block_id}${commit_id !== null
@@ -214,6 +218,15 @@ export default class Api {
     async getBlockVersions(block_id){
         let res = []
         await instance.get(`/versioning/block/${block_id}/info`).then((resp)=>{
+            resp.data.forEach((item) => {
+                res.push(item)
+            })}
+        )
+        return res
+    }
+    async getDocVersions(doc_id){
+        let res = []
+        await instance.get(`/versioning/document/${doc_id}/info`).then((resp)=>{
             resp.data.forEach((item) => {
                 res.push(item)
             })}

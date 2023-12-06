@@ -6,11 +6,12 @@ import AddIcon from "@mui/icons-material/Add";
 import {Form, Modal} from "react-bootstrap";
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import ButtonAddWorkspace from "../Components/ModalButton/ButtonAddWorkspace";
+import {useNavigate, useParams} from "react-router-dom";
 
 export default function WorkspaceSelect (props) {
 
     const [workspaces, setWorkspaces] = useState([]);
-
+    let navigate = useNavigate()
 
     const fetchWorkspaces = async () => {
         try {
@@ -27,8 +28,8 @@ export default function WorkspaceSelect (props) {
     }, []);
 
     const handleClick = (id) => {
-        props.onSelect(id)
-        window.location.hash = "#workspace/docs"
+
+        navigate(`/workspace/${id}`)
     }
 
     const handleSubmit = async (newWorkspace) => {

@@ -7,17 +7,18 @@ import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
 import {Form, Modal} from "react-bootstrap";
 import ButtonAddDocument from "./ModalButton/ButtonAddDocument";
-export default function Sidebar(props){
-
+import {useNavigate} from "react-router-dom";
+export default function Sidebar({workspaceID}){
 
     const [sidebarData, setSidebarData] = useState([]);
-
     const [workspace, setWorkspace] = useState(null)
+    let navigate = useNavigate()
+
     const fetchDocs = async () => {
         try {
-            const response = await api.getDocumentsTree(props.workspaceID)
+            const response = await api.getDocumentsTree(workspaceID)
             setSidebarData(response)
-            props.onSelect(response[0].id)
+            navigate(`/workspace/${workspaceID}/document/${response[0].id}/view`)
         }
         catch (e){
             console.log(e)
@@ -26,7 +27,7 @@ export default function Sidebar(props){
 
     const fetchWorkspace = async () =>{
         try{
-            const response = await api.getWorkspaceInfo(props.workspaceID)
+            const response = await api.getWorkspaceInfo(workspaceID)
             setWorkspace(response)
         }
         catch (e){
@@ -42,13 +43,13 @@ export default function Sidebar(props){
 
 
     const handleAdd = async (newDocument) => {
-        await api.addDocument(newDocument, props.workspaceID)
+        await api.addDocument(newDocument, workspaceID)
         setSidebarData([])
         fetchDocs()
     }
 
     const handleClick = (id) => {
-        props.onSelect(id)
+        navigate(`/workspace/${workspaceID}/document/${id}/view`)
     }
 
     function getChildren(children) {

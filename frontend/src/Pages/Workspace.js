@@ -18,9 +18,8 @@ export default function Workspace(){
 
     return (
         <Routes>
-            <Route path="/docs" element={<WorkspaceDocs setHistoryBlock={handleSetBlockHistory} workspace_id={workspaceID} />} />
-            <Route path="/select" element={<WorkspaceSelect onSelect={setWorkspaceID}/>} />
-            <Route path="/block_history" element={<BlockVersions block={blockHistory}/>} />
+            <Route path="/" element={<WorkspaceSelect onSelect={setWorkspaceID}/>} />
+            <Route path="/:wp_id/*" element={<WorkspaceDocs setHistoryBlock={handleSetBlockHistory} />} />
         </Routes>
     )
 }

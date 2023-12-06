@@ -1,4 +1,5 @@
 import React, {useContext} from 'react';
+import {useNavigate} from 'react-router-dom';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -10,16 +11,16 @@ import {Box} from "@mui/system";
 import PersonIcon from '@mui/icons-material/Person';
 import "../Styles/BaseColors.css"
 import "../Styles/Navbar.css"
+import {Link} from "react-router-dom";
 
 
 export default function AppNavbar(props) {
     const [anchorEl, setAnchorEl] = React.useState(null);
     /*const user = useContext()*/
-
+    const navigate = useNavigate();
     const handleMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
     };
-
 
     const handleMenuClose = () => {
         setAnchorEl(null);
@@ -31,7 +32,9 @@ export default function AppNavbar(props) {
             <div>
                 <Typography variant="h6"
                             component="a"
-                            href="#"
+                            onClick={() => {
+                                navigate("/")
+                            }}
                             id="typography-home">
                     ГЛАВНАЯ
                 </Typography>
@@ -43,18 +46,22 @@ export default function AppNavbar(props) {
                 </Typography>
             </div>
 
-
         if (props.user !== null && props.user.wiki_api_client !== null) {
             return (
                 <div className="base-button">
                     <Stack direction="row" alignItems="center" spacing={2}>
                         {base}
                         {props.user.wiki_api_client.responsibility === 'ADMIN' ? (
-                            <Button id="typography-home" href="#admin">
+                            <Button id="typography-home" onClick={() => {
+                                navigate("/admin")
+                            }}>
                                 ИНСТРУМЕНТЫ АДМИНА
                             </Button>
                         ) : null}
-                        <Button id="typography-home" href="#workspace/select">
+
+                        <Button id="typography-home" onClick={() => {
+                            navigate("/workspace")
+                        }}>
                             ПРОЕКТЫ
                         </Button>
                     </Stack>
@@ -68,11 +75,15 @@ export default function AppNavbar(props) {
             return (
                 <Stack direction="row" spacing={2} sx={{ justifyContent: 'flex-end', marginLeft: 'auto' }}>
                     <Button id="base-button" /*sx={{color: '#423e42', ':hover': {backgroundColor: '#506796'}, background: '#637cad',}} */
-                            variant="contained" href="#login">
+                            variant="contained"onClick={() => {
+                        navigate("/login")
+                    }}>
                         ВОЙТИ
                     </Button>
                     <Button id="accent-button"  /*sx={{background:'#b07285', color: '#423e42', ':hover': {backgroundColor: '#8a4a5d'}}}*/
-                            variant="contained" href="#signup">
+                            variant="contained" onClick={() => {
+                        navigate("/signup")
+                    }}>
                         ЗАРЕГИСТРИРОВАТЬСЯ
                     </Button>
                 </Stack>
@@ -104,13 +115,14 @@ export default function AppNavbar(props) {
                     >
                         <MenuItem  onClick={()=> {
                             handleMenuClose()
-                            window.location.href = "#profile"
+                            navigate("/profile")
+
                         }}>
                             Profile
                         </MenuItem>
                         <MenuItem onClick={()=> {
                             handleMenuClose()
-                            window.location.href = "#logout"
+                            navigate("/logout")
                         }}>
                             Logout
                         </MenuItem>

@@ -5,7 +5,7 @@ import {api} from "../Config/app.config";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
 
-export default function Verify(){
+export default function Verify({onRefresh}){
 
     const [code, setCode] = useState();
     const [isError, setIsError] = useState(false);
@@ -15,6 +15,7 @@ export default function Verify(){
         event.preventDefault();
         try {
             await api.verify(code);
+            onRefresh()
             window.location.href = '#';
             }
             catch (error){

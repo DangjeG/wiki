@@ -1,5 +1,5 @@
 import TextBlock from "./TextBlock";
-import ImageBlock from "../ImageBlock";
+import ImageBlock from "./ImageBlock";
 import {IconButton} from "@mui/material";
 import {Delete} from "@mui/icons-material";
 import HistoryIcon from '@mui/icons-material/History';
@@ -7,6 +7,7 @@ import HistoryIcon from '@mui/icons-material/History';
 export default function BlockComponent(props) {
 
     const block = props.block
+
 
     const getBlockView = () =>{
         switch(block.type_block) {
@@ -18,6 +19,14 @@ export default function BlockComponent(props) {
     }
     const getTools = () => {
         switch(props.mode) {
+            case 'view':
+                return(
+                    <div style={{float: 'right'}}>
+                        <IconButton onClick={handleShowHistory}>
+                            <HistoryIcon/>
+                        </IconButton>
+                    </div>
+                )
             case 'edit':
                 return(
                     <div style={{float: 'right'}}>
