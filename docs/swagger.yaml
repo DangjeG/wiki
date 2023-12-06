@@ -93,12 +93,15 @@ components:
           - type: string
           - type: 'null'
           title: Link
+        permission_mode:
+          $ref: '#/components/schemas/ObjectPermissionMode'
         position:
           title: Position
           type: integer
         type_block:
           $ref: '#/components/schemas/TypeBlock'
       required:
+      - permission_mode
       - id
       - document_id
       - position
@@ -121,12 +124,15 @@ components:
           format: uuid
           title: Id
           type: string
+        permission_mode:
+          $ref: '#/components/schemas/ObjectPermissionMode'
         position:
           title: Position
           type: integer
         type_block:
           $ref: '#/components/schemas/TypeBlock'
       required:
+      - permission_mode
       - id
       - document_id
       - position
@@ -393,6 +399,8 @@ components:
             type: string
           - type: 'null'
           title: Parent Document Id
+        permission_mode:
+          $ref: '#/components/schemas/ObjectPermissionMode'
         title:
           title: Title
           type: string
@@ -401,6 +409,7 @@ components:
           title: Workspace Id
           type: string
       required:
+      - permission_mode
       - id
       - title
       - workspace_id
@@ -429,10 +438,13 @@ components:
           format: date-time
           title: Last Published Version At
           type: string
+        permission_mode:
+          $ref: '#/components/schemas/ObjectPermissionMode'
         title:
           title: Title
           type: string
       required:
+      - permission_mode
       - id
       - title
       - last_published_version_at
@@ -1001,6 +1013,20 @@ components:
           - $ref: '#/components/schemas/ObjectPermissionMode'
           - type: 'null'
       title: UpdateBaseObjectPermission
+      type: object
+    UpdateBlockData:
+      properties:
+        block_id:
+          format: uuid
+          title: Block Id
+          type: string
+        content:
+          title: Content
+          type: string
+      required:
+      - block_id
+      - content
+      title: UpdateBlockData
       type: object
     UpdateBlockInfo:
       properties:
@@ -2052,14 +2078,6 @@ paths:
           format: uuid
           title: Block Id
           type: string
-      - in: query
-        name: type_block
-        required: false
-        schema:
-          allOf:
-          - $ref: '#/components/schemas/TypeBlock'
-          default: FILE
-          title: Type Block
       requestBody:
         content:
           multipart/form-data:
@@ -2091,25 +2109,12 @@ paths:
   /api/v1/blocks/data/text:
     put:
       operationId: update_block_data_api_v1_blocks_data_text_put
-      parameters:
-      - in: query
-        name: block_id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBlockData'
         required: true
-        schema:
-          format: uuid
-          title: Block Id
-          type: string
-      - in: query
-        name: type_block
-        required: true
-        schema:
-          $ref: '#/components/schemas/TypeBlock'
-      - in: query
-        name: content
-        required: true
-        schema:
-          title: Content
-          type: string
       responses:
         '200':
           content:
@@ -2541,6 +2546,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
       summary: Add template
       tags:
       - DocumentTemplate
@@ -2615,6 +2626,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
       summary: Get all document templates
       tags:
       - DocumentTemplate

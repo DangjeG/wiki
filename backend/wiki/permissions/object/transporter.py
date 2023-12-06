@@ -23,6 +23,7 @@ class PermissionTransporter:
 
     def __init__(self, session):
         self.session = session
+        self.permission_repository = ObjectPermissionRepository(session)
 
     async def _transfer_general_permission(self,
                                            object_permission,

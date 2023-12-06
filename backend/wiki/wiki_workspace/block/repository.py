@@ -14,13 +14,14 @@ from wiki.database.utils import (
 from wiki.permissions.object.general.models import GeneralBlockPermission
 from wiki.permissions.object.group.models import GroupBlockPermission
 from wiki.permissions.object.individual.models import IndividualBlockPermission
+from wiki.wiki_workspace.block.enums import TypeBlock
 from wiki.wiki_workspace.block.model import Block
 from wiki.wiki_workspace.block.schemas import CreateBlock
 from wiki.wiki_workspace.repository import ObjectRepository
 
 
 class BlockRepository(ObjectRepository):
-    _block_not_found_exception = WikiException(
+    block_not_found_exception = WikiException(
         message="Block not found.",
         error_code=WikiErrorCode.BLOCK_NOT_FOUND,
         http_status_code=status.HTTP_404_NOT_FOUND
@@ -40,11 +41,10 @@ class BlockRepository(ObjectRepository):
         res = await self._get_result_block_with_permission(user_id)
         return res.all()
 
-    @menage_db_not_found_result_method(NotFoundResultMode.EXCEPTION, ex=_block_not_found_exception)
+    @menage_db_not_found_result_method(NotFoundResultMode.EXCEPTION, ex=block_not_found_exception)
     async def get_block_with_permission_by_id(self, user_id: UUID, block_id: UUID):
         res = await self._get_result_block_with_permission(user_id, Block.id == block_id)
-        arr = res.all()
-        return arr[0] if len(arr) > 0 else None
+        return res.first()
 
     @menage_db_commit_method(CommitMode.FLUSH)
     async def create_block(self, create_block: CreateBlock) -> Block:
@@ -62,10 +62,13 @@ class BlockRepository(ObjectRepository):
     async def update_block(self,
                            block_id: UUID,
                            *,
-                           position: Optional[int] = None) -> Block:
+                           position: Optional[int] = None,
+                           type_block: Optional[TypeBlock] = None) -> Block:
         block = await self.get_block_by_id(block_id)
         if position is not None:
             block.position = position
+        if type_block is not None:
+            block.type_block = str(type_block)
         self.session.add(block)
 
         return block
@@ -75,6 +78,16 @@ class BlockRepository(ObjectRepository):
         block = await self.get_block_by_id(block_id)
         block.is_deleted = True
         self.session.add(block)
+
+    async def get_all_block_with_permissions_by_document_id(self,
+                                                            user_id: UUID,
+                                                            document_id: UUID,
+                                                            is_only_existing: bool = True):
+        whereclause = [Block.document_id == document_id]
+        if is_only_existing:
+            whereclause.append(Block.is_deleted == False)
+        res = await self._get_result_block_with_permission(user_id, *whereclause)
+        return res.all()
 
     async def get_all_block_by_document_id(self,
                                            document_id: UUID,
@@ -86,7 +99,7 @@ class BlockRepository(ObjectRepository):
         result = block_query.scalars().all()
         return result
 
-    @menage_db_not_found_result_method(NotFoundResultMode.EXCEPTION, ex=_block_not_found_exception)
+    @menage_db_not_found_result_method(NotFoundResultMode.EXCEPTION, ex=block_not_found_exception)
     async def get_block_by_id(self, block_id: UUID, is_only_existing: bool = True) -> Block:
         whereclause = [Block.id == block_id]
         if is_only_existing:
