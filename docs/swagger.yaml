@@ -88,12 +88,20 @@ components:
           format: uuid
           title: Id
           type: string
+        link:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Link
+        permission_mode:
+          $ref: '#/components/schemas/ObjectPermissionMode'
         position:
           title: Position
           type: integer
         type_block:
           $ref: '#/components/schemas/TypeBlock'
       required:
+      - permission_mode
       - id
       - document_id
       - position
@@ -116,12 +124,15 @@ components:
           format: uuid
           title: Id
           type: string
+        permission_mode:
+          $ref: '#/components/schemas/ObjectPermissionMode'
         position:
           title: Position
           type: integer
         type_block:
           $ref: '#/components/schemas/TypeBlock'
       required:
+      - permission_mode
       - id
       - document_id
       - position
@@ -138,6 +149,16 @@ components:
       required:
       - file
       title: Body_create_and_upload_asset_api_v1_asset_storage_asset_upload_post
+      type: object
+    Body_update_block_data_api_v1_blocks_data_file_put:
+      properties:
+        file:
+          format: binary
+          title: File
+          type: string
+      required:
+      - file
+      title: Body_update_block_data_api_v1_blocks_data_file_put
       type: object
     CreateBlock:
       properties:
@@ -378,6 +399,8 @@ components:
             type: string
           - type: 'null'
           title: Parent Document Id
+        permission_mode:
+          $ref: '#/components/schemas/ObjectPermissionMode'
         title:
           title: Title
           type: string
@@ -386,6 +409,7 @@ components:
           title: Workspace Id
           type: string
       required:
+      - permission_mode
       - id
       - title
       - workspace_id
@@ -414,10 +438,13 @@ components:
           format: date-time
           title: Last Published Version At
           type: string
+        permission_mode:
+          $ref: '#/components/schemas/ObjectPermissionMode'
         title:
           title: Title
           type: string
       required:
+      - permission_mode
       - id
       - title
       - last_published_version_at
@@ -1346,10 +1373,13 @@ components:
           type: string
         owner_user:
           $ref: '#/components/schemas/UserBaseInfoResponse'
+        permission_mode:
+          $ref: '#/components/schemas/ObjectPermissionMode'
         title:
           title: Title
           type: string
       required:
+      - permission_mode
       - id
       - title
       - owner_user
@@ -1943,6 +1973,49 @@ paths:
       - WorkspaceBlocks
   /api/v1/blocks/data:
     get:
+      operationId: get_block_by_id_api_v1_blocks_data_get
+      parameters:
+      - in: query
+        name: block_id
+        required: true
+        schema:
+          format: uuid
+          title: Block Id
+          type: string
+      - in: query
+        name: version_commit_id
+        required: false
+        schema:
+          anyOf:
+          - maxLength: 64
+            minLength: 64
+            type: string
+          - type: 'null'
+          title: Version Commit Id
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockDataResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get data block by id
+      tags:
+      - WorkspaceBlocks
+  /api/v1/blocks/data/all:
+    get:
       description: '## Getting document blocks data
 
 
@@ -1950,7 +2023,7 @@ paths:
 
         :param version_commit_id: Specify the commit identifier of a particular version.
         If None, get the latest version of the data.'
-      operationId: get_blocks_api_v1_blocks_data_get
+      operationId: get_blocks_api_v1_blocks_data_all_get
       parameters:
       - in: query
         name: document_id
@@ -1976,7 +2049,7 @@ paths:
               schema:
                 items:
                   $ref: '#/components/schemas/BlockDataResponse'
-                title: Response Get Blocks Api V1 Blocks Data Get
+                title: Response Get Blocks Api V1 Blocks Data All Get
                 type: array
           description: Successful Response
         '422':
@@ -1994,8 +2067,48 @@ paths:
       summary: Get all data blocks by id document
       tags:
       - WorkspaceBlocks
+  /api/v1/blocks/data/file:
     put:
-      operationId: update_block_data_api_v1_blocks_data_put
+      operationId: update_block_data_api_v1_blocks_data_file_put
+      parameters:
+      - in: query
+        name: block_id
+        required: true
+        schema:
+          format: uuid
+          title: Block Id
+          type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_update_block_data_api_v1_blocks_data_file_put'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockDataResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Update file data document block
+      tags:
+      - WorkspaceBlocks
+  /api/v1/blocks/data/text:
+    put:
+      operationId: update_block_data_api_v1_blocks_data_text_put
       requestBody:
         content:
           application/json:
@@ -2021,7 +2134,7 @@ paths:
       - WikiApiKey: []
       - WikiAccessToken: []
       - WikiBearer: []
-      summary: Update data document block
+      summary: Update text data document block
       tags:
       - WorkspaceBlocks
   /api/v1/blocks/info:
@@ -2090,49 +2203,6 @@ paths:
       - WikiAccessToken: []
       - WikiBearer: []
       summary: Get all publish data blocks by id document
-      tags:
-      - WorkspaceBlocks
-  /api/v1/blocks/{block_id}/data:
-    get:
-      operationId: get_block_by_id_api_v1_blocks__block_id__data_get
-      parameters:
-      - in: path
-        name: block_id
-        required: true
-        schema:
-          format: uuid
-          title: Block Id
-          type: string
-      - in: query
-        name: version_commit_id
-        required: false
-        schema:
-          anyOf:
-          - maxLength: 64
-            minLength: 64
-            type: string
-          - type: 'null'
-          title: Version Commit Id
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BlockDataResponse'
-          description: Successful Response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-          description: Validation Error
-      security:
-      - WikiRootApiKey: []
-      - WikiApiKey: []
-      - WikiApiKey: []
-      - WikiAccessToken: []
-      - WikiBearer: []
-      summary: Get data block by id document
       tags:
       - WorkspaceBlocks
   /api/v1/document/:
@@ -2476,6 +2546,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
       summary: Add template
       tags:
       - DocumentTemplate
@@ -2550,9 +2626,47 @@ paths:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
       summary: Get all document templates
       tags:
       - DocumentTemplate
+  /api/v1/export_document/:
+    get:
+      operationId: download_docx_api_v1_export_document__get
+      parameters:
+      - in: query
+        name: document_id
+        required: true
+        schema:
+          format: uuid
+          title: Document Id
+          type: string
+      responses:
+        '202':
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Export Docx
+      tags:
+      - ExportDocument
   /api/v1/permission_domain/:
     post:
       operationId: create_permission_domain_api_v1_permission_domain__post

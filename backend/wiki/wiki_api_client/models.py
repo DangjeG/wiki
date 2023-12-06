@@ -8,6 +8,7 @@ from uuid_extensions import uuid7
 from wiki.common.models import EnabledDeletedMixin
 from wiki.database.core import Base
 from wiki.wiki_api_client.enums import ResponsibilityType
+from wiki.wiki_api_client.schemas import WikiApiClientInfoResponse
 
 
 class WikiApiClient(Base, EnabledDeletedMixin):
@@ -22,6 +23,14 @@ class WikiApiClient(Base, EnabledDeletedMixin):
         self.description = description
         self.responsibility = str(responsibility)
         self.is_enabled = is_enabled
+
+    def get_response_info(self):
+        return WikiApiClientInfoResponse(
+            id=self.id,
+            description=self.description,
+            responsibility=self.responsibility,
+            is_enabled=self.is_enabled
+        )
 
 
 class WikiApiKey(Base, EnabledDeletedMixin):

@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, UploadFile
+from fastapi import APIRouter, Depends, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 from yadisk_async import YaDisk
@@ -35,9 +35,9 @@ asset_storage_router = APIRouter()
     summary="Upload Asset"
 )
 async def create_and_upload_asset(
-        file: UploadFile,
         workspace_id: UUID,
         asset_type: AssetType,
+        file: UploadFile = File(),
         session: AsyncSession = Depends(get_db),
         ya_disk: YaDisk = Depends(get_ya_disk_session_storage),
         user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER))

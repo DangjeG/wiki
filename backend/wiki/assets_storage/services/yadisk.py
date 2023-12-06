@@ -12,7 +12,7 @@ class YaDiskAssetsStorage(BaseAssetsStorage):
     session: YaDisk
 
     @manage_ya_disk_storage_exception_method()
-    async def upload_asset(self, asset: Asset, data: BytesIO):
+    async def upload_asset(self, asset: Asset, data: BytesIO | bytes):
         resource = await self.session.upload(data, self.get_asset_path(asset))
         return await resource.get_download_link()
 

@@ -5,18 +5,21 @@ from sqlalchemy import select, and_
 from starlette import status
 
 from wiki.common.exceptions import WikiException, WikiErrorCode
-from wiki.database.repository import BaseRepository
 from wiki.database.utils import (
     menage_db_commit_method,
     CommitMode,
     menage_db_not_found_result_method,
     NotFoundResultMode
 )
+from wiki.permissions.object.general.models import GeneralDocumentPermission
+from wiki.permissions.object.group.models import GroupDocumentPermission
+from wiki.permissions.object.individual.models import IndividualDocumentPermission
 from wiki.wiki_workspace.document.model import Document
+from wiki.wiki_workspace.repository import ObjectRepository
 
 
-class DocumentRepository(BaseRepository):
-    _document_not_found_exception = WikiException(
+class DocumentRepository(ObjectRepository):
+    document_not_found_exception = WikiException(
         message="Document not found.",
         error_code=WikiErrorCode.DOCUMENT_NOT_FOUND,
         http_status_code=status.HTTP_404_NOT_FOUND
@@ -27,7 +30,26 @@ class DocumentRepository(BaseRepository):
         http_status_code=status.HTTP_409_CONFLICT
     )
 
-    @menage_db_not_found_result_method(NotFoundResultMode.EXCEPTION, ex=_document_not_found_exception)
+    async def _get_result_document_with_permission(self, user_id: UUID, *whereclause):
+        return await self._get_result_object_with_permission(
+            Document,
+            IndividualDocumentPermission,
+            GroupDocumentPermission,
+            GeneralDocumentPermission,
+            user_id,
+            *whereclause
+        )
+
+    async def get_documents_with_permission(self, user_id: UUID) -> list:
+        res = await self._get_result_document_with_permission(user_id)
+        return res.all()
+
+    @menage_db_not_found_result_method(NotFoundResultMode.EXCEPTION, ex=document_not_found_exception)
+    async def get_document_with_permission_by_id(self, user_id: UUID, document_id: UUID):
+        res = await self._get_result_document_with_permission(user_id, Document.id == document_id)
+        return res.first()
+
+    @menage_db_not_found_result_method(NotFoundResultMode.EXCEPTION, ex=document_not_found_exception)
     async def get_document_by_id(self, document_id: UUID, is_only_existing: bool = True) -> Document:
         whereclause = [Document.id == document_id]
         if is_only_existing:
@@ -74,8 +96,23 @@ class DocumentRepository(BaseRepository):
 
         return document
 
-    async def get_all_document_by_workspace_id(self, workspace_id: UUID) -> list[Document]:
-        document_query = await self.session.execute(select(Document).where(Document.workspace_id == workspace_id))
+    async def get_all_document_with_permission_by_workspace_id(self,
+                                                               user_id: UUID,
+                                                               workspace_id: UUID,
+                                                               is_only_existing: bool = True):
+        whereclause = [Document.workspace_id == workspace_id]
+        if is_only_existing:
+            whereclause.append(Document.is_deleted == False)
+        res = await self._get_result_document_with_permission(user_id, *whereclause)
+        return res.all()
+
+    async def get_all_document_by_workspace_id(self,
+                                               workspace_id: UUID,
+                                               is_only_existing: bool = True) -> list[Document]:
+        whereclause = [Document.workspace_id == workspace_id]
+        if is_only_existing:
+            whereclause.append(Document.is_deleted == False)
+        document_query = await self.session.execute(select(Document).where(and_(*whereclause)))
         result = document_query.scalars().all()
         return result
 

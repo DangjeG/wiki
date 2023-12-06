@@ -3,7 +3,8 @@ from typing import Optional
 from uuid import UUID
 
 from wiki.models import WikiBase
-from wiki.user.schemas import UserFullInfoResponse, UserBaseInfoResponse
+from wiki.user.schemas import UserBaseInfoResponse
+from wiki.wiki_workspace.schemas import ObjectPermissionInfoMixin
 
 
 class CreateDocument(WikiBase):
@@ -12,7 +13,7 @@ class CreateDocument(WikiBase):
     parent_document_id: Optional[UUID] = None
 
 
-class DocumentInfoResponse(WikiBase):
+class DocumentInfoResponse(WikiBase, ObjectPermissionInfoMixin):
     id: UUID
     title: str
     workspace_id: UUID
@@ -22,7 +23,7 @@ class DocumentInfoResponse(WikiBase):
     last_published_version_at: datetime
 
 
-class DocumentNodeInfoResponse(WikiBase):
+class DocumentNodeInfoResponse(WikiBase, ObjectPermissionInfoMixin):
     id: UUID
     title: str
     last_published_version_at: datetime

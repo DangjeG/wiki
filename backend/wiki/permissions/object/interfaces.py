@@ -5,9 +5,6 @@ from wiki.permissions.object.schemas import (
     CreateGroupObjectPermission,
     CreateIndividualObjectPermission, BaseObjectPermissionInfo
 )
-from wiki.wiki_workspace.block.schemas import BlockInfoResponse
-from wiki.wiki_workspace.document.schemas import DocumentInfoResponse
-from wiki.wiki_workspace.schemas import WorkspaceInfoResponse
 
 
 class IGenObjectPermission:
