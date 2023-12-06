@@ -34,10 +34,11 @@ export default function App() {
         try {
             const response = await api.getMe();
             setUser(response);
-            setUserLoading(false)
         } catch (error) {
             console.log(error)
         }
+        setUserLoading(false)
+
     };
 
 
