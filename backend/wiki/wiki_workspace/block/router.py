@@ -461,7 +461,9 @@ async def set_asset_link_for_block(data: list[BlockDataResponse],
                                    asset_repository: AssetRepository,
                                    ya_storage: YaDiskAssetsStorage):
     for r in data:
-        if r.type_block != TypeBlock.TEXT and r.content != "" and r.permission_mode > ObjectPermissionMode.INACCESSIBLE:
+        if (not r.type_block in (TypeBlock.TEXT, TypeBlock.WIKI_LINK) and
+                r.content != "" and
+                r.permission_mode > ObjectPermissionMode.INACCESSIBLE):
             asset = await asset_repository.get_asset_by_id(UUID(r.content))
             r.link = await ya_storage.download_asset(asset)
 

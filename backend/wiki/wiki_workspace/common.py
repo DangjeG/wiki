@@ -75,7 +75,7 @@ async def get_data_blocks(session,
                                                                                           document_ids,
                                                                                           block.id,
                                                                                           version_commit_id)
-                if TypeBlock(block.type_block) == TypeBlock.WIKI_LINK:
+                if TypeBlock(block.type_block) == TypeBlock.WIKI_LINK and content != "":
                     content = WikiLinkSchema.get_from_content_string(content)
 
             append_block = BlockDataResponse(

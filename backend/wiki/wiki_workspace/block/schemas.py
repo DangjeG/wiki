@@ -43,13 +43,13 @@ class WikiLinkSchema(WikiBase):
         Args:
             content: string stored in LakeFS is versioned, format: workspace_id:document_id:block_id
         """
-        arr = [None if item == "" else item for item in content.split(":")]
-        return cls(workspace_id=UUID(arr[0]),
-                   document_id=UUID(arr[1]),
-                   block_id=UUID(arr[2]))
+        arr = [None if item in ("", "None") else UUID(item) for item in content.split(":")]
+        return cls(workspace_id=arr[0],
+                   document_id=arr[1],
+                   block_id=arr[2])
 
     def to_content_string(self):
-        return f"{str(self.workspace_id) or ''}:{str(self.document_id) or ''}:{str(self.block_id) or ''}"
+        return f"{self.workspace_id or ''}:{self.document_id or ''}:{self.block_id or ''}"
 
 
 class BlockDataResponse(BlockInfoResponse):
