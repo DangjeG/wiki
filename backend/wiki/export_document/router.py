@@ -1,13 +1,14 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
-from fastapi.responses import FileResponse
 from lakefs_client.client import LakeFSClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
+from starlette.responses import FileResponse
 
 from wiki.common.schemas import WikiUserHandlerData
 from wiki.database.deps import get_db
+from wiki.export_document.utils import export_document
 from wiki.permissions.base import BasePermission
 from wiki.wiki_api_client.enums import ResponsibilityType
 from wiki.wiki_storage.deps import get_storage_client
@@ -52,20 +53,11 @@ async def download_docx(
         )
         list_content_document.append(content)
 
-    # await export_document(
-    #     user_id=user.id,
-    #     document_id=document.id,
-    #     list_document_content=list_content_document
-    # )
+    file_name = str(user.id) + str(document_id)
 
-    file_name = document.title
+    await export_document(
+        file_name=file_name,
+        list_document_content=list_content_document
+    )
 
-    file_path = str(user.id) + str(document.id) #+ ".docx"
-
-    test_file = open(file_path + ".html", "w+")
-
-    for content in list_content_document:
-        test_file.write(content)
-    test_file.close()
-
-    # return FileResponse(path=file_path + ".html", filename=file_name, media_type='multipart/form-data')
+    return FileResponse("temp_export/" + file_name + ".docx", media_type='application/octet-stream', filename=file_name + ".docx")
