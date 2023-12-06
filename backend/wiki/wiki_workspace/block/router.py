@@ -32,7 +32,8 @@ from wiki.wiki_workspace.block.schemas import (
     BlockDataResponse,
     UpdateBlockData,
     UpdateBlockInfo,
-    BlockInfoResponse
+    BlockInfoResponse,
+    WikiLinkSchema
 )
 from wiki.wiki_workspace.common import get_block_data_by_id, get_data_blocks
 from wiki.wiki_workspace.document.repository import DocumentRepository
@@ -100,12 +101,78 @@ _update_block_forbidden_exception = WikiException(
 
 
 @block_router.put(
+    "/data/link",
+    response_model=BlockDataResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update wiki link data document block"
+)
+async def update_block_data_link(
+        block_id: UUID,
+        update_link: WikiLinkSchema,
+        session: AsyncSession = Depends(get_db),
+        storage_client: LakeFSClient = Depends(get_storage_client),
+        user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER))
+):
+    """
+    ## Update wiki link data document block
+    One of the specified object ids will be used to create the link in priority: block_id, document_id, workspace_id
+    """
+
+    block_repository: BlockRepository = BlockRepository(session)
+    block = await block_repository.get_block_with_permission_by_id(user.id, block_id)
+
+    if (not user.wiki_api_client.responsibility == ResponsibilityType.ADMIN and
+            ObjectPermissionMode(block.permission_mode) < ObjectPermissionMode.EDITING):
+        raise _update_block_forbidden_exception
+
+    if TypeBlock(block.type_block) != TypeBlock.WIKI_LINK:
+        raise WikiException(
+            message="Doesn't match block type.",
+            error_code=WikiErrorCode.BLOCK_NOT_SPECIFIED,
+            http_status_code=status.HTTP_409_CONFLICT
+        )
+
+    document_repository: DocumentRepository = DocumentRepository(session)
+    document = await document_repository.get_document_by_id(block.document_id)
+    document_ids = await document_repository.get_list_ids_of_document_hierarchy(document)
+    workspace_repository: WorkspaceRepository = WorkspaceRepository(session)
+    workspace: Workspace = await workspace_repository.get_workspace_by_id(document.workspace_id)
+
+    if list(update_link.model_dump().values()).count(None) != len(update_link.model_fields) - 1:
+        raise WikiException(
+            message="It is necessary to specify at least one object id for link creation",
+            error_code=WikiErrorCode.BLOCK_NOT_SPECIFIED,
+            http_status_code=status.HTTP_400_BAD_REQUEST
+        )
+
+    content = update_link.to_content_string()
+    storage_service: BaseWikiStorageService = BaseWikiStorageService(storage_client)
+    storage_service.upload_document_block_in_workspace_storage(content=StringIO(content),
+                                                               workspace_id=workspace.id,
+                                                               document_ids=document_ids,
+                                                               block_id=block.id)
+
+    return BlockDataResponse(
+        id=block.id,
+        document_id=block.document_id,
+        position=block.position,
+        type_block=block.type_block,
+        content=update_link,
+        created_at=block.created_at,
+        permission_mode=get_permission_mode_by_responsibility(
+            block.permission_mode,
+            user.wiki_api_client.responsibility
+        )
+    )
+
+
+@block_router.put(
     "/data/file",
     response_model=BlockDataResponse,
     status_code=status.HTTP_200_OK,
     summary="Update file data document block"
 )
-async def update_block_data(
+async def update_block_data_file(
         block_id: UUID,
         file: UploadFile = File(),
         session: AsyncSession = Depends(get_db),
@@ -114,15 +181,13 @@ async def update_block_data(
         user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER))
 ):
     block_repository: BlockRepository = BlockRepository(session)
-    block_perm = await block_repository.get_block_with_permission_by_id(user.id, block_id)
+    block = await block_repository.get_block_with_permission_by_id(user.id, block_id)
 
     if (not user.wiki_api_client.responsibility == ResponsibilityType.ADMIN and
-            ObjectPermissionMode(block_perm.permission_mode) < ObjectPermissionMode.EDITING):
+            ObjectPermissionMode(block.permission_mode) < ObjectPermissionMode.EDITING):
         raise _update_block_forbidden_exception
 
-    block = await block_repository.update_block(block_id)
-
-    if TypeBlock(block.type_block) == TypeBlock.TEXT:
+    if TypeBlock(block.type_block) in [TypeBlock.TEXT, TypeBlock.WIKI_LINK]:
         raise WikiException(
             message="Doesn't match block type.",
             error_code=WikiErrorCode.BLOCK_NOT_SPECIFIED,
@@ -154,16 +219,15 @@ async def update_block_data(
         workspace_id=workspace.id
     )
 
-    content = str(asset.id)
+    ya_storage = YaDiskAssetsStorage(ya_disk)
+    await ya_storage.upload_asset(asset, file.file)
 
+    content = str(asset.id)
     storage_service: BaseWikiStorageService = BaseWikiStorageService(storage_client)
     storage_service.upload_document_block_in_workspace_storage(content=StringIO(content),
                                                                workspace_id=workspace.id,
                                                                document_ids=document_ids,
                                                                block_id=block.id)
-
-    ya_storage = YaDiskAssetsStorage(ya_disk)
-    await ya_storage.upload_asset(asset, file.file)
 
     return BlockDataResponse(
         id=block.id,
@@ -174,7 +238,7 @@ async def update_block_data(
         created_at=block.created_at,
         link=await ya_storage.download_asset(asset),
         permission_mode=get_permission_mode_by_responsibility(
-            block_perm.permission_mode,
+            block.permission_mode,
             user.wiki_api_client.responsibility
         )
     )
@@ -186,14 +250,14 @@ async def update_block_data(
     status_code=status.HTTP_200_OK,
     summary="Update text data document block"
 )
-async def update_block_data(
+async def update_block_data_text(
         update_data_block: UpdateBlockData,
         session: AsyncSession = Depends(get_db),
         storage_client: LakeFSClient = Depends(get_storage_client),
         user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER))
 ):
     block_repository: BlockRepository = BlockRepository(session)
-    block = await block_repository.get_block_with_permission_by_id(update_data_block.block_id)
+    block = await block_repository.get_block_with_permission_by_id(user.id, update_data_block.block_id)
 
     if (not user.wiki_api_client.responsibility == ResponsibilityType.ADMIN and
             ObjectPermissionMode(block.permission_mode) < ObjectPermissionMode.EDITING):
@@ -250,7 +314,8 @@ async def update_block_info(
         raise _update_block_forbidden_exception
 
     block = await block_repository.update_block(update_data_block.block_id,
-                                                position=update_data_block.position)
+                                                position=update_data_block.position,
+                                                type_block=update_data_block.type_block)
 
     return BlockInfoResponse(
         id=block.id,

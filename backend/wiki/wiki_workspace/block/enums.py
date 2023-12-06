@@ -6,3 +6,4 @@ class TypeBlock(WikiBaseEnum):
     TEXT = "TEXT"
     FILE = "FILE"
     VIDEO = "VIDEO"
+    WIKI_LINK = "WIKI_LINK"

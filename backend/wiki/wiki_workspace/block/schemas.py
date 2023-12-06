@@ -15,6 +15,7 @@ class CreateBlock(WikiBase):
 
 class UpdateBlockInfo(WikiBase):
     block_id: UUID
+    type_block: Optional[TypeBlock] = None
     position: Optional[int] = None
 
 
@@ -31,6 +32,26 @@ class BlockInfoResponse(WikiBase, ObjectPermissionInfoMixin):
     created_at: datetime
 
 
+class WikiLinkSchema(WikiBase):
+    workspace_id: Optional[UUID] = None
+    document_id: Optional[UUID] = None
+    block_id: Optional[UUID] = None
+
+    @classmethod
+    def get_from_content_string(cls, content: str):
+        """
+        Args:
+            content: string stored in LakeFS is versioned, format: workspace_id:document_id:block_id
+        """
+        arr = [None if item == "" else item for item in content.split(":")]
+        return cls(workspace_id=UUID(arr[0]),
+                   document_id=UUID(arr[1]),
+                   block_id=UUID(arr[2]))
+
+    def to_content_string(self):
+        return f"{str(self.workspace_id) or ''}:{str(self.document_id) or ''}:{str(self.block_id) or ''}"
+
+
 class BlockDataResponse(BlockInfoResponse):
-    content: str  # WYSIWYG
+    content: str | WikiLinkSchema  # WYSIWYG | data for wiki link
     link: Optional[str] = None

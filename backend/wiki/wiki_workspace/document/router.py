@@ -339,7 +339,7 @@ async def get_tree_documents_by_workspace_id(
         user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER))
 ):
     document_repository: DocumentRepository = DocumentRepository(session)
-    documents = await document_repository.get_all_document_with_permission_by_workspace_id(workspace_id)
+    documents = await document_repository.get_all_document_with_permission_by_workspace_id(user.id, workspace_id)
     result_docs: list[DocumentNodeInfoResponse] = get_children_document(
         documents=documents,
         root_document_id=root_document_id,

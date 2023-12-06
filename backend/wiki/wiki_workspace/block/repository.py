@@ -14,6 +14,7 @@ from wiki.database.utils import (
 from wiki.permissions.object.general.models import GeneralBlockPermission
 from wiki.permissions.object.group.models import GroupBlockPermission
 from wiki.permissions.object.individual.models import IndividualBlockPermission
+from wiki.wiki_workspace.block.enums import TypeBlock
 from wiki.wiki_workspace.block.model import Block
 from wiki.wiki_workspace.block.schemas import CreateBlock
 from wiki.wiki_workspace.repository import ObjectRepository
@@ -61,10 +62,13 @@ class BlockRepository(ObjectRepository):
     async def update_block(self,
                            block_id: UUID,
                            *,
-                           position: Optional[int] = None) -> Block:
+                           position: Optional[int] = None,
+                           type_block: Optional[TypeBlock] = None) -> Block:
         block = await self.get_block_by_id(block_id)
         if position is not None:
             block.position = position
+        if type_block is not None:
+            block.type_block = str(type_block)
         self.session.add(block)
 
         return block

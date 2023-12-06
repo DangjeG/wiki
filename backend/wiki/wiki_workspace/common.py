@@ -2,8 +2,9 @@ from wiki.permissions.object.enums import ObjectPermissionMode
 from wiki.permissions.object.utils import get_permission_mode_by_responsibility
 from wiki.wiki_api_client.enums import ResponsibilityType
 from wiki.wiki_storage.services.base import BaseWikiStorageService
+from wiki.wiki_workspace.block.enums import TypeBlock
 from wiki.wiki_workspace.block.repository import BlockRepository
-from wiki.wiki_workspace.block.schemas import BlockDataResponse
+from wiki.wiki_workspace.block.schemas import BlockDataResponse, WikiLinkSchema
 from wiki.wiki_workspace.document.repository import DocumentRepository
 from wiki.wiki_workspace.repository import WorkspaceRepository
 
@@ -29,6 +30,9 @@ async def get_block_data_by_id(session, user, block_id, storage_client, version_
                                                                                       document_ids,
                                                                                       block.id,
                                                                                       version_commit_id)
+            if TypeBlock(block.type_block) == TypeBlock.WIKI_LINK:
+                content = WikiLinkSchema.get_from_content_string(content)
+
         return BlockDataResponse(
             id=block.id,
             document_id=block.document_id,
@@ -71,6 +75,9 @@ async def get_data_blocks(session,
                                                                                           document_ids,
                                                                                           block.id,
                                                                                           version_commit_id)
+                if TypeBlock(block.type_block) == TypeBlock.WIKI_LINK:
+                    content = WikiLinkSchema.get_from_content_string(content)
+
             append_block = BlockDataResponse(
                 id=block.id,
                 document_id=block.document_id,
