@@ -3,7 +3,6 @@ from fastapi_pagination import Page, paginate
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from wiki.common.exceptions import WikiException, WikiErrorCode
 from wiki.common.schemas import BaseResponse, WikiUserHandlerData
 from wiki.database.deps import get_db
 from wiki.permissions.base import BasePermission

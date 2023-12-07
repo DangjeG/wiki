@@ -4,27 +4,29 @@ from fastapi import APIRouter, Depends
 from lakefs_client.client import LakeFSClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
-from starlette.responses import StreamingResponse
+from starlette.responses import Response
 
 from wiki.common.schemas import WikiUserHandlerData
 from wiki.database.deps import get_db
-from wiki.export_document.utils import export_document
+from wiki.database.utils import utcnow
 from wiki.permissions.base import BasePermission
 from wiki.wiki_api_client.enums import ResponsibilityType
 from wiki.wiki_storage.deps import get_storage_client
 from wiki.wiki_storage.services.versioning import VersioningWikiStorageService
 from wiki.wiki_workspace.block.repository import BlockRepository
+from wiki.wiki_workspace.document.export.utils import export_document_docx
 from wiki.wiki_workspace.document.repository import DocumentRepository
 
-export_document_router = APIRouter()
+document_export_router = APIRouter()
 
-@export_document_router.get(
-    "/",
-    response_model=None,
+
+@document_export_router.post(
+    "/export",
+    response_class=Response,
     status_code=status.HTTP_202_ACCEPTED,
-    summary="Export Docx"
+    summary="Export published version document"
 )
-async def download_docx(
+async def document_to_docx(
         document_id: UUID,
         session: AsyncSession = Depends(get_db),
         storage_client: LakeFSClient = Depends(get_storage_client),
@@ -35,7 +37,9 @@ async def download_docx(
 
     block_repository: BlockRepository = BlockRepository(session)
 
-    list_blocks_document = await block_repository.get_all_block_by_document_id(document_id)
+    list_blocks_document = await block_repository.get_all_block_with_permissions_by_document_id(user.id,
+                                                                                                document_id,
+                                                                                                document.current_published_version_commit_id)
 
     storage_service: VersioningWikiStorageService = VersioningWikiStorageService(storage_client)
 
@@ -53,13 +57,10 @@ async def download_docx(
         )
         list_content_document.append(content)
 
-    file_name = "export"
+    title = f"document-{document.title}-{utcnow()}.docx"
+    res = export_document_docx(list_content_document, title)
+    headers = {"Content-Disposition": f'attachment; filename="{title}"'}
+    resp = Response(content=res, headers=headers, media_type='application/msword;charset="ISO-8859-1"')
+    resp.charset = "ISO-8859-1"
 
-    bytes = await export_document(
-        file_name=file_name,
-        list_document_content=list_content_document
-    )
-
-    headers = {"Content-Disposition": f'attachment; filename="{file_name}.docx"'}
-
-    return StreamingResponse(content=bytes.read(), headers=headers, media_type='application/msword')
+    return resp

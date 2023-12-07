@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Button, Checkbox, FormControl, FormControlLabel, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { api } from "../Config/app.config";
 import "../Styles/Login.css";
+import {useNavigate} from "react-router-dom";
 
 export default function SignUp() {
+    let navigation = useNavigate()
     const [email, setEmail] = useState("");
     const [username, setUsername] = useState("");
     const [firstName, setFirstName] = useState("");
@@ -21,7 +23,7 @@ export default function SignUp() {
         event.preventDefault();
         try {
             await api.signup(email, username, firstName, lastName, secondName, organizationId, isUserAgreementAccepted);
-            window.location.href = "#verify";
+            navigation("/verify")
         } catch (error) {
             console.error(error);
         }

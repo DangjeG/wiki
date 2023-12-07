@@ -1,3 +1,4 @@
+from typing import Optional
 from uuid import UUID
 
 from sqlalchemy import select, Result, and_, Row
@@ -16,6 +17,7 @@ from wiki.permissions.object.individual.models import IndividualWorkspacePermiss
 from wiki.user.models import User
 from wiki.user_group.models import Group, UserGroup
 from wiki.wiki_api_client.models import WikiApiClient
+from wiki.wiki_workspace.block.model import Block, VersionBlock
 from wiki.wiki_workspace.model import Workspace
 
 
@@ -26,6 +28,7 @@ class ObjectRepository(BaseRepository):
                                                  group_permission_class,
                                                  general_permission_class,
                                                  user_id: UUID,
+                                                 version_commit_id: Optional[str] = None,
                                                  *whereclause) -> Result:
         """
         SELECT wp.id,
@@ -87,7 +90,14 @@ class ObjectRepository(BaseRepository):
                 general_permission_class.required_responsibility.in_(subquery_2)
             ),
             isouter=True
-        ).where(and_(*whereclause)))
+        ))
+        if version_commit_id is not None and object_class == Block:
+            query = (query.join(VersionBlock, Block.id == VersionBlock.block_id)
+                     .where(and_(VersionBlock.version_commit_id == version_commit_id,
+                                 *whereclause)))
+        else:
+            query = query.where(and_(*whereclause))
+
         return await self.session.execute(query)
 
 

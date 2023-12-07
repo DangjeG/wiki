@@ -1,6 +1,5 @@
 from difflib import ndiff
 from io import StringIO
-from typing import Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
@@ -10,10 +9,10 @@ from pydantic import constr
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from wiki.common.exceptions import WikiException, WikiErrorCode
 from wiki.common.schemas import WikiUserHandlerData
 from wiki.database.deps import get_db
 from wiki.permissions.base import BasePermission
+from wiki.permissions.object.enums import ObjectPermissionMode
 from wiki.user.models import User
 from wiki.user.repository import UserRepository
 from wiki.wiki_api_client.enums import ResponsibilityType
@@ -36,6 +35,7 @@ from wiki.wiki_workspace.versioning.utils import (
     get_version_document_info_list
 )
 
+
 versioning_workspace_router = APIRouter()
 
 
@@ -52,7 +52,12 @@ async def get_list_versions_document_block(
         user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER))
 ):
     block_repository: BlockRepository = BlockRepository(session)
-    block: Block = await block_repository.get_block_by_id(block_id)
+    block: Block = await block_repository.get_block_with_permission_by_id(user.id, block_id)
+
+    if (not user.wiki_api_client.responsibility == ResponsibilityType.ADMIN and
+            ObjectPermissionMode(block.permission_mode) < ObjectPermissionMode.INACCESSIBLE):
+        raise block_repository.block_not_found_exception
+
     document_repository: DocumentRepository = DocumentRepository(session)
     document: Document = await document_repository.get_document_by_id(block.document_id)
     document_ids = await document_repository.get_list_ids_of_document_hierarchy(document)
@@ -85,10 +90,14 @@ async def version_rollback_document_block(
     user_repository: UserRepository = UserRepository(session)
     user_db: User = await user_repository.get_user_by_id(user.id)
 
-    block_rollback_data = await get_block_data_by_id(session, block_id, storage_client, rollback_commit_id)
-
     block_repository: BlockRepository = BlockRepository(session)
     block = await block_repository.get_block_by_id(block_id)
+    if (not user.wiki_api_client.responsibility == ResponsibilityType.ADMIN and
+            ObjectPermissionMode(block.permission_mode) < ObjectPermissionMode.EDITING):
+        raise block_repository.block_not_found_exception
+
+    block_rollback_data = await get_block_data_by_id(session, block_id, storage_client, rollback_commit_id)
+
     document_repository: DocumentRepository = DocumentRepository(session)
     document = await document_repository.get_document_by_id(block.document_id)
     document_ids = await document_repository.get_list_ids_of_document_hierarchy(document)
@@ -104,6 +113,7 @@ async def version_rollback_document_block(
                                                                      document.id,
                                                                      CommitMetadataScheme(
                                                                          committer_user_id=str(user_db.id)))
+    await block_repository.create_version_block(block, resp.id)
 
     return BlockDataResponse(
         id=block.id,
@@ -137,21 +147,19 @@ async def version_rollback_document(
     user_repository: UserRepository = UserRepository(session)
     user_db: User = await user_repository.get_user_by_id(user.id)
 
-    # document_repository: DocumentRepository = DocumentRepository(session)
-    # document = await document_repository.get_document_by_id(document_id)
-    #
-    # storage_service: VersioningWikiStorageService = VersioningWikiStorageService(storage_client)
-    # commit: Commit = storage_service.rollback_document(document.workspace_id,
-    #                                                    document.id,
-    #                                                    rollback_commit_id,
-    #                                                    CommitMetadataScheme(
-    #                                                        committer_user_id=str(user_db.id))
-    #                                                    )
-
-    rollback_data_blocks = await get_data_blocks(session, document_id, rollback_commit_id, storage_client)
-
     document_repository: DocumentRepository = DocumentRepository(session)
     document = await document_repository.get_document_by_id(document_id)
+
+    if (not user.wiki_api_client.responsibility == ResponsibilityType.ADMIN and
+            ObjectPermissionMode(document.permission_mode) < ObjectPermissionMode.EDITING):
+        raise document_repository.document_not_found_exception
+
+    rollback_data_blocks = await get_data_blocks(session,
+                                                 user,
+                                                 document_id,
+                                                 rollback_commit_id,
+                                                 storage_client)
+
     document_ids = await document_repository.get_list_ids_of_document_hierarchy(document)
     workspace_repository: WorkspaceRepository = WorkspaceRepository(session)
     workspace = await workspace_repository.get_workspace_by_id(document.workspace_id)
@@ -166,7 +174,24 @@ async def version_rollback_document(
                                                                      document.id,
                                                                      CommitMetadataScheme(
                                                                          committer_user_id=str(user_db.id)))
-    # return await get_data_blocks(session, document.id, commit.id, storage_client)
+
+    # Block sets may vary from version to version.
+    # When executing rollback, you need to restore and delete blocks.
+    block_repository = BlockRepository(session)
+    rollback_id_blocks = [item.id for item in rollback_data_blocks]
+    current_blocks = await block_repository.get_all_block_by_document_id(document_id)
+    for block in current_blocks:
+        await block_repository.create_version_block(block, resp.id)
+
+    current_id_blocks = [item.id for item in current_blocks]
+    on_delete = set(current_id_blocks) - set(rollback_id_blocks)
+    on_restore = set(rollback_id_blocks) - set(current_id_blocks)
+    for i in on_delete:
+        await block_repository.mark_block_deleted(i)
+    for i in on_restore:
+        await block_repository.mark_block_undeleted(i)
+    # --------------------------------------------------------------------------------------
+
     return rollback_data_blocks
 
 
@@ -210,6 +235,11 @@ async def get_list_versions_document(
 ):
     document_repository: DocumentRepository = DocumentRepository(session)
     document: Document = await document_repository.get_document_by_id(document_id)
+
+    if (not user.wiki_api_client.responsibility == ResponsibilityType.ADMIN and
+            ObjectPermissionMode(document.permission_mode) < ObjectPermissionMode.EDITING):
+        raise document_repository.document_not_found_exception
+
     document_ids = await document_repository.get_list_ids_of_document_hierarchy(document)
 
     storage_service: VersioningWikiStorageService = VersioningWikiStorageService(storage_client)

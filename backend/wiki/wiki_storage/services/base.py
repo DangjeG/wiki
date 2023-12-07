@@ -70,7 +70,7 @@ class BaseWikiStorageService:
         api_instance = self.client.objects_api
         path = forming_document_block_storage_path(document_ids, block_id)
         thread = api_instance.get_object(repository=str(workspace_id),
-                                         ref=version_commit_id or str(document_ids[-1]), # specific version or latest
+                                         ref=version_commit_id or str(document_ids[-1]),  # specific version or latest
                                          path=path,
                                          async_req=True)
         res = thread.get()

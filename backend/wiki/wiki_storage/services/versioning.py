@@ -20,7 +20,6 @@ from wiki.wiki_storage.utils import (
 
 
 class VersioningWikiStorageService(BaseWikiStorageService):
-
     @menage_lakefs_api_exception_method()
     def commit_workspace_document_version(self,
                                           workspace_id: UUID,

@@ -29,6 +29,7 @@ export default function DirectoryListItem(props) {
 
     const handleShowHistory = (event) => {
         event.stopPropagation();
+        fetchVersions()
         setShowHistoryDialog(true);
     };
 

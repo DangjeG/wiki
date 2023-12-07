@@ -28,3 +28,5 @@ venv.bak/
 wiki_db_data/
 wiki_db_log/
 wiki_lake_fs_storage_data/
+
+node_modules/

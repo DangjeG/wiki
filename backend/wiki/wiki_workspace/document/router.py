@@ -44,9 +44,7 @@ document_router = APIRouter()
     "/",
     response_model=DocumentInfoResponse,
     status_code=status.HTTP_202_ACCEPTED,
-    summary="Create a document using a template, "
-            "if template_id=None then will be created empty document "
-            "if parent_document_id=None then document is in the root."
+    summary="Create document"
 )
 async def create_document(
         new_document: CreateDocument,
@@ -55,6 +53,13 @@ async def create_document(
         storage_client: LakeFSClient = Depends(get_storage_client),
         user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER))
 ):
+    """
+    ## Create document
+    Create a document using a template,
+    if template_id=None then will be created empty document,
+    if parent_document_id=None then document is in the root.
+    """
+
     user_repository: UserRepository = UserRepository(session)
     user_db: User = await user_repository.get_user_by_id(user.id)
     document_repository: DocumentRepository = DocumentRepository(session)
@@ -90,6 +95,7 @@ async def create_document(
 
     # You must create at least one block to create the first starting publication of a document
     block_repository: BlockRepository = BlockRepository(session)
+    new_blocks = []
     if template_id is None:
         block = await block_repository.create_block(get_template_first_block(document.id))
         await permission_transporter.transfer_to_block(block, document)
@@ -98,6 +104,8 @@ async def create_document(
                                                                    workspace_id=document.workspace_id,
                                                                    document_ids=document_ids,
                                                                    block_id=block.id)
+
+        new_blocks.append(block)
     else:
         document_template_repository: DocumentTemplateRepository = DocumentTemplateRepository(session)
         template: DocumentTemplate = await document_template_repository.get_document_template_by_id(template_id)
@@ -109,6 +117,8 @@ async def create_document(
                     position=template_block.position,
                     type_block=template_block.type_block
                 ))
+            new_blocks.append(block)
+
             await permission_transporter.transfer_to_block(block, document)
             document_template_ids = await document_repository.get_list_ids_of_document_hierarchy(document_template)
             content = storage_service.get_content_document_block_in_workspace_storage(
@@ -130,6 +140,8 @@ async def create_document(
                                                                      document.id,
                                                                      CommitMetadataScheme(
                                                                          committer_user_id=str(user_db.id)))
+    for block in new_blocks:
+        await block_repository.create_version_block(block, resp.id)
 
     # Immediately publish a blank version of the document
     await _publish_document(document, document_repository, storage_service)
@@ -192,9 +204,14 @@ async def publish_document(
                                                                              document.id,
                                                                              CommitMetadataScheme(
                                                                                  committer_user_id=str(user_db.id)))
+            block_repository = BlockRepository(session)
+            blocks = await block_repository.get_all_block_by_document_id(document.id)
+            for block in blocks:
+                await block_repository.create_version_block(block, resp.id)
         except WikiException:
             pass
 
+    document = await document_repository.get_document_by_id(document_id)
     await _publish_document(document, document_repository, storage_service)
 
     return BaseResponse(msg="Document published")
@@ -246,6 +263,10 @@ async def save_document(
     resp: Commit = storage_service.commit_workspace_document_version(document.workspace_id,
                                                                      document.id,
                                                                      CommitMetadataScheme(committer_user_id=str(user_db.id)))
+    block_repository = BlockRepository(session)
+    blocks = await block_repository.get_all_block_by_document_id(document.id)
+    for block in blocks:
+        await block_repository.create_version_block(block, resp.id)
 
     return BaseResponse(msg="Document saved")
 
@@ -327,9 +348,7 @@ async def get_document_info_by_id(
     "/tree",
     response_model=list[DocumentNodeInfoResponse],
     status_code=status.HTTP_200_OK,
-    summary="Get all tree document by workspace id"
-            "If root_document_id=None then be the root workspace"
-            "If max_deep=None or root_document_id=0 then will be returned all document"
+    summary="Get tree documents"
 )
 async def get_tree_documents_by_workspace_id(
         workspace_id: UUID,
@@ -338,6 +357,17 @@ async def get_tree_documents_by_workspace_id(
         session: AsyncSession = Depends(get_db),
         user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER))
 ):
+    """
+    ## Get tree documents from workspace
+    Get all tree document by workspace id
+    If root_document_id=None then be the root workspace
+    If max_deep=None or root_document_id=0 then will be returned all document
+
+
+    !!! Hiding a document (HIDDEN_INACCESSIBLE) from the user at the top
+    of the hierarchy will also hide documents lower down the hierarchy
+    """
+
     document_repository: DocumentRepository = DocumentRepository(session)
     documents = await document_repository.get_all_document_with_permission_by_workspace_id(user.id, workspace_id)
     result_docs: list[DocumentNodeInfoResponse] = get_children_document(

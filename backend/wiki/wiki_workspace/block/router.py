@@ -40,6 +40,7 @@ from wiki.wiki_workspace.document.repository import DocumentRepository
 from wiki.wiki_workspace.model import Workspace
 from wiki.wiki_workspace.repository import WorkspaceRepository
 
+
 block_router = APIRouter()
 
 
@@ -449,6 +450,7 @@ async def get_publish_blocks(
         )
 
     res = await get_data_blocks(session,
+                                user,
                                 document_id,
                                 document.current_published_version_commit_id,
                                 storage_client)

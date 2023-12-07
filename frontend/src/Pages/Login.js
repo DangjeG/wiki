@@ -4,6 +4,7 @@ import { api } from "../Config/app.config";
 import "../Styles/Login.css";
 import "../Styles/BaseColors.css";
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import {useNavigate} from "react-router-dom";
 
 const CustomTextField = styled(TextField)({
     '& .MuiInputLabel-root.Mui-focused': {
@@ -12,6 +13,8 @@ const CustomTextField = styled(TextField)({
 });
 
 export default function Login() {
+
+    let navigation = useNavigate()
     const [email, setEmail] = useState("");
     const [isError, setIsError] = useState(false);
     const [errorText, setErrorText] = useState("")
@@ -24,7 +27,7 @@ export default function Login() {
         try {
             await api.login(email);
             setIsError(false)
-            window.location.href = "#verify";
+            navigation("/verify")
         } catch (error) {
             setErrorText(error.response.data.message)
             setIsError(true)

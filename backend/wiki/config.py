@@ -96,7 +96,7 @@ class Settings(BaseSettings):
     EMAIL_USE_CREDENTIALS: bool = True
     EMAIL_VALIDATE_CERTS: bool = True
 
-    EMAIL_SENDING: bool = True  # If you don’t want letters sent to the email, set false.
+    EMAIL_SENDING: bool = False  # If you don’t want letters sent to the email, set false.
 
     LAKECTL_SERVER_ENDPOINT_URL: str = "http://localhost:8001"
     LAKEFS_STORAGE_NAMESPACE_ROOT: str = "local://wiki_storage/"

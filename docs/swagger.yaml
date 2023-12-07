@@ -74,8 +74,10 @@ components:
     BlockDataResponse:
       properties:
         content:
+          anyOf:
+          - type: string
+          - $ref: '#/components/schemas/WikiLinkSchema'
           title: Content
-          type: string
         created_at:
           format: date-time
           title: Created At
@@ -150,7 +152,7 @@ components:
       - file
       title: Body_create_and_upload_asset_api_v1_asset_storage_asset_upload_post
       type: object
-    Body_update_block_data_api_v1_blocks_data_file_put:
+    Body_update_block_data_file_api_v1_blocks_data_file_put:
       properties:
         file:
           format: binary
@@ -158,7 +160,7 @@ components:
           type: string
       required:
       - file
-      title: Body_update_block_data_api_v1_blocks_data_file_put
+      title: Body_update_block_data_file_api_v1_blocks_data_file_put
       type: object
     CreateBlock:
       properties:
@@ -989,6 +991,7 @@ components:
       - TEXT
       - FILE
       - VIDEO
+      - WIKI_LINK
       title: TypeBlock
       type: string
     UpdateAsset:
@@ -1039,6 +1042,10 @@ components:
           - type: integer
           - type: 'null'
           title: Position
+        type_block:
+          anyOf:
+          - $ref: '#/components/schemas/TypeBlock'
+          - type: 'null'
       required:
       - block_id
       title: UpdateBlockInfo
@@ -1364,6 +1371,28 @@ components:
       - create_date
       - api_key_prefix
       title: WikiApiKeyInfoResponse
+      type: object
+    WikiLinkSchema:
+      properties:
+        block_id:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Block Id
+        document_id:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Document Id
+        workspace_id:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Workspace Id
+      title: WikiLinkSchema
       type: object
     WorkspaceInfoResponse:
       properties:
@@ -2069,7 +2098,7 @@ paths:
       - WorkspaceBlocks
   /api/v1/blocks/data/file:
     put:
-      operationId: update_block_data_api_v1_blocks_data_file_put
+      operationId: update_block_data_file_api_v1_blocks_data_file_put
       parameters:
       - in: query
         name: block_id
@@ -2082,7 +2111,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Body_update_block_data_api_v1_blocks_data_file_put'
+              $ref: '#/components/schemas/Body_update_block_data_file_api_v1_blocks_data_file_put'
         required: true
       responses:
         '200':
@@ -2106,9 +2135,52 @@ paths:
       summary: Update file data document block
       tags:
       - WorkspaceBlocks
+  /api/v1/blocks/data/link:
+    put:
+      description: '## Update wiki link data document block
+
+        One of the specified object ids will be used to create the link in priority:
+        block_id, document_id, workspace_id'
+      operationId: update_block_data_link_api_v1_blocks_data_link_put
+      parameters:
+      - in: query
+        name: block_id
+        required: true
+        schema:
+          format: uuid
+          title: Block Id
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WikiLinkSchema'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockDataResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Update wiki link data document block
+      tags:
+      - WorkspaceBlocks
   /api/v1/blocks/data/text:
     put:
-      operationId: update_block_data_api_v1_blocks_data_text_put
+      operationId: update_block_data_text_api_v1_blocks_data_text_put
       requestBody:
         content:
           application/json:
@@ -2207,6 +2279,13 @@ paths:
       - WorkspaceBlocks
   /api/v1/document/:
     post:
+      description: '## Create document
+
+        Create a document using a template,
+
+        if template_id=None then will be created empty document,
+
+        if parent_document_id=None then document is in the root.'
       operationId: create_document_api_v1_document__post
       parameters:
       - in: query
@@ -2241,9 +2320,7 @@ paths:
       - WikiApiKey: []
       - WikiAccessToken: []
       - WikiBearer: []
-      summary: Create a document using a template, if template_id=None then will be
-        created empty document if parent_document_id=None then document is in the
-        root.
+      summary: Create document
       tags:
       - WorkspaceDocument
   /api/v1/document/all:
@@ -2283,6 +2360,35 @@ paths:
       summary: Get all document by workspace id
       tags:
       - WorkspaceDocument
+  /api/v1/document/export:
+    post:
+      operationId: document_to_docx_api_v1_document_export_post
+      parameters:
+      - in: query
+        name: document_id
+        required: true
+        schema:
+          format: uuid
+          title: Document Id
+          type: string
+      responses:
+        '202':
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Export published version document
+      tags:
+      - ExportDocument
   /api/v1/document/info:
     get:
       operationId: get_document_info_by_id_api_v1_document_info_get
@@ -2318,6 +2424,19 @@ paths:
       - WorkspaceDocument
   /api/v1/document/tree:
     get:
+      description: '## Get tree documents from workspace
+
+        Get all tree document by workspace id
+
+        If root_document_id=None then be the root workspace
+
+        If max_deep=None or root_document_id=0 then will be returned all document
+
+
+
+        !!! Hiding a document (HIDDEN_INACCESSIBLE) from the user at the top
+
+        of the hierarchy will also hide documents lower down the hierarchy'
       operationId: get_tree_documents_by_workspace_id_api_v1_document_tree_get
       parameters:
       - in: query
@@ -2368,9 +2487,7 @@ paths:
       - WikiApiKey: []
       - WikiAccessToken: []
       - WikiBearer: []
-      summary: Get all tree document by workspace idIf root_document_id=None then
-        be the root workspaceIf max_deep=None or root_document_id=0 then will be returned
-        all document
+      summary: Get tree documents
       tags:
       - WorkspaceDocument
   /api/v1/document/{document_id}/publish:
@@ -2635,38 +2752,6 @@ paths:
       summary: Get all document templates
       tags:
       - DocumentTemplate
-  /api/v1/export_document/:
-    get:
-      operationId: download_docx_api_v1_export_document__get
-      parameters:
-      - in: query
-        name: document_id
-        required: true
-        schema:
-          format: uuid
-          title: Document Id
-          type: string
-      responses:
-        '202':
-          content:
-            application/json:
-              schema: {}
-          description: Successful Response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-          description: Validation Error
-      security:
-      - WikiRootApiKey: []
-      - WikiApiKey: []
-      - WikiApiKey: []
-      - WikiAccessToken: []
-      - WikiBearer: []
-      summary: Export Docx
-      tags:
-      - ExportDocument
   /api/v1/permission_domain/:
     post:
       operationId: create_permission_domain_api_v1_permission_domain__post

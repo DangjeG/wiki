@@ -56,7 +56,9 @@ async def get_data_blocks(session,
                           storage_client):
     block_repository: BlockRepository = BlockRepository(session)
 
-    blocks = await block_repository.get_all_block_with_permissions_by_document_id(user.id, document_id)
+    blocks = await block_repository.get_all_block_with_permissions_by_document_id(user.id,
+                                                                                  document_id,
+                                                                                  version_commit_id)
     document_repository: DocumentRepository = DocumentRepository(session)
     document = await document_repository.get_document_by_id(document_id)
     document_ids = await document_repository.get_list_ids_of_document_hierarchy(document)

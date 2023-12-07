@@ -3,7 +3,7 @@ from uuid import UUID
 from sqlalchemy import Column, Uuid, ForeignKey, String, Integer
 from uuid_extensions import uuid7
 
-from wiki.common.models import EnabledDeletedMixin
+from wiki.common.models import EnabledDeletedMixin, TimeStampMixin
 from wiki.database.core import Base
 from wiki.permissions.object.general.models import GeneralObjectPermissionMixin, GeneralBlockPermission
 from wiki.permissions.object.group.models import GroupObjectPermissionMixin, GroupBlockPermission
@@ -54,3 +54,13 @@ class Block(Base, EnabledDeletedMixin, IGenObjectPermission):
             user_id=create_permission.user_id,
             object_id=self.id
         )
+
+
+class VersionBlock(Base, TimeStampMixin):
+    """
+    Block versions: the table is needed to resolve inconsistencies in the set of blocks in different versions
+    """
+
+    id = Column(Uuid, default=uuid7, primary_key=True, nullable=False)
+    block_id = Column(ForeignKey("block.id"), nullable=False)
+    version_commit_id = Column(String(64), nullable=False)

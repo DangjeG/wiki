@@ -66,7 +66,7 @@ class PermissionTransporter:
             get_db_permission_class(ObjectPermissionType.INDIVIDUAL, transmitting_object_type)
         )
         for permission in individual_permissions:
-            await self.permission_repository.create_group_permission(
+            await self.permission_repository.create_individual_permission(
                 CreateIndividualObjectPermission(
                     mode=permission.mode,
                     user_id=permission.user_id
