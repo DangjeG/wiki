@@ -4,7 +4,7 @@ import {MenuList, Tooltip} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import SaveIcon from '@mui/icons-material/Save';
 import ImageIcon from "@mui/icons-material/Image";
-import BlockComponent from "./Block";
+import BlockComponent from "./Block/Block";
 import React, {useEffect, useState} from "react";
 import {api} from "../Config/app.config";
 import {useParams} from "react-router-dom";

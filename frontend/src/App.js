@@ -17,12 +17,10 @@ import ProtectedRoute from "./Components/ProtectedRoute";
 export default function App() {
 
     const [user, setUser] = useState(null)
-    const [userLoading, setUserLoading] = useState()
+
 
     useEffect(() => {
-
         fetchUser();
-
     }, []);
 
     const handleRefresh = () => {
@@ -30,22 +28,18 @@ export default function App() {
     }
 
     const fetchUser = async () => {
-        setUserLoading(true)
         try {
             const response = await api.getMe();
             setUser(response);
         } catch (error) {
             console.log(error)
         }
-        setUserLoading(false)
-
     };
 
 
 
         return (
             /*<UserContext.Provider value={user}>*/
-            userLoading ? <></> :
                 <BrowserRouter basename={"/wiki/demo"}>
                     <AppNavbar user={user}/>
                     <Routes>
@@ -68,7 +62,6 @@ export default function App() {
                         <Route path={"/test/*"} element={<TestPage/>}/>
                     </Routes>
                 </BrowserRouter>
-
            /* </UserContext.Provider>*/
         )
 }

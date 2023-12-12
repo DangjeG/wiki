@@ -12,7 +12,6 @@ import {Box} from "@mui/system";
 import PersonIcon from '@mui/icons-material/Person';
 import "../Styles/BaseColors.css"
 import "../Styles/Navbar.css"
-import {Link} from "react-router-dom";
 
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ButtonGroup from '@mui/material/ButtonGroup';
