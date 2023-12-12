@@ -1,10 +1,11 @@
-import React, {useContext} from 'react';
+import React, {useContex, useState, useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/material/Stack';
 import Toolbar from '@mui/material/Toolbar';
+import {api} from "../Config/app.config";
 import AppBar from '@mui/material/AppBar';
 import Typography from '@mui/material/Typography';
 import {Box} from "@mui/system";
@@ -13,11 +14,17 @@ import "../Styles/BaseColors.css"
 import "../Styles/Navbar.css"
 import {Link} from "react-router-dom";
 
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ButtonGroup from '@mui/material/ButtonGroup';
+
 
 export default function AppNavbar(props) {
+
+    const [workspaces, setWorkspaces] = useState([]);
+
     const [anchorEl, setAnchorEl] = React.useState(null);
     /*const user = useContext()*/
-    const navigate = useNavigate();
+    let navigate = useNavigate();
     const handleMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -25,6 +32,33 @@ export default function AppNavbar(props) {
     const handleMenuClose = () => {
         setAnchorEl(null);
     };
+
+    useEffect(() => {
+        fetchWorkspaces()
+    }, []);
+
+    const fetchWorkspaces = async () => {
+        try {
+            const response = await api.getWorkspaces();
+            setWorkspaces(response);
+        } catch (error) {
+            console.log(error)
+        }
+    };
+
+    const [pojectsMenu, setPojectsMenu] = useState(null);
+
+    const handleClick = (event) => {
+        setPojectsMenu(event.currentTarget);
+    };
+    
+    const handleClose = () => {
+        setPojectsMenu(null);
+    };
+
+    const handleClickWorkspace = (id) => {
+        navigate(`/workspace/${id}`)
+    }
 
     function getLeftPanel() {
 
@@ -58,12 +92,28 @@ export default function AppNavbar(props) {
                                 ИНСТРУМЕНТЫ АДМИНА
                             </Button>
                         ) : null}
-
-                        <Button id="typography-home" onClick={() => {
-                            navigate("/workspace")
-                        }}>
-                            ПРОЕКТЫ
+                        <Button id="typography-home" 
+                                    onClick={() => {navigate("/workspace")}}>
+                                ПРОЕКТЫ
+                            </Button>
+                            <Button id="typography-home"
+                                    onMouseEnter={handleClick}
+                                    onMouseDown={handleClose}>
+                                <ArrowDownwardIcon />
                         </Button>
+                        <Menu anchorEl={pojectsMenu}
+                              open={Boolean(pojectsMenu)}
+                              onClose={handleClose}
+                              onMouseDown={handleClose}>
+                            {workspaces.map((item) => {
+                                return <MenuItem onClick={handleClose}>
+                                    <Button 
+                                        onClick={() => handleClickWorkspace(item.id)}>
+                                        {item.title}
+                                    </Button>
+                                </MenuItem>
+                            })}
+                        </Menu>
                     </Stack>
                 </div>
             )

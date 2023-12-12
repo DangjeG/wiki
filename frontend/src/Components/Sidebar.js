@@ -71,13 +71,13 @@ export default function Sidebar({workspaceID}){
                     <Typography fontWeight="bold">
                         {workspace ? workspace.title: null}
                     </Typography>
+                    <ButtonAddDocument onSubmit={handleAdd}/>
                     <List>
                         {sidebarData.map((item) =>
                         {
                             return <DirectoryListItem onClick={handleClick} id={item.id} title={item.title} children={getChildren(item.children)} />
                         })}
                     </List>
-                   <ButtonAddDocument onSubmit={handleAdd}/>
                 </Grid>
             </Grid>
         </>
