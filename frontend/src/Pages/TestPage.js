@@ -1,5 +1,5 @@
 import React from "react";
-import BlockComponent from "../Components/Block";
+import BlockComponent from "../Components/Block/Block";
 
 
 export default function TestPage(){

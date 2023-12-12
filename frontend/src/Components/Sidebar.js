@@ -18,7 +18,7 @@ export default function Sidebar({workspaceID}){
         try {
             const response = await api.getDocumentsTree(workspaceID)
             setSidebarData(response)
-            navigate(`/workspace/${workspaceID}/document/${response[0].id}/view`)
+            navigate(`/workspace/${workspaceID}/document/${response[0].id}/edit`)
         }
         catch (e){
             console.log(e)
@@ -49,7 +49,7 @@ export default function Sidebar({workspaceID}){
     }
 
     const handleClick = (id) => {
-        navigate(`/workspace/${workspaceID}/document/${id}/view`)
+        navigate(`/workspace/${workspaceID}/document/${id}/edit`)
     }
 
     function getChildren(children) {

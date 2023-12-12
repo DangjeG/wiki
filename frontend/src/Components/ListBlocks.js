@@ -3,7 +3,7 @@ import SaveAltIcon from "@mui/icons-material/SaveAlt";
 import {Tooltip} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import ImageIcon from "@mui/icons-material/Image";
-import BlockComponent from "./Block";
+import BlockComponent from "./Block/Block";
 import React, {useEffect, useState} from "react";
 import {api} from "../Config/app.config";
 import {useParams} from "react-router-dom";
@@ -93,7 +93,7 @@ export default function ListBlocks() {
                 </Tooltip>
             </Button>
             {blocks.map((item) => {
-                return <BlockComponent mode={"edit"} onShowHistory={() => {
+                return <BlockComponent mode={mode} onShowHistory={() => {
                 }} onDelete={handleDelete} onChange={handleChange} block={item}/>
             })}</>)
 }

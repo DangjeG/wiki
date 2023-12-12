@@ -11,7 +11,6 @@ import {Box} from "@mui/system";
 import PersonIcon from '@mui/icons-material/Person';
 import "../Styles/BaseColors.css"
 import "../Styles/Navbar.css"
-import {Link} from "react-router-dom";
 
 
 export default function AppNavbar(props) {

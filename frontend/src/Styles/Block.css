@@ -1,0 +1,22 @@
+.block-container{
+    margin: 10px 5%;
+    width:90%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: row;
+}
+
+.block-editor{
+    width: 90%;
+}
+.block-view{
+    width: 90%;
+}
+
+.block__toolbar_visibility_hidden{
+    display: none;
+}
+.block__toolbar_visibility_visible{
+    display: block;
+}

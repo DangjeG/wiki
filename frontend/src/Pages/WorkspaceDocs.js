@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {api} from "../Config/app.config";
-import BlockComponent from "../Components/Block";
+import BlockComponent from "../Components/Block/Block";
 import Button from "@mui/material/Button";
 import Sidebar from "../Components/Sidebar";
 import {Grid, Tooltip} from "@mui/material";
