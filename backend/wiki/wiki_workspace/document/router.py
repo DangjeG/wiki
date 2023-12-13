@@ -163,6 +163,32 @@ async def create_document(
     )
 
 
+@document_router.delete(
+    "/{document_id}",
+    response_model=BaseResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Delete document"
+)
+async def delete_document(
+        document_id: UUID,
+        session: AsyncSession = Depends(get_db),
+        user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER))
+):
+    document_repository: DocumentRepository = DocumentRepository(session)
+    if user.wiki_api_client.responsibility != ResponsibilityType.ADMIN:
+        document = await document_repository.get_document_with_permission_by_id(user.id, document_id)
+        if document.permission_mode < ObjectPermissionMode.DELETION:
+            raise WikiException(
+                message="You can't delete this document. You must have permission to delete it.",
+                error_code=WikiErrorCode.DOCUMENT_DELETE_FORBIDDEN,
+                http_status_code=status.HTTP_403_FORBIDDEN
+            )
+    else:
+        document = await document_repository.get_document_by_id(document_id)
+
+    await document_repository
+
+
 @document_router.post(
     "/{document_id}/publish",
     response_model=BaseResponse,

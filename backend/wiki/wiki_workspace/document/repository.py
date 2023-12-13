@@ -78,6 +78,13 @@ class DocumentRepository(ObjectRepository):
         return new_document
 
     @menage_db_commit_method(CommitMode.FLUSH)
+    async def mark_document_delete(self, document_id: UUID):
+        document = await self.get_document_by_id(document_id)
+        document.is_deleted = True
+
+        self.session.add(document)
+
+    @menage_db_commit_method(CommitMode.FLUSH)
     async def update_document(self,
                               document: Document,
                               *,
