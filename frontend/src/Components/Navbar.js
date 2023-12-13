@@ -81,7 +81,7 @@ export default function AppNavbar(props) {
 
         if (props.user !== null && props.user.wiki_api_client !== null) {
             return (
-                <div className="base-button">
+                <div className="base-button" onMouseEnter={handleClose}>
                     <Stack direction="row" alignItems="center" spacing={2}>
                         {base}
                         {props.user.wiki_api_client.responsibility === 'ADMIN' ? (
@@ -91,19 +91,21 @@ export default function AppNavbar(props) {
                                 ИНСТРУМЕНТЫ АДМИНА
                             </Button>
                         ) : null}
-                        <Button id="typography-home" 
-                                    onClick={() => {navigate("/workspace")}}>
+                        <Button id="typography-home"
+                                onClick={() => {navigate("/workspace")}}>
                                 ПРОЕКТЫ
-                            </Button>
-                            <Button id="typography-home"
-                                    onMouseEnter={handleClick}
-                                    onMouseDown={handleClose}>
-                                <ArrowDownwardIcon />
+                        </Button>
+                        <Button id="typography-home"
+                                size="small"
+                                aria-label="select merge strategy"
+                                aria-haspopup="menu"
+                                onMouseEnter={handleClick}>
+                            <ArrowDownwardIcon />
                         </Button>
                         <Menu anchorEl={pojectsMenu}
                               open={Boolean(pojectsMenu)}
-                              onClose={handleClose}
-                              onMouseDown={handleClose}>
+                              onClick={handleClose}
+                              onMouseLeave={handleClose}>
                             {workspaces.map((item) => {
                                 return <MenuItem onClick={handleClose}>
                                     <Button 
