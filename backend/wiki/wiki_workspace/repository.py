@@ -75,15 +75,15 @@ class ObjectRepository(BaseRepository):
                 object_class.id == individual_permission_class.object_id,
                 individual_permission_class.user_id == user_id
             ),
-            isouter=True)
-                 .join(
+            isouter=True
+        ).join(
             group_permission_class,
             and_(
                 object_class.id == group_permission_class.object_id,
                 group_permission_class.group_id.in_(subquery_1)
             ),
-            isouter=True)
-                 .join(
+            isouter=True
+        ).join(
             general_permission_class,
             and_(
                 object_class.id == general_permission_class.object_id,
@@ -115,6 +115,7 @@ class WorkspaceRepository(ObjectRepository):
             GroupWorkspacePermission,
             GeneralWorkspacePermission,
             user_id,
+            None,
             *whereclause
         )
 

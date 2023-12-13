@@ -37,6 +37,7 @@ class DocumentRepository(ObjectRepository):
             GroupDocumentPermission,
             GeneralDocumentPermission,
             user_id,
+            None,
             *whereclause
         )
 
