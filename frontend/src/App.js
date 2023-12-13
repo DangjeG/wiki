@@ -13,17 +13,20 @@ import Profile from "./Pages/Profile";
 import Workspace from "./Pages/Workspace";
 import TestPage from "./Pages/TestPage";
 import ProtectedRoute from "./Components/ProtectedRoute";
+import Preload from "./Components/Preload";
 
 export default function App() {
 
     const [user, setUser] = useState(null)
+    const [userLoad, setUserLoad] = useState(true)
 
 
     useEffect(() => {
-        fetchUser();
+        handleRefresh();
     }, []);
 
     const handleRefresh = () => {
+        setUserLoad(true)
         fetchUser()
     }
 
@@ -34,34 +37,39 @@ export default function App() {
         } catch (error) {
             console.log(error)
         }
+        setUserLoad(false)
     };
 
 
 
         return (
+            <>
+                {userLoad? <Preload/> :
+                    <BrowserRouter basename={"/wiki/demo"}>
+                        <AppNavbar user={user}/>
+                        <Routes>
+                            <Route path={"/"} element={<Home/>}/>
+                            <Route path={"/login"} element={<Login/>}/>
+                            <Route path={"/verify"} element={<Verify onRefresh={handleRefresh}/>}/>
+                            <Route path={"/signup"} element={<SignUp/>}/>
+                            <Route path={"/logout"} element={<Logout onRefresh={handleRefresh}/>}/>
+                            <Route element={<ProtectedRoute requirement={
+                                user !== null && user.wiki_api_client !== null && user.wiki_api_client.responsibility === 'ADMIN'
+                            }/>}>
+                                <Route path={"/admin"} element={<Admin/>}/>
+                            </Route>
+                            <Route element={<ProtectedRoute requirement={
+                                user !== null && user.wiki_api_client !== null
+                            }/>}>
+                                <Route path={"/profile"} element={<Profile/>}/>
+                                <Route path={"/workspace/*"} element={<Workspace/>}/>
+                            </Route>
+                            <Route path={"/test/*"} element={<TestPage/>}/>
+                        </Routes>
+                    </BrowserRouter>}
+            </>
             /*<UserContext.Provider value={user}>*/
-                <BrowserRouter basename={"/wiki/demo"}>
-                    <AppNavbar user={user}/>
-                    <Routes>
-                        <Route path={"/"} element={<Home/>}/>
-                        <Route path={"/login"} element={<Login/>}/>
-                        <Route path={"/verify"} element={<Verify onRefresh={handleRefresh}/>}/>
-                        <Route path={"/signup"} element={<SignUp/>}/>
-                        <Route path={"/logout"} element={<Logout onRefresh={handleRefresh}/>}/>
-                        <Route element={<ProtectedRoute requirement={
-                            user !== null && user.wiki_api_client !== null && user.wiki_api_client.responsibility === 'ADMIN'
-                        }/>}>
-                            <Route path={"/admin"} element={<Admin/>}/>
-                        </Route>
-                        <Route element={<ProtectedRoute requirement={
-                            user !== null && user.wiki_api_client !== null
-                        }/>}>
-                            <Route path={"/profile"} element={<Profile/>}/>
-                            <Route path={"/workspace/*"} element={<Workspace/>}/>
-                        </Route>
-                        <Route path={"/test/*"} element={<TestPage/>}/>
-                    </Routes>
-                </BrowserRouter>
+
            /* </UserContext.Provider>*/
         )
 }

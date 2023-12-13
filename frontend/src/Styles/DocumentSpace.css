@@ -8,10 +8,11 @@
 
 .documentHeader {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: flex-end;
     align-items: center;
     gap: 5px;
     overflow: hidden;
+    width: 100%;
 }
 
 .blockList {

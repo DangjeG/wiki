@@ -1,11 +1,12 @@
+import React, {useState} from "react";
+import {Box, IconButton, Menu, MenuItem} from "@mui/material";
+import {MoreVert as MoreVertIcon} from "@mui/icons-material";
+import ButtonAddDocument from "../../../ModalButton/ButtonAddDocument";
 import {Form, Modal} from "react-bootstrap";
 import Button from "@mui/material/Button";
-import {Box, Tooltip} from "@mui/material";
-import React, {useState} from "react";
-import AddIcon from "@mui/icons-material/Add";
 
-
-export default function ButtonAddDocument({onSubmit, children},){
+const DocumentTreeItemMenuButton = ({ onClickNewDocument, onClickRename, onClickDelete, workspaceId, documentId }) => {
+    const [anchorEl, setAnchorEl] = React.useState(null);
 
     const [show, setShow] = useState(false);
     const [newDocument, setNewDocument] = useState()
@@ -13,14 +14,33 @@ export default function ButtonAddDocument({onSubmit, children},){
     const handleShow = () => setShow(true);
     const handleAdd = async () => {
         handleClose()
-        onSubmit(newDocument)
+        onClickNewDocument(newDocument)
     }
 
-    return(
+    const handleOpenMenu = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleCloseMenu = () => {
+        setAnchorEl(null);
+    };
+
+    return (
         <>
-            <div onClick={handleShow}>
-                {children}
-            </div>
+            <IconButton onClick={handleOpenMenu}>
+                <MoreVertIcon />
+            </IconButton>
+            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
+                <MenuItem onClick={() => {
+                    setShow(true)
+                    handleCloseMenu()
+                }}>New Document</MenuItem>
+                {/*<MenuItem onClick={() => onClickRename()}>Rename</MenuItem>*/}
+                <MenuItem onClick={() => {
+                    onClickDelete()
+                    handleCloseMenu()
+                }}>Delete</MenuItem>
+            </Menu>
 
             <Modal show={show} onHide={handleClose}
                    style={{overflow: 'auto', width: '400px', height: '550px', position: 'absolute',
@@ -48,5 +68,7 @@ export default function ButtonAddDocument({onSubmit, children},){
                 </Modal.Footer>
             </Modal>
         </>
-    )
-}
+    );
+};
+
+export default DocumentTreeItemMenuButton;

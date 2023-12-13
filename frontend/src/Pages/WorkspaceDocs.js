@@ -1,12 +1,12 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {api} from "../Config/app.config";
 import {Grid} from "@mui/material";
 import {Route, Routes, useParams} from "react-router-dom";
 import ListBlocks from "../Components/ListBlocks";
-import {Sidebar} from "../Components/Sidebar/index"
+import {Sidebar} from "../Components/Sidebar/Sidebar"
 
 export default function WorkspaceDocs (){
-
+    
     return (
         <>
             <Grid container spacing={0} style={{ marginTop:'70px', height: '100vh' }}>

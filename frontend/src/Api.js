@@ -163,7 +163,9 @@ export default class Api {
         await instance.post(`/document/${document_id}/publish`)
     }
 
-
+    async deleteDoc(doc_id){
+        await instance.delete(`/document?document_id=${doc_id}`)
+    }
     async addBlock(document_id, position, type_block){
         await instance.post(`/blocks`,{
             "document_id": document_id,

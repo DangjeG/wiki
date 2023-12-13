@@ -17,10 +17,13 @@ import {
     ThemeProvider,
   } from '@mui/material/styles';
 import "../Styles/DocumentSpace.css"
+import Preload from "./Preload";
 
 
 export default function ListBlocks() {
 
+    const [docLoad, setDocLoad] = useState(true);
+    const [blocksLoad, setBlocksLoad] = useState(true);
     const [anchorEl, setAnchorEl] = useState(null);
     const [uncommented, setUncommented] = useState(false)
     const [blocks, setBlocks] = useState([]);
@@ -31,6 +34,8 @@ export default function ListBlocks() {
     theme = responsiveFontSizes(theme);
 
     useEffect(() => {
+        setBlocksLoad(true)
+        setDocLoad(true)
         fetchBlocks(doc_id)
         fetchDoc(doc_id)
     }, [doc_id]);
@@ -40,9 +45,11 @@ export default function ListBlocks() {
             setBlocks([])
             const response = await api.getBlocks(ID)
             setBlocks(response)
+
         } catch (e) {
             console.log(e)
         }
+        setBlocksLoad(false)
     };
 
     const fetchDoc = async (ID) => {
@@ -53,6 +60,7 @@ export default function ListBlocks() {
         } catch (e) {
             console.log(e)
         }
+        setDocLoad(false)
     };
 
     const handleChange = () => {
@@ -71,22 +79,20 @@ export default function ListBlocks() {
     }
     const handleDelete = async (block) => {
         await api.deleteBlock(block.id)
+        setBlocksLoad(true)
         fetchBlocks(doc_id);
-        setUncommented(true)
     }
 
     const handleAddText = async () => {
         await api.addBlock(doc_id, 0, "TEXT")
+        setBlocksLoad(true)
         fetchBlocks(doc_id)
-        setUncommented(true)
     }
     const handleAddImage = async () => {
         await api.addBlock(doc_id, 0, "IMG")
+        setBlocksLoad(true)
         fetchBlocks(doc_id)
-        setUncommented(true)
     }
-
-    //
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -102,71 +108,74 @@ export default function ListBlocks() {
         }*/
 
     return (
-        <div className="container">
-            <div className="documentHeader">
-                <ThemeProvider theme={theme}>
-                    <Typography variant="h5">
-                        {document ? document.title: null}
-                    </Typography>
-                </ThemeProvider>
-                <Button 
-                        // id="base-button" 
-                        // sx={{marginTop: '20px', marginBottom: '20px', marginLeft: '80%'}}
-                        variant="outlined"
-                        disabled={!uncommented}
-                        onClick={handleSave}>
-                    <Tooltip sx={{width: '10px', height: '10px'}}
-                            title="Сохранить"
-                            placement="top"
-                            arrow>
-                        <SaveIcon sx={{color: '#1976d2'}}/>
-                    </Tooltip>
-                </Button>
-                <Button variant="contained" 
-                        onClick={handleClick}>
-                    <Tooltip sx={{width: '10px', height: '10px'}}
-                            title="Добавить блок"
-                            placement="top"
-                            arrow>
-                        <AddIcon sx={{color: '#FFFFFF'}}/>
-                    </Tooltip>
-                </Button>
-                <Menu
-                    anchorEl={anchorEl}
-                    open={Boolean(anchorEl)}
-                    onClose={handleClose}
-                >
-                    <MenuItem onClick={handleClose}>
-                        <Button sx={{border: 'none', outline: 'none'}}
-                                variant="outlined" onClick={handleAddText}>
+        <>
+            { docLoad || blocksLoad? <Preload/> :
+                <div className="container">
+                    <div className="documentHeader">
+                        <ThemeProvider theme={theme}>
+                            <Typography variant="h5">
+                                {document ? document.title: null}
+                            </Typography>
+                        </ThemeProvider>
+                        <Button
+                            // id="base-button"
+                            // sx={{marginTop: '20px', marginBottom: '20px', marginLeft: '80%'}}
+                            variant="outlined"
+                            disabled={!uncommented}
+                            onClick={handleSave}>
                             <Tooltip sx={{width: '10px', height: '10px'}}
-                                    title="Добавить текстовый блок"
-                                    placement="top"
-                                    arrow>
-                                <TextFieldsIcon sx={{color: '#000000'}}/>
+                                     title="Сохранить"
+                                     placement="top"
+                                     arrow>
+                                <SaveIcon sx={{color: '#1976d2'}}/>
                             </Tooltip>
                         </Button>
-                    </MenuItem>
-                    <MenuItem onClick={handleClose}>
-                        <Button sx={{border: 'none', outline: 'none'}}
-                                variant="outlined" onClick={handleAddImage}>
+                        <Button variant="contained"
+                                onClick={handleClick}>
                             <Tooltip sx={{width: '10px', height: '10px'}}
-                                    title="Добавить блок с изображением"
-                                    placement="top"
-                                    arrow>
-                                <ImageIcon sx={{color: '#000000'}}/>
+                                     title="Добавить блок"
+                                     placement="top"
+                                     arrow>
+                                <AddIcon sx={{color: '#FFFFFF'}}/>
                             </Tooltip>
                         </Button>
-                    </MenuItem>
-                </Menu>
-            </div>
-            
-            <div className="blockList">
-                {blocks.map((item) => {
-                    return <BlockComponent mode={mode} onShowHistory={() => {
-                    }} onDelete={handleDelete} onChange={handleChange} block={item}/>
-                })}
-            </div>
-        </div>
+                        <Menu
+                            anchorEl={anchorEl}
+                            open={Boolean(anchorEl)}
+                            onClose={handleClose}
+                        >
+                            <MenuItem onClick={handleClose}>
+                                <Button sx={{border: 'none', outline: 'none'}}
+                                        variant="outlined" onClick={handleAddText}>
+                                    <Tooltip sx={{width: '10px', height: '10px'}}
+                                             title="Добавить текстовый блок"
+                                             placement="top"
+                                             arrow>
+                                        <TextFieldsIcon sx={{color: '#000000'}}/>
+                                    </Tooltip>
+                                </Button>
+                            </MenuItem>
+                            <MenuItem onClick={handleClose}>
+                                <Button sx={{border: 'none', outline: 'none'}}
+                                        variant="outlined" onClick={handleAddImage}>
+                                    <Tooltip sx={{width: '10px', height: '10px'}}
+                                             title="Добавить блок с изображением"
+                                             placement="top"
+                                             arrow>
+                                        <ImageIcon sx={{color: '#000000'}}/>
+                                    </Tooltip>
+                                </Button>
+                            </MenuItem>
+                        </Menu>
+                    </div>
+
+                    <div className="blockList">
+                        {blocks.map((item) => {
+                            return <BlockComponent mode={mode} onShowHistory={() => {
+                            }} onDelete={handleDelete} onChange={handleChange} block={item}/>
+                        })}
+                    </div>
+                </div>}
+        </>
     )
 }
