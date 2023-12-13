@@ -13,13 +13,11 @@ import ListBlocks from "../Components/ListBlocks";
 
 export default function WorkspaceDocs (){
 
-    let {wp_id} = useParams();
-     console.log(wp_id)
     return (
         <>
             <Grid container spacing={0} style={{ marginTop:'70px', height: '100vh' }}>
                 <Grid item xs={3}>
-                    <Sidebar workspaceID={wp_id}/>
+                    <Sidebar/>
                 </Grid>
                 <Grid item xs={9} sx={{ borderLeft: '1px solid #443C69', marginTop:'10px' }}>
 

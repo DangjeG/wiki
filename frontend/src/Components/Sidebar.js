@@ -7,14 +7,20 @@ import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
 import {Form, Modal} from "react-bootstrap";
 import ButtonAddDocument from "./ModalButton/ButtonAddDocument";
-import {useNavigate} from "react-router-dom";
-export default function Sidebar({workspaceID}){
+import {useNavigate, useParams} from "react-router-dom";
+export default function Sidebar(){
 
     const [sidebarData, setSidebarData] = useState([]);
     const [workspace, setWorkspace] = useState(null)
     let navigate = useNavigate()
+    let {wp_id} = useParams();
 
-    const fetchDocs = async () => {
+    useEffect(() => {
+        fetchDocs(wp_id)
+        fetchWorkspace(wp_id)
+    }, [wp_id]);
+
+    const fetchDocs = async (workspaceID) => {
         try {
             const response = await api.getDocumentsTree(workspaceID)
             setSidebarData(response)
@@ -25,7 +31,7 @@ export default function Sidebar({workspaceID}){
         }
     };
 
-    const fetchWorkspace = async () =>{
+    const fetchWorkspace = async (workspaceID) =>{
         try{
             const response = await api.getWorkspaceInfo(workspaceID)
             setWorkspace(response)
@@ -36,20 +42,20 @@ export default function Sidebar({workspaceID}){
     }
 
     useEffect(() => {
-        fetchWorkspace()
-        fetchDocs()
+        fetchWorkspace(wp_id)
+        fetchDocs(wp_id)
     }, []);
 
 
 
     const handleAdd = async (newDocument) => {
-        await api.addDocument(newDocument, workspaceID)
+        await api.addDocument(newDocument, wp_id)
         setSidebarData([])
         fetchDocs()
     }
 
     const handleClick = (id) => {
-        navigate(`/workspace/${workspaceID}/document/${id}/edit`)
+        navigate(`/workspace/${wp_id}/document/${id}/edit`)
     }
 
     function getChildren(children) {

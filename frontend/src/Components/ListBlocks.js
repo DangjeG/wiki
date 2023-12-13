@@ -1,6 +1,5 @@
 import Button from "@mui/material/Button";
-import SaveAltIcon from "@mui/icons-material/SaveAlt";
-import {MenuList, Tooltip} from "@mui/material";
+import { Tooltip} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import SaveIcon from '@mui/icons-material/Save';
 import ImageIcon from "@mui/icons-material/Image";
@@ -11,32 +10,29 @@ import {useParams} from "react-router-dom";
 import Menu from '@mui/material/Menu';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
 import MenuItem from '@mui/material/MenuItem';
-import Styles from '../Styles/DocumentSpace.css';
-import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 import {
     createTheme,
     responsiveFontSizes,
     ThemeProvider,
   } from '@mui/material/styles';
+import "../Styles/DocumentSpace.css"
 
 
 export default function ListBlocks() {
 
     const [anchorEl, setAnchorEl] = useState(null);
-    const [isHovered, setIsHovered] = useState(false);
-
     const [uncommented, setUncommented] = useState(false)
     const [blocks, setBlocks] = useState([]);
-    const [documentID, setDocumentID] = useState(null)
+    const [document, setDocument] = useState(null)
     let {doc_id, mode} = useParams();
-
     let theme = createTheme();
 
     theme = responsiveFontSizes(theme);
 
     useEffect(() => {
         fetchBlocks(doc_id)
+        fetchDoc(doc_id)
     }, [doc_id]);
 
     const fetchBlocks = async (ID) => {
@@ -44,7 +40,16 @@ export default function ListBlocks() {
             setBlocks([])
             const response = await api.getBlocks(ID)
             setBlocks(response)
-            setDocumentID(ID)
+        } catch (e) {
+            console.log(e)
+        }
+    };
+
+    const fetchDoc = async (ID) => {
+        try {
+            setBlocks([])
+            const response = await api.getDocumentsInfo(ID)
+            setDocument(response)
         } catch (e) {
             console.log(e)
         }
@@ -62,22 +67,22 @@ export default function ListBlocks() {
         for (let item of blocks)
             if (item.type_block === "TEXT")
                 await api.updateTextBlockData(item.id, item.content)
-        await api.saveDocument(documentID)
+        await api.saveDocument(doc_id)
     }
     const handleDelete = async (block) => {
         await api.deleteBlock(block.id)
-        fetchBlocks(documentID);
+        fetchBlocks(doc_id);
         setUncommented(true)
     }
 
     const handleAddText = async () => {
-        await api.addBlock(documentID, 0, "TEXT")
-        fetchBlocks(documentID)
+        await api.addBlock(doc_id, 0, "TEXT")
+        fetchBlocks(doc_id)
         setUncommented(true)
     }
     const handleAddImage = async () => {
-        await api.addBlock(documentID, 0, "IMG")
-        fetchBlocks(documentID)
+        await api.addBlock(doc_id, 0, "IMG")
+        fetchBlocks(doc_id)
         setUncommented(true)
     }
 
@@ -97,11 +102,11 @@ export default function ListBlocks() {
         }*/
 
     return (
-        <div className="Styles.container" class="container">
-            <div className="Styles.documentHeader" class="documentHeader">
+        <div className="container">
+            <div className="documentHeader">
                 <ThemeProvider theme={theme}>
                     <Typography variant="h5">
-                        {documentID ? documentID: null}
+                        {document ? document.title: null}
                     </Typography>
                 </ThemeProvider>
                 <Button 
@@ -156,9 +161,9 @@ export default function ListBlocks() {
                 </Menu>
             </div>
             
-            <div className="Styles.blockList" class="blockList">
+            <div className="blockList">
                 {blocks.map((item) => {
-                    return <BlockComponent mode={"edit"} onShowHistory={() => {
+                    return <BlockComponent mode={mode} onShowHistory={() => {
                     }} onDelete={handleDelete} onChange={handleChange} block={item}/>
                 })}
             </div>

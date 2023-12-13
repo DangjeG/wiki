@@ -137,17 +137,20 @@ export default function BlockComponent(props) {
                     {getBlockView()}
                 </div>
                 }
-            <div className={showMenu ? "block__toolbar_visibility_visible" : "block__toolbar_visibility_hidden"}>
-                <Button onClick={handleClick}>
-                    <MoreVertIcon/>
-                </Button>
-                <Menu
-                    open={Boolean(anchorEl)}
-                    onClose={handleClose}
-                    anchorEl={anchorEl}
-                >
-                    {getTools()}
-                </Menu>
+
+            <div className={"tools-container"}>
+                <div className={showMenu? "block__toolbar_visibility_visible" : "block__toolbar_visibility_hidden"}>
+                    <Button onClick={handleClick}>
+                        <MoreVertIcon/>
+                    </Button>
+                    <Menu
+                        open={Boolean(anchorEl)}
+                        onClose={handleClose}
+                        anchorEl={anchorEl}
+                    >
+                        {getTools()}
+                    </Menu>
+                </div>
             </div>
         </div>
     )

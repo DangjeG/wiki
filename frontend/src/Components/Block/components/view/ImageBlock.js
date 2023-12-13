@@ -2,6 +2,6 @@
 export default function ImageBlock({block}){
 
     return(
-        <img src={block.link} width="600"/>
+        <img src={block.link} width="90%"/>
     )
 }

@@ -149,7 +149,7 @@ export default class Api {
 
     async getDocumentsInfo(document_id){
         let document = null
-        await instance.get(`/document/info?workspace_id=${document_id}`).then((resp)=> {
+        await instance.get(`/document/info?document_id=${document_id}`).then((resp)=> {
             document = resp.data
         })
         return document
