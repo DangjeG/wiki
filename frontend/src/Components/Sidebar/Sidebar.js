@@ -76,7 +76,6 @@ export function Sidebar(){
     }
 
     const handleClick = (id, mode) => {
-        alert(mode)
         navigate(`/workspace/${wp_id}/document/${id}/${mode}`)
     }
 

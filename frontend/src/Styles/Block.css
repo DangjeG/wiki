@@ -1,6 +1,6 @@
 .block-container{
     margin: 10px 5%;
-    width:90%;
+    min-width:90%;
     display: flex;
     justify-content: flex-start;
     align-items: flex-start;
@@ -15,7 +15,7 @@
     border-radius: 10px;
 }
 .block-view{
-    width: 95%;
+    min-width: 95%;
 }
 
 .tools-container{

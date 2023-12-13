@@ -117,28 +117,34 @@ export default function ListBlocks() {
                                 {document ? document.title: null}
                             </Typography>
                         </ThemeProvider>
-                        <Button
-                            // id="base-button"
-                            // sx={{marginTop: '20px', marginBottom: '20px', marginLeft: '80%'}}
-                            variant="outlined"
-                            disabled={!uncommented}
-                            onClick={handleSave}>
-                            <Tooltip sx={{width: '10px', height: '10px'}}
-                                     title="Сохранить"
-                                     placement="top"
-                                     arrow>
-                                <SaveIcon sx={{color: '#1976d2'}}/>
-                            </Tooltip>
-                        </Button>
-                        <Button variant="contained"
-                                onClick={handleClick}>
-                            <Tooltip sx={{width: '10px', height: '10px'}}
-                                     title="Добавить блок"
-                                     placement="top"
-                                     arrow>
-                                <AddIcon sx={{color: '#FFFFFF'}}/>
-                            </Tooltip>
-                        </Button>
+                        {mode === "edit" ?
+                            <>
+                                <Button
+                                    // id="base-button"
+                                    // sx={{marginTop: '20px', marginBottom: '20px', marginLeft: '80%'}}
+                                    variant="outlined"
+                                    disabled={!uncommented}
+                                    onClick={handleSave}>
+                                    <Tooltip sx={{width: '10px', height: '10px'}}
+                                             title="Сохранить"
+                                             placement="top"
+                                             arrow>
+                                        <SaveIcon sx={{color: '#1976d2'}}/>
+                                    </Tooltip>
+                                </Button>
+                                <Button variant="contained"
+                                        onClick={handleClick}>
+                                    <Tooltip sx={{width: '10px', height: '10px'}}
+                                             title="Добавить блок"
+                                             placement="top"
+                                             arrow>
+                                        <AddIcon sx={{color: '#FFFFFF'}}/>
+                                    </Tooltip>
+                                </Button>
+                            </>
+
+                            :<></>
+                        }
                         <Menu
                             anchorEl={anchorEl}
                             open={Boolean(anchorEl)}
