@@ -379,6 +379,9 @@ components:
       - title
       title: CreateWorkspace
       type: object
+    DocumentExportType:
+      const: DOCX
+      title: DocumentExportType
     DocumentInfoResponse:
       properties:
         created_at:
@@ -2362,7 +2365,55 @@ paths:
       - WorkspaceDocument
   /api/v1/document/export:
     post:
-      operationId: document_to_docx_api_v1_document_export_post
+      operationId: export_document_api_v1_document_export_post
+      parameters:
+      - in: query
+        name: document_id
+        required: true
+        schema:
+          format: uuid
+          title: Document Id
+          type: string
+      - in: query
+        name: export_type
+        required: false
+        schema:
+          allOf:
+          - $ref: '#/components/schemas/DocumentExportType'
+          default: DOCX
+          title: Export Type
+      - in: query
+        name: version_commit_id
+        required: false
+        schema:
+          anyOf:
+          - maxLength: 64
+            minLength: 64
+            type: string
+          - type: 'null'
+          title: Version Commit Id
+      responses:
+        '202':
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Export document
+      tags:
+      - ExportDocument
+  /api/v1/document/export_doc:
+    post:
+      deprecated: true
+      operationId: document_to_docx_api_v1_document_export_doc_post
       parameters:
       - in: query
         name: document_id

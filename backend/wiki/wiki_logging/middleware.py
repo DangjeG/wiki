@@ -98,6 +98,11 @@ class WikiRouterLoggerMiddleware:
 
         duration: int = math.ceil((utcnow().timestamp() - start_time) * 1000)
 
+        try:
+            response_body = response_body.decode()
+        except UnicodeDecodeError:
+            response_body = "No utf-8 response"
+
         request_json_fields = RequestLogSchema(
             request_uri=str(request.url),
             request_referer=request_headers.get("referer", self.EMPTY_VALUE),
@@ -115,7 +120,7 @@ class WikiRouterLoggerMiddleware:
             response_status_code=response.status_code,
             response_size=int(response_headers.get("content-length", 0)),
             response_headers=json.dumps(response_headers),
-            response_body=response_body.decode(),
+            response_body=response_body,
             duration=duration
         ).model_dump()
 
