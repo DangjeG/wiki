@@ -1,4 +1,4 @@
-import BlockComponent from "../Components/Block";
+import BlockComponent from "../Components/Block/Block";
 import React, {useEffect, useState} from "react";
 import {api} from "../Config/app.config";
 import {Modal} from "react-bootstrap";

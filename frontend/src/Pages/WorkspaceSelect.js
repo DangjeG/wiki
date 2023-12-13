@@ -28,7 +28,6 @@ export default function WorkspaceSelect (props) {
     }, []);
 
     const handleClick = (id) => {
-
         navigate(`/workspace/${id}`)
     }
 

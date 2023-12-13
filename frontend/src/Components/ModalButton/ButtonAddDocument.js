@@ -27,7 +27,7 @@ export default function ButtonAddDocument({onSubmit}){
                          placement="top"
                          arrow>
                     Добавить
-                    <AddIcon sx={{color: '#000000'}}/>
+                    <AddIcon sx={{color: '#ffffff'}}/>
                 </Tooltip>
             </Button>
 

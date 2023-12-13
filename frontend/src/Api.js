@@ -183,15 +183,15 @@ export default class Api {
         })
     }
     async updateFileBlockData(block_id, content){
-        let link = ""
+        let block = null
         await instance.put(`/blocks/data/file?block_id=${block_id}`, content, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
         }).then((resp)=>{
-            link = resp.data.link
+            block = resp.data
         })
-        return link
+        return block
     }
     async getBlockData(block_id, commit_id){
         let url = `/blocks/data?block_id=${block_id}${commit_id !== null

@@ -3,6 +3,7 @@ import {Button, Form} from "react-bootstrap";
 import "../Styles/Login.css"
 import {api} from "../Config/app.config";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import {useNavigate} from "react-router-dom";
 
 
 export default function Verify({onRefresh}){
@@ -10,13 +11,14 @@ export default function Verify({onRefresh}){
     const [code, setCode] = useState();
     const [isError, setIsError] = useState(false);
     const [errorText, setErrorText] = useState("")
+    let navigation = useNavigate()
 
     async function handleFormSubmit(event) {
         event.preventDefault();
         try {
             await api.verify(code);
             onRefresh()
-            window.location.href = '#';
+            navigation(`/`)
             }
             catch (error){
                 setErrorText(error.response.data.message)
