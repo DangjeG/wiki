@@ -1,15 +1,9 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {api} from "../Config/app.config";
-import BlockComponent from "../Components/Block/Block";
-import Button from "@mui/material/Button";
-import Sidebar from "../Components/Sidebar";
-import {Grid, Tooltip} from "@mui/material";
-import SaveAltIcon from "@mui/icons-material/SaveAlt";
-import AddIcon from "@mui/icons-material/Add";
-import ImageIcon from '@mui/icons-material/Image';
+import {Grid} from "@mui/material";
 import {Route, Routes, useParams} from "react-router-dom";
 import ListBlocks from "../Components/ListBlocks";
-
+import {Sidebar} from "../Components/Sidebar/index"
 
 export default function WorkspaceDocs (){
 
@@ -31,4 +25,4 @@ export default function WorkspaceDocs (){
             </Grid>
         </>
     )
-}
+};
