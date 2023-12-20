@@ -1,13 +1,17 @@
 import {api} from "../Config/app.config";
 import React from "react";
 import {Modal, Button} from "react-bootstrap";
+import {useNavigate} from "react-router-dom";
 
 
 export default function Logout({onRefresh}) {
+
+    let navigation = useNavigate()
     React.useEffect( () => {
         async function fetch(){
             await api.logout()
             onRefresh()
+            navigation(`/`)
         }
         fetch()
     })

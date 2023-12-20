@@ -1,12 +1,14 @@
-import React from "react";
+import React, {useState} from "react";
 import {useTheme} from "@mui/material/styles";
 import {Box, Typography} from "@mui/material";
-import DocumentTreeItemEditButton from "./Buttons/DocumentTreeItemEditButton"
-import DocumentTreeItemMenuButton from "./Buttons/DocumentTreeItemMenuButton"
 import DocumentTreeItemRoot from "./DocumentTreeItemRoot";
+import "../../../Styles/Sidebar.css"
 
 
 const DocumentTreeItem = React.forwardRef(function StyledTreeItem(props, ref) {
+
+    const [showMenu, setShowMenu] = useState(false);
+
     const theme = useTheme();
     const {
         bgColor,
@@ -17,10 +19,6 @@ const DocumentTreeItem = React.forwardRef(function StyledTreeItem(props, ref) {
         labelFontWeight,
         colorForDarkMode,
         bgColorForDarkMode,
-        // onClickNewDocument,
-        // onClickRename,
-        // onClickDelete,
-        // onClickEdit,
         buttons,
         ...other
     } = props;
@@ -31,15 +29,26 @@ const DocumentTreeItem = React.forwardRef(function StyledTreeItem(props, ref) {
             theme.palette.mode !== 'dark' ? bgColor : bgColorForDarkMode,
     };
 
+    const handleMouseEnter = () => {
+        setShowMenu(true);
+    };
+
+    const handleMouseLeave = () => {
+        setShowMenu(false);
+    };
+
     return (
         <DocumentTreeItemRoot
             label={
                 <Box
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
                     sx={{
                         display: 'flex',
                         alignItems: 'center',
                         p: 0.5,
                         pr: 0,
+                        minHeight: "48px"
                     }}
                 >
                     <Box component={LabelIcon} color={labelFontWeight ? "black" : "inherit"} sx={{ mr: 1 }} />
@@ -51,13 +60,9 @@ const DocumentTreeItem = React.forwardRef(function StyledTreeItem(props, ref) {
                     }}>
                         {labelText}
                     </Typography>
-                    {buttons}
-                    {/*<DocumentTreeItemEditButton onClickEdit/>*/}
-                    {/*<DocumentTreeItemMenuButton*/}
-                    {/*    onClickNewDocument={onClickNewDocument}*/}
-                    {/*    onClickRename={onClickRename}*/}
-                    {/*    onClickDelete={onClickDelete}*/}
-                    {/*/>*/}
+                    <div className={showMenu? "item-toolbar_visibility_visible" : "item-toolbar_visibility_hidden"}>
+                        {buttons}
+                    </div>
                 </Box>
             }
             style={styleProps}

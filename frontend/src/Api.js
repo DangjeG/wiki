@@ -164,8 +164,35 @@ export default class Api {
     }
 
     async deleteDoc(doc_id){
-        await instance.delete(`/document?document_id=${doc_id}`)
+        await instance.delete(`/document/${doc_id}`)
     }
+
+    async exportDoc(doc_id, filename) {
+        await instance.post(`/document/export?document_id=${doc_id}`,
+            {},
+            {responseType: 'arraybuffer'}).then((resp) => {
+            const downloadUrl = this.createDownloadUrl(resp.data);
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = `${filename}.docx`;
+            link.click();
+        })
+    }
+
+    createDownloadUrl(streamOfBits) {
+        const blob = new Blob([streamOfBits], {type: 'application/octet-stream'});
+        return window.URL.createObjectURL(blob);
+    }
+
+    getFilename(contentDisposition) {
+        const regex = /filename\*?=['"]?(?:UTF-\d['"]*)?([^;\s'"]*)['"]?;?/i;
+        const match = contentDisposition.match(regex);
+        if (match && match.length > 1) {
+            return decodeURIComponent(match[1]);
+        }
+        return null;
+    }
+
     async addBlock(document_id, position, type_block){
         await instance.post(`/blocks`,{
             "document_id": document_id,

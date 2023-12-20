@@ -23,7 +23,8 @@ export function Sidebar(){
     const [sidebarData, setSidebarData] = useState([]);
     const [workspace, setWorkspace] = useState(null)
     let navigate = useNavigate()
-    let {wp_id} = useParams();
+    let {wp_id, mode} = useParams();
+
 
     useEffect(() => {
 
@@ -45,6 +46,7 @@ export function Sidebar(){
         try {
             const response = await api.getDocumentsTree(workspaceID)
             setSidebarData(response)
+            console.log(sidebarData)
             setDocsLoad(false)
         }
         catch (e){
@@ -75,6 +77,10 @@ export function Sidebar(){
         fetchDocs(wp_id)
     }
 
+    const handleExport = async (document_id, filename) => {
+        await api.exportDoc(document_id, filename)
+    }
+
     const handleClick = (id, mode) => {
         navigate(`/workspace/${wp_id}/document/${id}/${mode}`)
     }
@@ -95,8 +101,8 @@ export function Sidebar(){
                         <DocumentTreeItemEditButton onClick={() => handleClick(item.id, "edit")}/>
                         <DocumentTreeItemMenuButton
                              onClickNewDocument={(title) => handleAdd(title, item.id)}
-                            // onClickRename={onClickRename}
-                            // onClickDelete={onClickDelete}
+                             onClickDelete={() => handleDelete(item.id)}
+                             onClickExport={() => handleExport(item.id, item.title)}
                         />
                     </>
                 )}
@@ -150,8 +156,8 @@ export function Sidebar(){
                                             <DocumentTreeItemEditButton onClick={() => handleClick(item.id, "edit")}/>
                                             <DocumentTreeItemMenuButton
                                                  onClickNewDocument={(title) => handleAdd(title, item.id)}
-                                                // onClickRename={onClickRename}
-                                                // onClickDelete={onClickDelete}
+                                                 onClickDelete={() => handleDelete(item.id)}
+                                                 onClickExport={() => handleExport(item.id,  item.title)}
                                             />
                                         </>
                                     )}

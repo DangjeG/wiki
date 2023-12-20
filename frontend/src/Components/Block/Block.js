@@ -19,6 +19,7 @@ export default function BlockComponent(props) {
     const [showEditor, setShowEditor] = useState(false)
     const [block, setBlock] = useState(props.block)
     const [anchorEl, setAnchorEl] = useState(null);
+    const [showMenu, setShowMenu] = useState(false);
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };
@@ -26,7 +27,7 @@ export default function BlockComponent(props) {
         setAnchorEl(null);
     };
 
-    const [showMenu, setShowMenu] = useState(false);
+
 
     const handleMouseEnter = () => {
         setShowMenu(true);
@@ -36,9 +37,8 @@ export default function BlockComponent(props) {
         setShowMenu(false);
     };
 
-
-    const getBlockView = () =>{
-        switch(block.type_block) {
+    const getBlockView = (type_block) =>{
+        switch(type_block) {
             case 'TEXT':
             return <TextBlock block={block}/>
             case 'IMG':
@@ -46,8 +46,8 @@ export default function BlockComponent(props) {
         }
     }
 
-    const getBlockEditor = () => {
-        switch(block.type_block) {
+    const getBlockEditor = (type_block) => {
+        switch(type_block) {
             case 'TEXT':
                 return <Wysiwyg block={block} onChange={handleChange}/>
             case 'IMG':
@@ -55,40 +55,7 @@ export default function BlockComponent(props) {
         }
     }
 
-    const getTools = () => {
-        switch(props.mode) {
-            case 'view':
-                return(
-                    <div style={{float: 'right'}}>
-                        <MenuItem onClick={handleShowHistory}>
-                            <HistoryIcon/>
-                        </MenuItem>
-                    </div>
-                )
-            case 'edit':
-                return(
-                    <div >
-                        <MenuItem onClick={handleDelete}>
-                            <Delete/>
-                        </MenuItem>
-                        <MenuItem onClick={handleShowHistory}>
-                            <HistoryIcon/>
-                        </MenuItem>
-                        <MenuItem onClick={handleShowEditor}>
-                            <EditIcon/>
-                        </MenuItem>
-                    </div>
-            /*case 'version':
-                return (
-                    <div style={{float: 'right'}}>
-                        <IconButton onClick={handleDelete}>
-                            <Delete/>
-                        </IconButton>
-                    </div>*/
-                )
-        }
-    }
-
+/*
     const handleAddAbove = () => {
         //props.onAddAbove(block)
     }
@@ -104,6 +71,7 @@ export default function BlockComponent(props) {
     const handleMoveUp = () => {
         //props.onMoveUp(block)
     }
+*/
 
     const handleDelete = () => {
         props.onDelete(block)
@@ -122,36 +90,56 @@ export default function BlockComponent(props) {
         props.onChange()
     }
 
-
-    return (
-        <div
-            className={"block-container"}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-        >
-            {showEditor ?
-                <div className={"block-editor"}>
-                    {getBlockEditor()}
-                </div> :
-                <div className={"block-view"}>
-                    {getBlockView()}
+    switch(props.mode){
+        case "view" :
+            return(
+                <div className={"block-container"}>
+                    <div className={"block-view"}>
+                        {getBlockView(block.type_block)}
+                    </div>
                 </div>
-                }
+            )
 
-            <div className={"tools-container"}>
-                <div className={showMenu? "block__toolbar_visibility_visible" : "block__toolbar_visibility_hidden"}>
-                    <Button onClick={handleClick}>
-                        <MoreVertIcon/>
-                    </Button>
-                    <Menu
-                        open={Boolean(anchorEl)}
-                        onClose={handleClose}
-                        anchorEl={anchorEl}
-                    >
-                        {getTools()}
-                    </Menu>
+        case "edit" :
+            return (
+                <div
+                    className={"block-container block-container_hover"}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                >
+                    {showEditor ?
+                        <div className={"block-editor"}>
+                            {getBlockEditor(block.type_block)}
+                        </div> :
+                        <div className={"block-view"}>
+                            {getBlockView(block.type_block)}
+                        </div>
+                    }
+                    <div className={"tools-container"}>
+                        <div className={showMenu? "block__toolbar_visibility_visible" : "block__toolbar_visibility_hidden"}>
+                            <Button onClick={handleClick}>
+                                <MoreVertIcon/>
+                            </Button>
+                            <Menu
+                                open={Boolean(anchorEl)}
+                                onClose={handleClose}
+                                anchorEl={anchorEl}
+                            >
+                                <div >
+                                    <MenuItem onClick={handleDelete}>
+                                        <Delete/>
+                                    </MenuItem>
+                                    <MenuItem onClick={handleShowHistory}>
+                                        <HistoryIcon/>
+                                    </MenuItem>
+                                    <MenuItem onClick={handleShowEditor}>
+                                        <EditIcon/>
+                                    </MenuItem>
+                                </div>
+                            </Menu>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    )
+            )
+    }
 }
