@@ -5,7 +5,7 @@ import ButtonAddDocument from "../../../ModalButton/ButtonAddDocument";
 import {Form, Modal} from "react-bootstrap";
 import Button from "@mui/material/Button";
 
-const DocumentTreeItemMenuButton = ({ onClickNewDocument, onClickRename, onClickDelete, workspaceId, documentId }) => {
+const DocumentTreeItemMenuButton = ({ onClickNewDocument, onClickExport, onClickDelete }) => {
     const [anchorEl, setAnchorEl] = React.useState(null);
 
     const [show, setShow] = useState(false);
@@ -40,6 +40,10 @@ const DocumentTreeItemMenuButton = ({ onClickNewDocument, onClickRename, onClick
                     onClickDelete()
                     handleCloseMenu()
                 }}>Delete</MenuItem>
+                <MenuItem onClick={() => {
+                    onClickExport()
+                    handleCloseMenu()
+                }}>Export</MenuItem>
             </Menu>
 
             <Modal show={show} onHide={handleClose}

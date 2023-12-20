@@ -35,7 +35,7 @@ export default function App() {
             const response = await api.getMe();
             setUser(response);
         } catch (error) {
-            console.log(error)
+            setUser(null)
         }
         setUserLoad(false)
     };
@@ -48,10 +48,10 @@ export default function App() {
                     <BrowserRouter basename={"/wiki/demo"}>
                         <AppNavbar user={user}/>
                         <Routes>
-                            <Route path={"/"} element={<Home/>}/>
+                            <Route path={"/"} element={<Home user={user}/>}/>
                             <Route path={"/login"} element={<Login/>}/>
                             <Route path={"/verify"} element={<Verify onRefresh={handleRefresh}/>}/>
-                            <Route path={"/signup"} element={<SignUp/>}/>
+                            {/*<Route path={"/signup"} element={<SignUp/>}/>*/}
                             <Route path={"/logout"} element={<Logout onRefresh={handleRefresh}/>}/>
                             <Route element={<ProtectedRoute requirement={
                                 user !== null && user.wiki_api_client !== null && user.wiki_api_client.responsibility === 'ADMIN'

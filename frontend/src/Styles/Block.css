@@ -1,25 +1,24 @@
 .block-container{
     margin: 10px 5%;
+    padding: 5px;
     min-width:90%;
+    min-height: 40px;
     display: flex;
     justify-content: flex-start;
     align-items: flex-start;
     flex-direction: row;
-    min-height: 25px;
 }
 
 .block-editor{
-    width: 95%;
+    min-width: 95%;
     min-height: 250px;
-    border: solid 1px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
 }
 .block-view{
     min-width: 95%;
 }
 
 .tools-container{
-    width: 5px;
+    min-width: 5%;
 }
 
 .block__toolbar_visibility_hidden{
@@ -27,4 +26,9 @@
 }
 .block__toolbar_visibility_visible{
     display: block;
+}
+
+.block-container_hover{
+    box-shadow: 2px 2px 5px rgba(2, 2, 2, .1);
+    border-radius: 10px;
 }

@@ -71,12 +71,12 @@ export default function AppNavbar(props) {
                             id="typography-home">
                     ГЛАВНАЯ
                 </Typography>
-                <Typography variant="h6"
+                {/*<Typography variant="h6"
                             component="a"
                             href="https://d-element.ru/?ysclid=lolx8ntig9911662351"
                             id="typography-home">
                     ПЕРЕЙТИ НА САЙТ
-                </Typography>
+                </Typography>*/}
             </div>
 
         if (props.user !== null && props.user.wiki_api_client !== null) {
@@ -131,12 +131,12 @@ export default function AppNavbar(props) {
                     }}>
                         ВОЙТИ
                     </Button>
-                    <Button id="accent-button"  /*sx={{background:'#b07285', color: '#423e42', ':hover': {backgroundColor: '#8a4a5d'}}}*/
+                   {/* <Button id="accent-button"  /*sx={{background:'#b07285', color: '#423e42', ':hover': {backgroundColor: '#8a4a5d'}}}
                             variant="contained" onClick={() => {
                         navigate("/signup")
                     }}>
                         ЗАРЕГИСТРИРОВАТЬСЯ
-                    </Button>
+                    </Button>*/}
                 </Stack>
             );
         } else {
