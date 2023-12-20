@@ -61,8 +61,8 @@ async def export_document(
                                                      ya_disk)
     if export_type.DOCX:
         res = converters.docx.convert(html)
-        headers = {"Content-Disposition": f'attachment; filename="{title}".docx'}
-        return Response(res, headers=headers, media_type="application/pdf")
+        headers = {"Content-Disposition": f'attachment; filename*=UTF-8\'\'"{title}"'}
+        return Response(res, headers=headers, media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
     raise Exception
 

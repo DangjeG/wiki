@@ -2541,6 +2541,47 @@ paths:
       summary: Get tree documents
       tags:
       - WorkspaceDocument
+  /api/v1/document/{document_id}:
+    delete:
+      description: '## Deleted document by id
+
+        **You have to have a deletion permission or be an administrator.**
+
+
+        When a document is deleted, the hierarchy changes:
+
+        all child documents become child documents of the parent.'
+      operationId: delete_document_api_v1_document__document_id__delete
+      parameters:
+      - in: path
+        name: document_id
+        required: true
+        schema:
+          format: uuid
+          title: Document Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Delete document
+      tags:
+      - WorkspaceDocument
   /api/v1/document/{document_id}/publish:
     post:
       description: '## Publish document

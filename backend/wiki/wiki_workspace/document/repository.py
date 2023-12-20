@@ -1,7 +1,7 @@
 from typing import Optional
 from uuid import UUID
 
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, update
 from starlette import status
 
 from wiki.common.exceptions import WikiException, WikiErrorCode
@@ -41,13 +41,22 @@ class DocumentRepository(ObjectRepository):
             *whereclause
         )
 
-    async def get_documents_with_permission(self, user_id: UUID) -> list:
-        res = await self._get_result_document_with_permission(user_id)
+    async def get_documents_with_permission(self, user_id: UUID, is_only_existing: bool = True) -> list:
+        whereclause = []
+        if is_only_existing:
+            whereclause.append(Document.is_deleted == False)
+        res = await self._get_result_document_with_permission(user_id, *whereclause)
         return res.all()
 
     @menage_db_not_found_result_method(NotFoundResultMode.EXCEPTION, ex=document_not_found_exception)
-    async def get_document_with_permission_by_id(self, user_id: UUID, document_id: UUID):
-        res = await self._get_result_document_with_permission(user_id, Document.id == document_id)
+    async def get_document_with_permission_by_id(self,
+                                                 user_id: UUID,
+                                                 document_id: UUID,
+                                                 is_only_existing: bool = True):
+        whereclause = [Document.id == document_id]
+        if is_only_existing:
+            whereclause.append(Document.is_deleted == False)
+        res = await self._get_result_document_with_permission(user_id, *whereclause)
         return res.first()
 
     @menage_db_not_found_result_method(NotFoundResultMode.EXCEPTION, ex=document_not_found_exception)
@@ -81,6 +90,11 @@ class DocumentRepository(ObjectRepository):
     async def mark_document_delete(self, document_id: UUID):
         document = await self.get_document_by_id(document_id)
         document.is_deleted = True
+
+        query = (update(Document).where(Document.parent_document_id == document_id)
+                 .values(parent_document_id=document.parent_document_id))
+
+        await self.session.execute(query)
 
         self.session.add(document)
 

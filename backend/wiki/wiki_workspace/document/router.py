@@ -174,6 +174,14 @@ async def delete_document(
         session: AsyncSession = Depends(get_db),
         user: WikiUserHandlerData = Depends(BasePermission(responsibility=ResponsibilityType.VIEWER))
 ):
+    """
+    ## Deleted document by id
+    **You have to have a deletion permission or be an administrator.**
+
+    When a document is deleted, the hierarchy changes:
+    all child documents become child documents of the parent.
+    """
+
     document_repository: DocumentRepository = DocumentRepository(session)
     if user.wiki_api_client.responsibility != ResponsibilityType.ADMIN:
         document = await document_repository.get_document_with_permission_by_id(user.id, document_id)
@@ -186,7 +194,9 @@ async def delete_document(
     else:
         document = await document_repository.get_document_by_id(document_id)
 
-    await document_repository
+    await document_repository.mark_document_delete(document.id)
+
+    return BaseResponse(msg="Document deleted")
 
 
 @document_router.post(
