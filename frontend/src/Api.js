@@ -262,4 +262,8 @@ export default class Api {
         )
         return res
     }
+
+    async rollbackDoc(document_id, commit_id){
+        await instance.post(`/versioning/document/${document_id}/rollback?rollback_commit_id=${commit_id}`)
+    }
 }

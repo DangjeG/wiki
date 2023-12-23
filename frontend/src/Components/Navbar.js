@@ -1,4 +1,4 @@
-import React, {useContex, useState, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
@@ -20,10 +20,11 @@ import ButtonGroup from '@mui/material/ButtonGroup';
 export default function AppNavbar(props) {
 
     const [workspaces, setWorkspaces] = useState([]);
-
-    const [anchorEl, setAnchorEl] = React.useState(null);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [pojectsMenu, setPojectsMenu] = useState(null);
     /*const user = useContext()*/
     let navigate = useNavigate();
+
     const handleMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -32,9 +33,6 @@ export default function AppNavbar(props) {
         setAnchorEl(null);
     };
 
-    useEffect(() => {
-        fetchWorkspaces()
-    }, []);
 
     const fetchWorkspaces = async () => {
         try {
@@ -44,8 +42,6 @@ export default function AppNavbar(props) {
             console.log(error)
         }
     };
-
-    const [pojectsMenu, setPojectsMenu] = useState(null);
 
     const handleClick = (event) => {
         setPojectsMenu(event.currentTarget);
@@ -182,6 +178,10 @@ export default function AppNavbar(props) {
             );
         }
     }
+
+    useEffect(() => {
+        fetchWorkspaces()
+    }, []);
 
     return (
         <>
