@@ -14,6 +14,7 @@ import NewDocumentButton from "./components/Buttons/NewDocumentButton";
 import {CircularProgress} from "@mui/material";
 import ButtonAddDocument from "../ModalButton/ButtonAddDocument";
 import PostAddIcon from "@mui/icons-material/PostAdd";
+import {DocumentTreeItemVersionButton} from "./components/Buttons/DocumentTreeItemVersionButton";
 
 
 export function Sidebar(){
@@ -76,6 +77,10 @@ export function Sidebar(){
         setSidebarData([])
         fetchDocs(wp_id)
     }
+    const handleRollback = () => {
+        navigate(`/workspace/${wp_id}`)
+        fetchDocs(wp_id)
+    }
 
     const handleExport = async (document_id, filename) => {
         await api.exportDoc(document_id, filename)
@@ -99,6 +104,7 @@ export function Sidebar(){
                 buttons={(
                     <>
                         <DocumentTreeItemEditButton onClick={() => handleClick(item.id, "edit")}/>
+                        <DocumentTreeItemVersionButton document={item} onRollback={handleRollback}/>
                         <DocumentTreeItemMenuButton
                              onClickNewDocument={(title) => handleAdd(title, item.id)}
                              onClickDelete={() => handleDelete(item.id)}
@@ -154,6 +160,7 @@ export function Sidebar(){
                                     buttons={(
                                         <>
                                             <DocumentTreeItemEditButton onClick={() => handleClick(item.id, "edit")}/>
+                                            <DocumentTreeItemVersionButton document={item} onRollback={handleRollback}/>
                                             <DocumentTreeItemMenuButton
                                                  onClickNewDocument={(title) => handleAdd(title, item.id)}
                                                  onClickDelete={() => handleDelete(item.id)}

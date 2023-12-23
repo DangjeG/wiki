@@ -72,7 +72,6 @@ export default function BlockComponent(props) {
         //props.onMoveUp(block)
     }
 */
-
     const handleDelete = () => {
         props.onDelete(block)
     }
