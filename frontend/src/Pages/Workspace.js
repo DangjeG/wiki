@@ -1,10 +1,6 @@
-
 import {Route, Routes} from "react-router-dom";
 import WorkspaceDocs from "./WorkspaceDocs";
 import WorkspaceSelect from "./WorkspaceSelect";
-
-
-
 
 
 export default function Workspace(){

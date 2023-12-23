@@ -16,10 +16,15 @@ export const DocumentTreeItemVersionButton = ({document, onRollback}) => {
 
     return (
         <>
-            <IconButton onClick={handleHistoryButtonClick}>
+            <IconButton onMouseEnter={handleHistoryButtonClick}>
                 <HistoryIcon/>
             </IconButton>
-            <VersionList document={document} show={showVersions} onRollback={handleRollback}/>
+            <VersionList
+                wikiObject={document}
+                show={showVersions}
+                onRollback={handleRollback}
+                onMouseLeave={handleHistoryButtonClick}
+            />
         </>
     )
 }

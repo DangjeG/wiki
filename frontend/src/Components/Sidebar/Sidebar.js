@@ -10,7 +10,6 @@ import {TreeView} from "@mui/x-tree-view/TreeView";
 import DocumentTreeItem from "./components/DocumentTreeItem"
 import DocumentTreeItemEditButton from "./components/Buttons/DocumentTreeItemEditButton";
 import DocumentTreeItemMenuButton from "./components/Buttons/DocumentTreeItemMenuButton";
-import NewDocumentButton from "./components/Buttons/NewDocumentButton";
 import {CircularProgress} from "@mui/material";
 import ButtonAddDocument from "../ModalButton/ButtonAddDocument";
 import PostAddIcon from "@mui/icons-material/PostAdd";

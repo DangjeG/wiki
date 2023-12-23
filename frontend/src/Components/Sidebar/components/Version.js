@@ -1,39 +1,46 @@
 import {styled} from "styled-components";
 import UndoIcon from '@mui/icons-material/Undo';
-import {IconButton} from "@mui/material";
-
-const Container = styled.div`
-  padding: 5px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  box-shadow: 2px 2px 5px rgba(2, 2, 2, .4);
-  align-items: flex-start;
-  border-radius: 10px;
-`
-
-const InfoBlock = styled.div`
-  display: flex;
-  flex-direction: column;
-`
+import {IconButton, ListItem, ListItemText, Tooltip} from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
 
 export const Version = ({version, onRollback}) => {
-
-
     const handleClickRollback = (event) => {
         event.stopPropagation();
         onRollback(version.object_id, version.commit_id)
     }
 
-    return(
-        <Container>
-            <InfoBlock>
-                <h5>{version.committer_user.username}</h5>
-                <p>{version.created_at}</p>
-            </InfoBlock>
-            <IconButton onClick={handleClickRollback}>
-                <UndoIcon/>
-            </IconButton>
-        </Container>
+    const addLeadingZero = (number) => {
+        if (number < 10) {
+            return `0${number}`;
+        }
+        return number;
+    }
+
+    const getFormattedDate = (date) => {
+        console.log(typeof date);
+        const year = date.getFullYear();
+        const month = date.toLocaleString("default", { month: "short" });
+        const day = date.getDate();
+        const hours = date.getHours();
+        const minutes = date.getMinutes();
+
+        return `${addLeadingZero(hours)}:${addLeadingZero(minutes)} ${month} ${day}, ${year}`;
+    }
+
+    return (
+        <ListItem>
+            <EditIcon style={{"margin-right": "20px"}} />
+            <Tooltip title="Нажмите для просмотра" arrow>
+                <ListItemText
+                    primary={`Кем изменино: ${version.committer_user.username}`}
+                    secondary={getFormattedDate(Date(version.created_at))} //"Jan 9, 2014"
+                />
+            </Tooltip>
+            <Tooltip title="Откатиться к версии" arrow>
+                <IconButton onClick={handleClickRollback}>
+                    <UndoIcon/>
+                </IconButton>
+            </Tooltip>
+        </ListItem>
     )
 }

@@ -1,40 +1,53 @@
-import {styled} from "styled-components";
 import {api} from "../../../Config/app.config";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Version} from "./Version";
+import {Divider, List} from "@mui/material";
+import Preload from "../../Preload";
 
-const Container = styled.div`
-  background: white;
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  z-index: 100;
-  width: 10px;
-  min-width: 300px;
-  min-height: 10px;
-  border-radius: 10px;
-  gap: 5px;
-`
-
-export const VersionList = ({document, show, onRollback}) => {
+const listStyles = {
+    background: "white",
+    "border-radius": "10px",
+    "max-height": "300px",
+    "min-height": "10px",
+    "min-width": "300px",
+    overflow: "auto",
+    position: "absolute",
+    "z-index": "100"
+}
 
 
-    const [versions, setVersions] = useState([])
+export const VersionList = ({wikiObject, show, onRollback, onMouseLeave, isBlock}) => {
+
+
+    const [versions, setVersions] = useState([]);
+    const [versionsLoad, setVersionsLoad] = useState(true);
+
     const fetchVersions = async () =>{
         try {
             setVersions([])
-            const res = await api.getDocVersions(document.id)
-            setVersions(res)
+            let res;
+            if (isBlock) {
+                res = await api.getBlockVersions(wikiObject.id)
+            } else {
+                res = await api.getDocVersions(wikiObject.id)
+            }
+
+            setVersions(res);
+            setVersionsLoad(false);
         }
         catch (e){
             console.log(e)
         }
-
     }
 
-    const handleRollback = async (document_id, commit_id) => {
-        await api.rollbackDoc(document_id, commit_id)
-        onRollback()
+    const handleRollback = async (object_id, commit_id) => {
+        if (isBlock) {
+            const blockData = await api.rollbackBlock(object_id, commit_id)
+            onRollback(blockData)
+        } else {
+            await api.rollbackDoc(object_id, commit_id)
+            onRollback()
+        }
         fetchVersions()
     }
     
@@ -45,12 +58,17 @@ export const VersionList = ({document, show, onRollback}) => {
 
     if (show)
         return(
-            <Container>
-                {versions.map((item) =>{
-                    return <Version version={item} onRollback={handleRollback}/>
+            <List style={listStyles} onMouseLeave={onMouseLeave}>
+                {versionsLoad? <Preload/> : versions.map((item) => {
+                    return (
+                        <>
+                            <Version version={item} onRollback={handleRollback}/>
+                            <Divider variant="inset" component="li" />
+                        </>
+                    )
                 })}
-            </Container>
-    )
+            </List>
+        )
     else
         return null
 }

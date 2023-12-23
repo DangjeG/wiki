@@ -1,5 +1,5 @@
 import Button from "@mui/material/Button";
-import { Tooltip} from "@mui/material";
+import {Chip, Tooltip} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import SaveIcon from '@mui/icons-material/Save';
 import ImageIcon from "@mui/icons-material/Image";
@@ -102,20 +102,22 @@ export default function ListBlocks() {
         setAnchorEl(null);
     };
 
-    /*    const handleShowHistory= async (block) => {
-            props.setHistoryBlock(block)
-            window.location.href="#workspace/block_history"
-        }*/
-
     return (
         <>
             { docLoad || blocksLoad? <Preload/> :
                 <div className="container">
                     <div className="documentHeader">
                         <ThemeProvider theme={theme}>
-                            <Typography variant="h5">
+                            <Typography
+                                variant="h4"
+                                style={{"margin-right": "20px"}}
+                            >
                                 {document ? document.title: null}
                             </Typography>
+                            <Chip
+                                label={mode === "edit" ? "Вы редактируете": "Вы в режиме просмотра"}
+                                style={{"margin-right": "auto"}}
+                            />
                         </ThemeProvider>
                         {mode === "edit" ?
                             <>
@@ -177,8 +179,11 @@ export default function ListBlocks() {
 
                     <div className="blockList">
                         {blocks.map((item) => {
-                            return <BlockComponent mode={mode} onShowHistory={() => {
-                            }} onDelete={handleDelete} onChange={handleChange} block={item}/>
+                            // В режиме просмотра пустые блоки не отображаем
+                            if (!(mode === "view" && item.content.trim() === "")) {
+                                return <BlockComponent mode={mode} onShowHistory={() => {
+                                }} onDelete={handleDelete} onChange={handleChange} block={item}/>
+                            }
                         })}
                     </div>
                 </div>}
