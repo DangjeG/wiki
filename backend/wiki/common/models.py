@@ -6,9 +6,9 @@ from wiki.database.utils import utcnow
 class TimeStampMixin:
     """Timestamping mixin"""
 
-    created_at = Column(DateTime(timezone=True), nullable=False, default=utcnow())
+    created_at = Column(DateTime(timezone=True), nullable=False, default=utcnow)
     created_at._creation_order = 9998
-    updated_at = Column(DateTime(timezone=True), nullable=False, default=utcnow())
+    updated_at = Column(DateTime(timezone=True), nullable=False, default=utcnow)
     updated_at._creation_order = 9998
 
     @staticmethod

@@ -136,7 +136,7 @@ class BlockRepository(ObjectRepository):
         else:
             st = st.join(VersionBlock, Block.id == VersionBlock.block_id)
             whereclause.append(VersionBlock.version_commit_id == version_commit_id)
-        block_query = await self.session.execute(st.where(and_(*whereclause)).order_by(Block.position))
+        block_query = await self.session.execute(st.where(and_(*whereclause)).order_by(Block.position, Block.created_at))
         result = block_query.scalars().all()
         return result
 

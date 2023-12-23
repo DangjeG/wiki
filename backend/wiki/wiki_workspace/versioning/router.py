@@ -4,11 +4,13 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends
 from lakefs_client.client import LakeFSClient
+from lakefs_client.exceptions import ServiceException
 from lakefs_client.model.commit import Commit
 from pydantic import constr
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
+from wiki.common.exceptions import WikiException, WikiErrorCode
 from wiki.common.schemas import WikiUserHandlerData
 from wiki.database.deps import get_db
 from wiki.permissions.base import BasePermission
@@ -159,6 +161,9 @@ async def version_rollback_document(
                                                  document_id,
                                                  rollback_commit_id,
                                                  storage_client)
+    block_repository: BlockRepository = BlockRepository(session)
+    rollback_blocks_ids = [item.id for item in rollback_data_blocks]
+    blocks = await block_repository.get_all_block_by_document_id(document_id)
 
     document_ids = await document_repository.get_list_ids_of_document_hierarchy(document)
     workspace_repository: WorkspaceRepository = WorkspaceRepository(session)
@@ -170,10 +175,26 @@ async def version_rollback_document(
                                                                    workspace_id=workspace.id,
                                                                    document_ids=document_ids,
                                                                    block_id=item.id)
-    resp: Commit = storage_service.commit_workspace_document_version(document.workspace_id,
-                                                                     document.id,
-                                                                     CommitMetadataScheme(
-                                                                         committer_user_id=str(user_db.id)))
+
+    # Hack, bad solution: Do a cleanup of these blocks that did not exist in the commit we are rolling back to
+    for block in blocks:
+        if not UUID(str(block.id)) in rollback_blocks_ids:
+            storage_service.upload_document_block_in_workspace_storage(content=StringIO(""),
+                                                                       workspace_id=workspace.id,
+                                                                       document_ids=document_ids,
+                                                                       block_id=block.id)
+
+    try:
+        resp: Commit = storage_service.commit_workspace_document_version(document.workspace_id,
+                                                                         document.id,
+                                                                         CommitMetadataScheme(
+                                                                             committer_user_id=str(user_db.id)))
+    except ServiceException:
+        raise WikiException(
+            message="The current state is identical to the one being rolled back to.",
+            error_code=WikiErrorCode.VERSIONING_ROLLBACK_ERROR,
+            http_status_code=status.HTTP_304_NOT_MODIFIED
+        )
 
     # Block sets may vary from version to version.
     # When executing rollback, you need to restore and delete blocks.

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
 from fastapi_pagination import Page, paginate
+from fastapi_pagination.utils import disable_installed_extensions_check
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
@@ -23,6 +24,7 @@ from wiki.wiki_api_client.repository import WikiApiClientRepository
 from wiki.wiki_api_client.schemas import CreateWikiApiClient
 
 user_router = APIRouter()
+disable_installed_extensions_check()
 
 
 @user_router.post(

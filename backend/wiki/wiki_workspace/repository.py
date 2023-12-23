@@ -98,6 +98,9 @@ class ObjectRepository(BaseRepository):
         else:
             query = query.where(and_(*whereclause))
 
+        query = query.order_by(Block.position) if object_class == Block else query
+        query = query.order_by(object_class.created_at)
+
         return await self.session.execute(query)
 
 
