@@ -1,0 +1,16 @@
+#typography-home{
+    flex-grow: 1;
+    color: #222222;
+    /*
+    max-width: 100px;
+    */
+    font-family: Inter, serif;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 15px;
+    letter-spacing: 0em;
+    text-align: left;
+    text-decoration: none;
+    display: inline-block;
+    padding: 15px;
+}

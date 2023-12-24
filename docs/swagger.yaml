@@ -1,0 +1,4584 @@
+components:
+  schemas:
+    ApproveUser:
+      properties:
+        api_client_description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Api Client Description
+        responsibility:
+          $ref: '#/components/schemas/ResponsibilityType'
+      required:
+      - responsibility
+      title: ApproveUser
+      type: object
+    AssetInfoResponse:
+      properties:
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        download_link:
+          anyOf:
+          - format: uri
+            maxLength: 2083
+            minLength: 1
+            type: string
+          - type: 'null'
+          title: Download Link
+        id:
+          format: uuid
+          title: Id
+          type: string
+        name:
+          title: Name
+          type: string
+        size_kb:
+          title: Size Kb
+          type: number
+        type:
+          $ref: '#/components/schemas/AssetType'
+        uploader_user:
+          $ref: '#/components/schemas/UserBaseInfoResponse'
+        workspace:
+          $ref: '#/components/schemas/WorkspaceInfoResponse'
+      required:
+      - id
+      - type
+      - name
+      - size_kb
+      - uploader_user
+      - workspace
+      - created_at
+      title: AssetInfoResponse
+      type: object
+    AssetType:
+      enum:
+      - IMAGE
+      - DOCUMENT
+      title: AssetType
+      type: string
+    BaseResponse:
+      properties:
+        msg:
+          default: ''
+          title: Msg
+          type: string
+        status:
+          default: success
+          title: Status
+          type: string
+      title: BaseResponse
+      type: object
+    BlockDataResponse:
+      properties:
+        content:
+          anyOf:
+          - type: string
+          - $ref: '#/components/schemas/WikiLinkSchema'
+          title: Content
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        document_id:
+          format: uuid
+          title: Document Id
+          type: string
+        id:
+          format: uuid
+          title: Id
+          type: string
+        link:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Link
+        permission_mode:
+          $ref: '#/components/schemas/ObjectPermissionMode'
+        position:
+          title: Position
+          type: integer
+        type_block:
+          $ref: '#/components/schemas/TypeBlock'
+      required:
+      - permission_mode
+      - id
+      - document_id
+      - position
+      - type_block
+      - created_at
+      - content
+      title: BlockDataResponse
+      type: object
+    BlockInfoResponse:
+      properties:
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        document_id:
+          format: uuid
+          title: Document Id
+          type: string
+        id:
+          format: uuid
+          title: Id
+          type: string
+        permission_mode:
+          $ref: '#/components/schemas/ObjectPermissionMode'
+        position:
+          title: Position
+          type: integer
+        type_block:
+          $ref: '#/components/schemas/TypeBlock'
+      required:
+      - permission_mode
+      - id
+      - document_id
+      - position
+      - type_block
+      - created_at
+      title: BlockInfoResponse
+      type: object
+    Body_create_and_upload_asset_api_v1_asset_storage_asset_upload_post:
+      properties:
+        file:
+          format: binary
+          title: File
+          type: string
+      required:
+      - file
+      title: Body_create_and_upload_asset_api_v1_asset_storage_asset_upload_post
+      type: object
+    Body_update_block_data_file_api_v1_blocks_data_file_put:
+      properties:
+        file:
+          format: binary
+          title: File
+          type: string
+      required:
+      - file
+      title: Body_update_block_data_file_api_v1_blocks_data_file_put
+      type: object
+    CreateBlock:
+      properties:
+        document_id:
+          format: uuid
+          title: Document Id
+          type: string
+        position:
+          title: Position
+          type: integer
+        type_block:
+          $ref: '#/components/schemas/TypeBlock'
+      required:
+      - document_id
+      - position
+      - type_block
+      title: CreateBlock
+      type: object
+    CreateDocument:
+      properties:
+        parent_document_id:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Parent Document Id
+        title:
+          title: Title
+          type: string
+        workspace_id:
+          format: uuid
+          title: Workspace Id
+          type: string
+      required:
+      - title
+      - workspace_id
+      title: CreateDocument
+      type: object
+    CreateGeneralObjectPermission:
+      properties:
+        mode:
+          allOf:
+          - $ref: '#/components/schemas/ObjectPermissionMode'
+          default: HIDDEN_INACCESSIBLE
+        required_responsibility:
+          $ref: '#/components/schemas/ResponsibilityType'
+      required:
+      - required_responsibility
+      title: CreateGeneralObjectPermission
+      type: object
+    CreateGroup:
+      properties:
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        is_members_can_add_to_group:
+          default: false
+          title: Is Members Can Add To Group
+          type: boolean
+        name:
+          title: Name
+          type: string
+      required:
+      - name
+      title: CreateGroup
+      type: object
+    CreateGroupObjectPermission:
+      properties:
+        group_id:
+          format: uuid
+          title: Group Id
+          type: string
+        mode:
+          allOf:
+          - $ref: '#/components/schemas/ObjectPermissionMode'
+          default: HIDDEN_INACCESSIBLE
+      required:
+      - group_id
+      title: CreateGroupObjectPermission
+      type: object
+    CreateIndividualObjectPermission:
+      properties:
+        mode:
+          allOf:
+          - $ref: '#/components/schemas/ObjectPermissionMode'
+          default: HIDDEN_INACCESSIBLE
+        user_id:
+          format: uuid
+          title: User Id
+          type: string
+      required:
+      - user_id
+      title: CreateIndividualObjectPermission
+      type: object
+    CreatePermissionDomain:
+      properties:
+        domain:
+          title: Domain
+          type: string
+        mode:
+          $ref: '#/components/schemas/DomainPermissionMode'
+      required:
+      - domain
+      - mode
+      title: CreatePermissionDomain
+      type: object
+    CreateUser:
+      properties:
+        email:
+          format: email
+          title: Email
+          type: string
+        first_name:
+          title: First Name
+          type: string
+        is_user_agreement_accepted:
+          default: false
+          title: Is User Agreement Accepted
+          type: boolean
+        last_name:
+          title: Last Name
+          type: string
+        position:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Position
+        second_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Second Name
+        username:
+          title: Username
+          type: string
+      required:
+      - email
+      - username
+      - first_name
+      - last_name
+      title: CreateUser
+      type: object
+    CreateVerifiedUser:
+      properties:
+        email:
+          format: email
+          title: Email
+          type: string
+        first_name:
+          title: First Name
+          type: string
+        is_enabled:
+          default: true
+          title: Is Enabled
+          type: boolean
+        is_user_agreement_accepted:
+          default: true
+          title: Is User Agreement Accepted
+          type: boolean
+        is_verified_email:
+          default: true
+          title: Is Verified Email
+          type: boolean
+        last_name:
+          title: Last Name
+          type: string
+        position:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Position
+        second_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Second Name
+        username:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+        wiki_api_client:
+          $ref: '#/components/schemas/CreateWikiApiClient'
+      required:
+      - email
+      - first_name
+      - last_name
+      - wiki_api_client
+      title: CreateVerifiedUser
+      type: object
+    CreateWikiApiClient:
+      properties:
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        is_enabled:
+          default: true
+          title: Is Enabled
+          type: boolean
+        responsibility:
+          allOf:
+          - $ref: '#/components/schemas/ResponsibilityType'
+          default: VIEWER
+      title: CreateWikiApiClient
+      type: object
+    CreateWorkspace:
+      properties:
+        title:
+          title: Title
+          type: string
+      required:
+      - title
+      title: CreateWorkspace
+      type: object
+    DocumentExportType:
+      const: DOCX
+      title: DocumentExportType
+    DocumentInfoResponse:
+      properties:
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        creator_user:
+          $ref: '#/components/schemas/UserBaseInfoResponse'
+        id:
+          format: uuid
+          title: Id
+          type: string
+        last_published_version_at:
+          format: date-time
+          title: Last Published Version At
+          type: string
+        parent_document_id:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Parent Document Id
+        permission_mode:
+          $ref: '#/components/schemas/ObjectPermissionMode'
+        title:
+          title: Title
+          type: string
+        workspace_id:
+          format: uuid
+          title: Workspace Id
+          type: string
+      required:
+      - permission_mode
+      - id
+      - title
+      - workspace_id
+      - creator_user
+      - created_at
+      - last_published_version_at
+      title: DocumentInfoResponse
+      type: object
+    DocumentNodeInfoResponse:
+      properties:
+        children:
+          anyOf:
+          - items: {}
+            type: array
+          - type: 'null'
+          title: Children
+        id:
+          format: uuid
+          title: Id
+          type: string
+        is_have_children:
+          default: false
+          title: Is Have Children
+          type: boolean
+        last_published_version_at:
+          format: date-time
+          title: Last Published Version At
+          type: string
+        permission_mode:
+          $ref: '#/components/schemas/ObjectPermissionMode'
+        title:
+          title: Title
+          type: string
+      required:
+      - permission_mode
+      - id
+      - title
+      - last_published_version_at
+      title: DocumentNodeInfoResponse
+      type: object
+    DocumentTemplateInfoResponse:
+      properties:
+        creator_user_id:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Creator User Id
+        description:
+          title: Description
+          type: string
+        document_id:
+          format: uuid
+          title: Document Id
+          type: string
+        document_template_type:
+          allOf:
+          - $ref: '#/components/schemas/DocumentTemplateType'
+          default: START
+        id:
+          format: uuid
+          title: Id
+          type: string
+        title:
+          title: Title
+          type: string
+      required:
+      - id
+      - title
+      - description
+      - document_id
+      title: DocumentTemplateInfoResponse
+      type: object
+    DocumentTemplateType:
+      const: START
+      title: DocumentTemplateType
+    DomainPermissionMode:
+      enum:
+      - REFUSE
+      - ACCEPT
+      title: DomainPermissionMode
+      type: string
+    FrontendUserLogin:
+      properties:
+        email:
+          anyOf:
+          - format: email
+            type: string
+          - type: 'null'
+          title: Email
+        username:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+      title: FrontendUserLogin
+      type: object
+    GeneralObjectPermissionInfo:
+      properties:
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        id:
+          format: uuid
+          title: Id
+          type: string
+        mode:
+          $ref: '#/components/schemas/ObjectPermissionMode'
+        object_id:
+          format: uuid
+          title: Object Id
+          type: string
+        required_responsibility:
+          $ref: '#/components/schemas/ResponsibilityType'
+        updated_at:
+          format: date-time
+          title: Updated At
+          type: string
+      required:
+      - id
+      - mode
+      - object_id
+      - created_at
+      - updated_at
+      - required_responsibility
+      title: GeneralObjectPermissionInfo
+      type: object
+    GroupInfo:
+      properties:
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          format: uuid
+          title: Id
+          type: string
+        is_members_can_add_to_group:
+          title: Is Members Can Add To Group
+          type: boolean
+        name:
+          title: Name
+          type: string
+        updated_at:
+          format: date-time
+          title: Updated At
+          type: string
+      required:
+      - id
+      - name
+      - is_members_can_add_to_group
+      - created_at
+      - updated_at
+      title: GroupInfo
+      type: object
+    GroupInfoWithUsers:
+      properties:
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          format: uuid
+          title: Id
+          type: string
+        is_members_can_add_to_group:
+          title: Is Members Can Add To Group
+          type: boolean
+        members:
+          items:
+            $ref: '#/components/schemas/UserBaseInfoResponse'
+          title: Members
+          type: array
+        name:
+          title: Name
+          type: string
+        updated_at:
+          format: date-time
+          title: Updated At
+          type: string
+      required:
+      - id
+      - name
+      - is_members_can_add_to_group
+      - created_at
+      - updated_at
+      - members
+      title: GroupInfoWithUsers
+      type: object
+    GroupObjectPermissionInfo:
+      properties:
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        group:
+          $ref: '#/components/schemas/GroupInfo'
+        id:
+          format: uuid
+          title: Id
+          type: string
+        mode:
+          $ref: '#/components/schemas/ObjectPermissionMode'
+        object_id:
+          format: uuid
+          title: Object Id
+          type: string
+        updated_at:
+          format: date-time
+          title: Updated At
+          type: string
+      required:
+      - id
+      - mode
+      - object_id
+      - created_at
+      - updated_at
+      - group
+      title: GroupObjectPermissionInfo
+      type: object
+    GroupOptionalInfo:
+      properties:
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        is_members_can_add_to_group:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Members Can Add To Group
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      title: GroupOptionalInfo
+      type: object
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          title: Detail
+          type: array
+      title: HTTPValidationError
+      type: object
+    HealthCheck:
+      description: Response model to validate and return when performing a health
+        check.
+      properties:
+        status:
+          default: OK
+          title: Status
+          type: string
+      title: HealthCheck
+      type: object
+    IndividualObjectPermissionInfo:
+      properties:
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        id:
+          format: uuid
+          title: Id
+          type: string
+        mode:
+          $ref: '#/components/schemas/ObjectPermissionMode'
+        object_id:
+          format: uuid
+          title: Object Id
+          type: string
+        updated_at:
+          format: date-time
+          title: Updated At
+          type: string
+        user:
+          $ref: '#/components/schemas/UserBaseInfoResponse'
+      required:
+      - id
+      - mode
+      - object_id
+      - created_at
+      - updated_at
+      - user
+      title: IndividualObjectPermissionInfo
+      type: object
+    ObjectPermissionMode:
+      enum:
+      - HIDDEN_INACCESSIBLE
+      - INACCESSIBLE
+      - VIEW_AND_EXPORT
+      - ABILITY_USE_TEMPLATE
+      - EDITING
+      - DELETION
+      title: ObjectPermissionMode
+      type: string
+    ObjectPermissionType:
+      enum:
+      - General
+      - Group
+      - Individual
+      title: ObjectPermissionType
+      type: string
+    ObjectType:
+      enum:
+      - Workspace
+      - Document
+      - Block
+      title: ObjectType
+      type: string
+    Page_DocumentTemplateInfoResponse_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/DocumentTemplateInfoResponse'
+          title: Items
+          type: array
+        page:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Page
+        pages:
+          anyOf:
+          - minimum: 0.0
+            type: integer
+          - type: 'null'
+          title: Pages
+        size:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Size
+        total:
+          minimum: 0.0
+          title: Total
+          type: integer
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[DocumentTemplateInfoResponse]
+      type: object
+    Page_GroupInfoWithUsers_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/GroupInfoWithUsers'
+          title: Items
+          type: array
+        page:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Page
+        pages:
+          anyOf:
+          - minimum: 0.0
+            type: integer
+          - type: 'null'
+          title: Pages
+        size:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Size
+        total:
+          minimum: 0.0
+          title: Total
+          type: integer
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[GroupInfoWithUsers]
+      type: object
+    Page_GroupInfo_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/GroupInfo'
+          title: Items
+          type: array
+        page:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Page
+        pages:
+          anyOf:
+          - minimum: 0.0
+            type: integer
+          - type: 'null'
+          title: Pages
+        size:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Size
+        total:
+          minimum: 0.0
+          title: Total
+          type: integer
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[GroupInfo]
+      type: object
+    Page_PermissionDomainInfoResponse_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/PermissionDomainInfoResponse'
+          title: Items
+          type: array
+        page:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Page
+        pages:
+          anyOf:
+          - minimum: 0.0
+            type: integer
+          - type: 'null'
+          title: Pages
+        size:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Size
+        total:
+          minimum: 0.0
+          title: Total
+          type: integer
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[PermissionDomainInfoResponse]
+      type: object
+    Page_UserBaseInfoResponse_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/UserBaseInfoResponse'
+          title: Items
+          type: array
+        page:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Page
+        pages:
+          anyOf:
+          - minimum: 0.0
+            type: integer
+          - type: 'null'
+          title: Pages
+        size:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Size
+        total:
+          minimum: 0.0
+          title: Total
+          type: integer
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[UserBaseInfoResponse]
+      type: object
+    Page_UserFullInfoResponse_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/UserFullInfoResponse'
+          title: Items
+          type: array
+        page:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Page
+        pages:
+          anyOf:
+          - minimum: 0.0
+            type: integer
+          - type: 'null'
+          title: Pages
+        size:
+          anyOf:
+          - minimum: 1.0
+            type: integer
+          - type: 'null'
+          title: Size
+        total:
+          minimum: 0.0
+          title: Total
+          type: integer
+      required:
+      - items
+      - total
+      - page
+      - size
+      title: Page[UserFullInfoResponse]
+      type: object
+    PermissionDomainInfoResponse:
+      properties:
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        domain:
+          title: Domain
+          type: string
+        id:
+          format: uuid
+          title: Id
+          type: string
+        is_enabled:
+          title: Is Enabled
+          type: boolean
+        mode:
+          $ref: '#/components/schemas/DomainPermissionMode'
+      required:
+      - id
+      - domain
+      - mode
+      - is_enabled
+      - created_at
+      title: PermissionDomainInfoResponse
+      type: object
+    ResponsibilityType:
+      enum:
+      - VIEWER
+      - EDITOR
+      - ADMIN
+      title: ResponsibilityType
+      type: string
+    TypeBlock:
+      enum:
+      - IMG
+      - TEXT
+      - FILE
+      - VIDEO
+      - WIKI_LINK
+      title: TypeBlock
+      type: string
+    UpdateAsset:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        workspace_id:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Workspace Id
+      title: UpdateAsset
+      type: object
+    UpdateBaseObjectPermission:
+      properties:
+        mode:
+          anyOf:
+          - $ref: '#/components/schemas/ObjectPermissionMode'
+          - type: 'null'
+      title: UpdateBaseObjectPermission
+      type: object
+    UpdateBlockData:
+      properties:
+        block_id:
+          format: uuid
+          title: Block Id
+          type: string
+        content:
+          title: Content
+          type: string
+      required:
+      - block_id
+      - content
+      title: UpdateBlockData
+      type: object
+    UpdateBlockInfo:
+      properties:
+        block_id:
+          format: uuid
+          title: Block Id
+          type: string
+        position:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Position
+        type_block:
+          anyOf:
+          - $ref: '#/components/schemas/TypeBlock'
+          - type: 'null'
+      required:
+      - block_id
+      title: UpdateBlockInfo
+      type: object
+    UpdateGeneralObjectPermission:
+      properties:
+        mode:
+          anyOf:
+          - $ref: '#/components/schemas/ObjectPermissionMode'
+          - type: 'null'
+        required_responsibility:
+          anyOf:
+          - $ref: '#/components/schemas/ResponsibilityType'
+          - type: 'null'
+      title: UpdateGeneralObjectPermission
+      type: object
+    UpdatePermissionDomain:
+      properties:
+        domain:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Domain
+        mode:
+          anyOf:
+          - $ref: '#/components/schemas/DomainPermissionMode'
+          - type: 'null'
+      title: UpdatePermissionDomain
+      type: object
+    UpdateWikiApiClient:
+      properties:
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        is_enabled:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Enabled
+        responsibility:
+          anyOf:
+          - $ref: '#/components/schemas/ResponsibilityType'
+          - type: 'null'
+      title: UpdateWikiApiClient
+      type: object
+    UserBaseInfoResponse:
+      properties:
+        email:
+          format: email
+          title: Email
+          type: string
+        first_name:
+          title: First Name
+          type: string
+        last_name:
+          title: Last Name
+          type: string
+        position:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Position
+        second_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Second Name
+        username:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+        wiki_api_client:
+          anyOf:
+          - $ref: '#/components/schemas/WikiApiClientInfoResponse'
+          - type: 'null'
+      required:
+      - email
+      - first_name
+      - last_name
+      title: UserBaseInfoResponse
+      type: object
+    UserFullInfoResponse:
+      properties:
+        email:
+          format: email
+          title: Email
+          type: string
+        first_name:
+          title: First Name
+          type: string
+        is_enabled:
+          title: Is Enabled
+          type: boolean
+        is_user_agreement_accepted:
+          title: Is User Agreement Accepted
+          type: boolean
+        is_verified_email:
+          title: Is Verified Email
+          type: boolean
+        last_name:
+          title: Last Name
+          type: string
+        position:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Position
+        second_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Second Name
+        username:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+        wiki_api_client:
+          anyOf:
+          - $ref: '#/components/schemas/WikiApiClientInfoResponse'
+          - type: 'null'
+      required:
+      - email
+      - first_name
+      - last_name
+      - is_user_agreement_accepted
+      - is_verified_email
+      - is_enabled
+      title: UserFullInfoResponse
+      type: object
+    UserSignResponse:
+      properties:
+        email_to:
+          format: email
+          title: Email To
+          type: string
+        expire_minutes:
+          default: 5
+          title: Expire Minutes
+          type: integer
+        verify_token:
+          title: Verify Token
+          type: string
+      required:
+      - email_to
+      - verify_token
+      title: UserSignResponse
+      type: object
+    UserUpdate:
+      properties:
+        email:
+          anyOf:
+          - format: email
+            type: string
+          - type: 'null'
+          title: Email
+        first_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: First Name
+        is_enabled:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Enabled
+        is_user_agreement_accepted:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is User Agreement Accepted
+        is_verified_email:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Verified Email
+        last_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Last Name
+        position:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Position
+        second_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Second Name
+        username:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+        wiki_api_client_id:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Wiki Api Client Id
+      title: UserUpdate
+      type: object
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          title: Location
+          type: array
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+      type: object
+    VersionBlockInfo:
+      properties:
+        commit_id:
+          maxLength: 64
+          minLength: 64
+          title: Commit Id
+          type: string
+        committer_user:
+          $ref: '#/components/schemas/UserBaseInfoResponse'
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        object_id:
+          format: uuid
+          title: Object Id
+          type: string
+      required:
+      - commit_id
+      - object_id
+      - committer_user
+      - created_at
+      title: VersionBlockInfo
+      type: object
+    VersionDocumentInfo:
+      properties:
+        commit_id:
+          maxLength: 64
+          minLength: 64
+          title: Commit Id
+          type: string
+        committer_user:
+          $ref: '#/components/schemas/UserBaseInfoResponse'
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        is_published:
+          default: false
+          title: Is Published
+          type: boolean
+        object_id:
+          format: uuid
+          title: Object Id
+          type: string
+      required:
+      - commit_id
+      - object_id
+      - committer_user
+      - created_at
+      title: VersionDocumentInfo
+      type: object
+    WikiApiClientInfoResponse:
+      properties:
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        id:
+          format: uuid
+          title: Id
+          type: string
+        is_enabled:
+          default: true
+          title: Is Enabled
+          type: boolean
+        responsibility:
+          allOf:
+          - $ref: '#/components/schemas/ResponsibilityType'
+          default: VIEWER
+      required:
+      - id
+      title: WikiApiClientInfoResponse
+      type: object
+    WikiApiKeyInfoResponse:
+      properties:
+        api_key:
+          title: Api Key
+          type: string
+        api_key_prefix:
+          title: Api Key Prefix
+          type: string
+        create_date:
+          format: date-time
+          title: Create Date
+          type: string
+        expires_date:
+          format: date-time
+          title: Expires Date
+          type: string
+      required:
+      - api_key
+      - expires_date
+      - create_date
+      - api_key_prefix
+      title: WikiApiKeyInfoResponse
+      type: object
+    WikiLinkSchema:
+      properties:
+        block_id:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Block Id
+        document_id:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Document Id
+        workspace_id:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Workspace Id
+      title: WikiLinkSchema
+      type: object
+    WorkspaceInfoResponse:
+      properties:
+        id:
+          format: uuid
+          title: Id
+          type: string
+        owner_user:
+          $ref: '#/components/schemas/UserBaseInfoResponse'
+        permission_mode:
+          $ref: '#/components/schemas/ObjectPermissionMode'
+        title:
+          title: Title
+          type: string
+      required:
+      - permission_mode
+      - id
+      - title
+      - owner_user
+      title: WorkspaceInfoResponse
+      type: object
+  securitySchemes:
+    WikiAccessToken:
+      in: cookie
+      name: wiki_access_token
+      type: apiKey
+    WikiApiKey:
+      in: header
+      name: X-Wiki-API-Key
+      type: apiKey
+    WikiBearer:
+      scheme: bearer
+      type: http
+    WikiRootApiKey:
+      description: 'Root key, allows you to perform actions as administrator, random
+        user data is generated.
+
+        **Limitation:** operations requiring an explicitly registered userare unavailable,
+        example.: `Create: POST /api_key/`.'
+      in: header
+      name: X-Wiki-ROOT-API-Key
+      type: apiKey
+info:
+  description: Welcome to Wiki's API documentation! Here you will able to discover
+    all of the ways you can interact with the Wiki API.
+  title: Wiki API
+  version: 0.0.1
+openapi: 3.1.0
+paths:
+  /api/v1/admins/approve_user:
+    post:
+      operationId: approve_user_api_v1_admins_approve_user_post
+      parameters:
+      - in: query
+        name: user_id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: User Id
+      - in: query
+        name: username
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+      - in: query
+        name: email
+        required: false
+        schema:
+          anyOf:
+          - format: email
+            type: string
+          - type: 'null'
+          title: Email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApproveUser'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserFullInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Approve the user for access to the system
+      tags:
+      - Admins
+  /api/v1/api_client/:
+    put:
+      operationId: update_wiki_api_client_api_v1_api_client__put
+      parameters:
+      - in: query
+        name: wiki_api_client_id
+        required: true
+        schema:
+          format: uuid
+          title: Wiki Api Client Id
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWikiApiClient'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WikiApiClientInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Update wiki api client
+      tags:
+      - WikiApiClient
+  /api/v1/api_key/:
+    delete:
+      operationId: delete_wiki_api_key_api_v1_api_key__delete
+      parameters:
+      - in: query
+        name: api_key_id
+        required: true
+        schema:
+          format: uuid
+          title: Api Key Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Delete wiki api key
+      tags:
+      - WikiApiClient
+    post:
+      operationId: create_wiki_api_key_api_v1_api_key__post
+      parameters:
+      - in: query
+        name: expires_date
+        required: true
+        schema:
+          format: date-time
+          title: Expires Date
+          type: string
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WikiApiKeyInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Create wiki api key
+      tags:
+      - WikiApiClient
+  /api/v1/api_key/deactivate:
+    put:
+      operationId: deactivate_wiki_api_key_api_v1_api_key_deactivate_put
+      parameters:
+      - in: query
+        name: api_key_id
+        required: true
+        schema:
+          format: uuid
+          title: Api Key Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Deactivate wiki api key
+      tags:
+      - WikiApiClient
+  /api/v1/asset_storage/asset/upload:
+    post:
+      operationId: create_and_upload_asset_api_v1_asset_storage_asset_upload_post
+      parameters:
+      - in: query
+        name: workspace_id
+        required: true
+        schema:
+          format: uuid
+          title: Workspace Id
+          type: string
+      - in: query
+        name: asset_type
+        required: true
+        schema:
+          $ref: '#/components/schemas/AssetType'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_create_and_upload_asset_api_v1_asset_storage_asset_upload_post'
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Upload Asset
+      tags:
+      - AssetStorage
+  /api/v1/asset_storage/asset/wp/{workspace_id}/:
+    get:
+      operationId: get_assets_for_workspace_api_v1_asset_storage_asset_wp__workspace_id___get
+      parameters:
+      - in: path
+        name: workspace_id
+        required: true
+        schema:
+          format: uuid
+          title: Workspace Id
+          type: string
+      - in: query
+        name: is_added_download_link
+        required: false
+        schema:
+          default: false
+          title: Is Added Download Link
+          type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/AssetInfoResponse'
+                title: Response Get Assets For Workspace Api V1 Asset Storage Asset
+                  Wp  Workspace Id   Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get Assets info for workspace
+      tags:
+      - AssetStorage
+  /api/v1/asset_storage/asset/{asset_id}/:
+    delete:
+      operationId: delete_asset_api_v1_asset_storage_asset__asset_id___delete
+      parameters:
+      - in: path
+        name: asset_id
+        required: true
+        schema:
+          format: uuid
+          title: Asset Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Delete Asset
+      tags:
+      - AssetStorage
+    get:
+      operationId: get_asset_api_v1_asset_storage_asset__asset_id___get
+      parameters:
+      - in: path
+        name: asset_id
+        required: true
+        schema:
+          format: uuid
+          title: Asset Id
+          type: string
+      - in: query
+        name: is_added_download_link
+        required: false
+        schema:
+          default: false
+          title: Is Added Download Link
+          type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get Asset info
+      tags:
+      - AssetStorage
+    put:
+      operationId: update_asset_info_api_v1_asset_storage_asset__asset_id___put
+      parameters:
+      - in: path
+        name: asset_id
+        required: true
+        schema:
+          format: uuid
+          title: Asset Id
+          type: string
+      - in: query
+        name: is_added_download_link
+        required: false
+        schema:
+          default: false
+          title: Is Added Download Link
+          type: boolean
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAsset'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Update Asset info
+      tags:
+      - AssetStorage
+  /api/v1/auth/login:
+    post:
+      description: '## Logging in to a user account
+
+        The endpoint for sending an email or username and receiving a login confirmation
+        token.
+
+        A confirmation code will be sent to the specified email.'
+      operationId: login_api_v1_auth_login_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FrontendUserLogin'
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSignResponse'
+          description: Verification token data.
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Login by email or username
+      tags:
+      - Auth
+  /api/v1/auth/signup:
+    post:
+      description: '## Registration - submitting an application
+
+        Sending an application for registration in the system.'
+      operationId: signup_api_v1_auth_signup_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUser'
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSignResponse'
+          description: Verification token data.
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Signup with user data entry
+      tags:
+      - Auth
+  /api/v1/auth/verify:
+    get:
+      description: '## Verification on the sent code
+
+        Endpoint for confirming the code received by mail, issuing access token to
+        perform authorized actions.'
+      operationId: verify_api_v1_auth_verify_get
+      parameters:
+      - in: query
+        name: token
+        required: true
+        schema:
+          title: Token
+          type: string
+      - in: query
+        name: verification_code
+        required: true
+        schema:
+          title: Verification Code
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Cookies are set. Success message.
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Verification by token and code
+      tags:
+      - Auth
+  /api/v1/blocks/:
+    delete:
+      operationId: delete_block_api_v1_blocks__delete
+      parameters:
+      - in: query
+        name: block_id
+        required: true
+        schema:
+          format: uuid
+          title: Block Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Delete a block from a document
+      tags:
+      - WorkspaceBlocks
+    post:
+      operationId: create_block_api_v1_blocks__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBlock'
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockDataResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Create block
+      tags:
+      - WorkspaceBlocks
+  /api/v1/blocks/data:
+    get:
+      operationId: get_block_by_id_api_v1_blocks_data_get
+      parameters:
+      - in: query
+        name: block_id
+        required: true
+        schema:
+          format: uuid
+          title: Block Id
+          type: string
+      - in: query
+        name: version_commit_id
+        required: false
+        schema:
+          anyOf:
+          - maxLength: 64
+            minLength: 64
+            type: string
+          - type: 'null'
+          title: Version Commit Id
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockDataResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get data block by id
+      tags:
+      - WorkspaceBlocks
+  /api/v1/blocks/data/all:
+    get:
+      description: '## Getting document blocks data
+
+
+        :param document_id: Document Identifier
+
+        :param version_commit_id: Specify the commit identifier of a particular version.
+        If None, get the latest version of the data.'
+      operationId: get_blocks_api_v1_blocks_data_all_get
+      parameters:
+      - in: query
+        name: document_id
+        required: true
+        schema:
+          format: uuid
+          title: Document Id
+          type: string
+      - in: query
+        name: version_commit_id
+        required: false
+        schema:
+          anyOf:
+          - maxLength: 64
+            minLength: 64
+            type: string
+          - type: 'null'
+          title: Version Commit Id
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/BlockDataResponse'
+                title: Response Get Blocks Api V1 Blocks Data All Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all data blocks by id document
+      tags:
+      - WorkspaceBlocks
+  /api/v1/blocks/data/file:
+    put:
+      operationId: update_block_data_file_api_v1_blocks_data_file_put
+      parameters:
+      - in: query
+        name: block_id
+        required: true
+        schema:
+          format: uuid
+          title: Block Id
+          type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_update_block_data_file_api_v1_blocks_data_file_put'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockDataResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Update file data document block
+      tags:
+      - WorkspaceBlocks
+  /api/v1/blocks/data/link:
+    put:
+      description: '## Update wiki link data document block
+
+        One of the specified object ids will be used to create the link in priority:
+        block_id, document_id, workspace_id'
+      operationId: update_block_data_link_api_v1_blocks_data_link_put
+      parameters:
+      - in: query
+        name: block_id
+        required: true
+        schema:
+          format: uuid
+          title: Block Id
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WikiLinkSchema'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockDataResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Update wiki link data document block
+      tags:
+      - WorkspaceBlocks
+  /api/v1/blocks/data/text:
+    put:
+      operationId: update_block_data_text_api_v1_blocks_data_text_put
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBlockData'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockDataResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Update text data document block
+      tags:
+      - WorkspaceBlocks
+  /api/v1/blocks/info:
+    put:
+      operationId: update_block_info_api_v1_blocks_info_put
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBlockInfo'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Update info document block
+      tags:
+      - WorkspaceBlocks
+  /api/v1/blocks/publish/data:
+    get:
+      description: '## Getting published document blocks data'
+      operationId: get_publish_blocks_api_v1_blocks_publish_data_get
+      parameters:
+      - in: query
+        name: document_id
+        required: true
+        schema:
+          format: uuid
+          title: Document Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/BlockDataResponse'
+                title: Response Get Publish Blocks Api V1 Blocks Publish Data Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all publish data blocks by id document
+      tags:
+      - WorkspaceBlocks
+  /api/v1/document/:
+    post:
+      description: '## Create document
+
+        Create a document using a template,
+
+        if template_id=None then will be created empty document,
+
+        if parent_document_id=None then document is in the root.'
+      operationId: create_document_api_v1_document__post
+      parameters:
+      - in: query
+        name: template_id
+        required: false
+        schema:
+          format: uuid
+          title: Template Id
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDocument'
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Create document
+      tags:
+      - WorkspaceDocument
+  /api/v1/document/all:
+    get:
+      operationId: get_documents_by_workspace_id_api_v1_document_all_get
+      parameters:
+      - in: query
+        name: workspace_id
+        required: true
+        schema:
+          format: uuid
+          title: Workspace Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/DocumentInfoResponse'
+                title: Response Get Documents By Workspace Id Api V1 Document All
+                  Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all document by workspace id
+      tags:
+      - WorkspaceDocument
+  /api/v1/document/export:
+    post:
+      operationId: export_document_api_v1_document_export_post
+      parameters:
+      - in: query
+        name: document_id
+        required: true
+        schema:
+          format: uuid
+          title: Document Id
+          type: string
+      - in: query
+        name: export_type
+        required: false
+        schema:
+          allOf:
+          - $ref: '#/components/schemas/DocumentExportType'
+          default: DOCX
+          title: Export Type
+      - in: query
+        name: version_commit_id
+        required: false
+        schema:
+          anyOf:
+          - maxLength: 64
+            minLength: 64
+            type: string
+          - type: 'null'
+          title: Version Commit Id
+      responses:
+        '202':
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Export document
+      tags:
+      - ExportDocument
+  /api/v1/document/export_doc:
+    post:
+      deprecated: true
+      operationId: document_to_docx_api_v1_document_export_doc_post
+      parameters:
+      - in: query
+        name: document_id
+        required: true
+        schema:
+          format: uuid
+          title: Document Id
+          type: string
+      responses:
+        '202':
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Export published version document
+      tags:
+      - ExportDocument
+  /api/v1/document/info:
+    get:
+      operationId: get_document_info_by_id_api_v1_document_info_get
+      parameters:
+      - in: query
+        name: document_id
+        required: true
+        schema:
+          format: uuid
+          title: Document Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get document info by id
+      tags:
+      - WorkspaceDocument
+  /api/v1/document/tree:
+    get:
+      description: '## Get tree documents from workspace
+
+        Get all tree document by workspace id
+
+        If root_document_id=None then be the root workspace
+
+        If max_deep=None or root_document_id=0 then will be returned all document
+
+
+
+        !!! Hiding a document (HIDDEN_INACCESSIBLE) from the user at the top
+
+        of the hierarchy will also hide documents lower down the hierarchy'
+      operationId: get_tree_documents_by_workspace_id_api_v1_document_tree_get
+      parameters:
+      - in: query
+        name: workspace_id
+        required: true
+        schema:
+          format: uuid
+          title: Workspace Id
+          type: string
+      - in: query
+        name: max_deep
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          default: 0
+          title: Max Deep
+      - in: query
+        name: root_document_id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Root Document Id
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/DocumentNodeInfoResponse'
+                title: Response Get Tree Documents By Workspace Id Api V1 Document
+                  Tree Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get tree documents
+      tags:
+      - WorkspaceDocument
+  /api/v1/document/{document_id}:
+    delete:
+      description: '## Deleted document by id
+
+        **You have to have a deletion permission or be an administrator.**
+
+
+        When a document is deleted, the hierarchy changes:
+
+        all child documents become child documents of the parent.'
+      operationId: delete_document_api_v1_document__document_id__delete
+      parameters:
+      - in: path
+        name: document_id
+        required: true
+        schema:
+          format: uuid
+          title: Document Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Delete document
+      tags:
+      - WorkspaceDocument
+  /api/v1/document/{document_id}/publish:
+    post:
+      description: '## Publish document
+
+
+        The last committed (saved) version of the document will be published and available
+        for viewing according to the set permissions.
+
+
+        :param document_id: The identifier of the document you are publishing.
+
+        :param is_save_last_uncommitted_changes: If set to true, all uncommitted changes
+        (user did not send a save request) will be automatically saved.'
+      operationId: publish_document_api_v1_document__document_id__publish_post
+      parameters:
+      - in: path
+        name: document_id
+        required: true
+        schema:
+          format: uuid
+          title: Document Id
+          type: string
+      - in: query
+        name: is_save_last_uncommitted_changes
+        required: false
+        schema:
+          default: true
+          title: Is Save Last Uncommitted Changes
+          type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Publish document
+      tags:
+      - WorkspaceDocument
+  /api/v1/document/{document_id}/save:
+    post:
+      description: '## Saving document
+
+
+        Commits changes, a new version will be created for all changed document objects.'
+      operationId: save_document_api_v1_document__document_id__save_post
+      parameters:
+      - in: path
+        name: document_id
+        required: true
+        schema:
+          format: uuid
+          title: Document Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Saving document
+      tags:
+      - WorkspaceDocument
+  /api/v1/document_template/:
+    get:
+      operationId: get_document_template_by_id_api_v1_document_template__get
+      parameters:
+      - in: query
+        name: document_template_id
+        required: true
+        schema:
+          format: uuid
+          title: Document Template Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentTemplateInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Add document template
+      tags:
+      - DocumentTemplate
+    post:
+      operationId: create_document_template_api_v1_document_template__post
+      parameters:
+      - in: query
+        name: title
+        required: true
+        schema:
+          title: Title
+          type: string
+      - in: query
+        name: description
+        required: true
+        schema:
+          title: Description
+          type: string
+      - in: query
+        name: document_id
+        required: true
+        schema:
+          format: uuid
+          title: Document Id
+          type: string
+      - in: query
+        name: orig_commit_id
+        required: true
+        schema:
+          title: Orig Commit Id
+          type: string
+      - in: query
+        name: document_template_type
+        required: false
+        schema:
+          allOf:
+          - $ref: '#/components/schemas/DocumentTemplateType'
+          default: START
+          title: Document Template Type
+      - in: query
+        name: creator_user_id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Creator User Id
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentTemplateInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Add template
+      tags:
+      - DocumentTemplate
+  /api/v1/document_template/all:
+    get:
+      operationId: get_all_document_templates_api_v1_document_template_all_get
+      parameters:
+      - in: query
+        name: title
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Title
+      - in: query
+        name: description
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      - in: query
+        name: document_template_type
+        required: false
+        schema:
+          anyOf:
+          - $ref: '#/components/schemas/DocumentTemplateType'
+          - type: 'null'
+          title: Document Template Type
+      - in: query
+        name: creator_user_id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Creator User Id
+      - description: Page number
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          description: Page number
+          minimum: 1
+          title: Page
+          type: integer
+      - description: Page size
+        in: query
+        name: size
+        required: false
+        schema:
+          default: 50
+          description: Page size
+          maximum: 100
+          minimum: 1
+          title: Size
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_DocumentTemplateInfoResponse_'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all document templates
+      tags:
+      - DocumentTemplate
+  /api/v1/permission_domain/:
+    post:
+      operationId: create_permission_domain_api_v1_permission_domain__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePermissionDomain'
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionDomainInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Create a new domain permission for signup
+      tags:
+      - PermissionsDomain
+    put:
+      operationId: update_permission_domain_api_v1_permission_domain__put
+      parameters:
+      - in: query
+        name: id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Id
+      - in: query
+        name: domain
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Domain
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePermissionDomain'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionDomainInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Update permission domain by id or domain name
+      tags:
+      - PermissionsDomain
+  /api/v1/permission_domain/all:
+    get:
+      operationId: get_permission_domains_api_v1_permission_domain_all_get
+      parameters:
+      - in: query
+        name: domain
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Domain
+      - in: query
+        name: mode
+        required: false
+        schema:
+          anyOf:
+          - $ref: '#/components/schemas/DomainPermissionMode'
+          - type: 'null'
+          title: Mode
+      - in: query
+        name: is_enabled
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Enabled
+      - description: Page number
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          description: Page number
+          minimum: 1
+          title: Page
+          type: integer
+      - description: Page size
+        in: query
+        name: size
+        required: false
+        schema:
+          default: 50
+          description: Page size
+          maximum: 100
+          minimum: 1
+          title: Size
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_PermissionDomainInfoResponse_'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all permission domain
+      tags:
+      - PermissionsDomain
+  /api/v1/permission_domain/info:
+    get:
+      operationId: get_permission_domain_info_api_v1_permission_domain_info_get
+      parameters:
+      - in: query
+        name: id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: Id
+      - in: query
+        name: domain
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Domain
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionDomainInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get permission domain by id or domain name
+      tags:
+      - PermissionsDomain
+  /api/v1/permission_object/admin/permission_type/{permission_type}/object_type/{object_type}/{object_id}:
+    post:
+      operationId: create_object_permission_api_v1_permission_object_admin_permission_type__permission_type__object_type__object_type___object_id__post
+      parameters:
+      - in: path
+        name: permission_type
+        required: true
+        schema:
+          $ref: '#/components/schemas/ObjectPermissionType'
+      - in: path
+        name: object_type
+        required: true
+        schema:
+          $ref: '#/components/schemas/ObjectType'
+      - in: path
+        name: object_id
+        required: true
+        schema:
+          format: uuid
+          title: Object Id
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              anyOf:
+              - $ref: '#/components/schemas/CreateGeneralObjectPermission'
+              - $ref: '#/components/schemas/CreateGroupObjectPermission'
+              - $ref: '#/components/schemas/CreateIndividualObjectPermission'
+              title: Create Permission
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/GeneralObjectPermissionInfo'
+                - $ref: '#/components/schemas/GroupObjectPermissionInfo'
+                - $ref: '#/components/schemas/IndividualObjectPermissionInfo'
+                title: Response Create Object Permission Api V1 Permission Object
+                  Admin Permission Type  Permission Type  Object Type  Object Type   Object
+                  Id  Post
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Create object permission
+      tags:
+      - PermissionsObject
+  /api/v1/permission_object/admin/permission_type/{permission_type}/object_type/{object_type}/{permission_id}:
+    put:
+      operationId: update_object_permission_api_v1_permission_object_admin_permission_type__permission_type__object_type__object_type___permission_id__put
+      parameters:
+      - in: path
+        name: permission_type
+        required: true
+        schema:
+          $ref: '#/components/schemas/ObjectPermissionType'
+      - in: path
+        name: object_type
+        required: true
+        schema:
+          $ref: '#/components/schemas/ObjectType'
+      - in: path
+        name: permission_id
+        required: true
+        schema:
+          format: uuid
+          title: Permission Id
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              anyOf:
+              - $ref: '#/components/schemas/UpdateBaseObjectPermission'
+              - $ref: '#/components/schemas/UpdateGeneralObjectPermission'
+              title: Update Permission
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/GeneralObjectPermissionInfo'
+                - $ref: '#/components/schemas/GroupObjectPermissionInfo'
+                - $ref: '#/components/schemas/IndividualObjectPermissionInfo'
+                title: Response Update Object Permission Api V1 Permission Object
+                  Admin Permission Type  Permission Type  Object Type  Object Type   Permission
+                  Id  Put
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Create object permission
+      tags:
+      - PermissionsObject
+  /api/v1/permission_object/general/object_type/{object_type}/object_id/:
+    get:
+      operationId: get_object_permissions_general_api_v1_permission_object_general_object_type__object_type__object_id__get
+      parameters:
+      - in: path
+        name: object_type
+        required: true
+        schema:
+          $ref: '#/components/schemas/ObjectType'
+      - in: query
+        name: object_id
+        required: true
+        schema:
+          format: uuid
+          title: Object Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/GeneralObjectPermissionInfo'
+                title: Response Get Object Permissions General Api V1 Permission Object
+                  General Object Type  Object Type  Object Id  Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all general permission by object type
+      tags:
+      - PermissionsObject
+  /api/v1/permission_object/group/{group_id}/object_type/{object_type}/:
+    get:
+      operationId: get_object_permissions_for_group_api_v1_permission_object_group__group_id__object_type__object_type___get
+      parameters:
+      - in: path
+        name: group_id
+        required: true
+        schema:
+          format: uuid
+          title: Group Id
+          type: string
+      - in: path
+        name: object_type
+        required: true
+        schema:
+          $ref: '#/components/schemas/ObjectType'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/GroupObjectPermissionInfo'
+                title: Response Get Object Permissions For Group Api V1 Permission
+                  Object Group  Group Id  Object Type  Object Type   Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all permission from group by object type
+      tags:
+      - PermissionsObject
+  /api/v1/permission_object/user/{user_id}/object_type/{object_type}/:
+    get:
+      operationId: get_object_permissions_for_user_api_v1_permission_object_user__user_id__object_type__object_type___get
+      parameters:
+      - in: path
+        name: user_id
+        required: true
+        schema:
+          format: uuid
+          title: User Id
+          type: string
+      - in: path
+        name: object_type
+        required: true
+        schema:
+          $ref: '#/components/schemas/ObjectType'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/IndividualObjectPermissionInfo'
+                title: Response Get Object Permissions For User Api V1 Permission
+                  Object User  User Id  Object Type  Object Type   Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all individual permission for user by object type
+      tags:
+      - PermissionsObject
+  /api/v1/user/:
+    delete:
+      operationId: delete_user_api_v1_user__delete
+      parameters:
+      - in: query
+        name: user_id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: User Id
+      - in: query
+        name: username
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+      - in: query
+        name: email
+        required: false
+        schema:
+          anyOf:
+          - format: email
+            type: string
+          - type: 'null'
+          title: Email
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Delete user
+      tags:
+      - User
+    put:
+      operationId: update_user_api_v1_user__put
+      parameters:
+      - in: query
+        name: user_id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: User Id
+      - in: query
+        name: username
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+      - in: query
+        name: email
+        required: false
+        schema:
+          anyOf:
+          - format: email
+            type: string
+          - type: 'null'
+          title: Email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserFullInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Update user
+      tags:
+      - User
+  /api/v1/user/all:
+    get:
+      operationId: get_users_api_v1_user_all_get
+      parameters:
+      - in: query
+        name: username
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+      - in: query
+        name: first_name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: First Name
+      - in: query
+        name: last_name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Last Name
+      - in: query
+        name: second_name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Second Name
+      - description: Page number
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          description: Page number
+          minimum: 1
+          title: Page
+          type: integer
+      - description: Page size
+        in: query
+        name: size
+        required: false
+        schema:
+          default: 50
+          description: Page size
+          maximum: 100
+          minimum: 1
+          title: Size
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_UserFullInfoResponse_'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all users
+      tags:
+      - User
+  /api/v1/user/info:
+    get:
+      operationId: get_user_api_v1_user_info_get
+      parameters:
+      - in: query
+        name: user_id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: User Id
+      - in: query
+        name: username
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+      - in: query
+        name: email
+        required: false
+        schema:
+          anyOf:
+          - format: email
+            type: string
+          - type: 'null'
+          title: Email
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserFullInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get user by id or username or email
+      tags:
+      - User
+  /api/v1/user/me:
+    get:
+      operationId: get_me_api_v1_user_me_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserFullInfoResponse'
+          description: Successful Response
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get info about the current user
+      tags:
+      - User
+  /api/v1/user/verified:
+    post:
+      operationId: create_verified_user_api_v1_user_verified_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVerifiedUser'
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserFullInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Create a verified user (has access to the system)
+      tags:
+      - User
+  /api/v1/user_group/:
+    delete:
+      operationId: delete_user_group_api_v1_user_group__delete
+      parameters:
+      - in: query
+        name: group_id
+        required: true
+        schema:
+          format: uuid
+          title: Group Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Delete group info by id
+      tags:
+      - UserGroup
+    post:
+      description: '## Create user group
+
+        Available for users starting from the EDITOR responsibility level'
+      operationId: create_user_group_api_v1_user_group__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGroup'
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupInfo'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Create user group
+      tags:
+      - UserGroup
+  /api/v1/user_group/all:
+    get:
+      operationId: get_all_groups_info_api_v1_user_group_all_get
+      parameters:
+      - in: query
+        name: name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      - in: query
+        name: description
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      - in: query
+        name: is_members_can_add_to_group
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Members Can Add To Group
+      - description: Page number
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          description: Page number
+          minimum: 1
+          title: Page
+          type: integer
+      - description: Page size
+        in: query
+        name: size
+        required: false
+        schema:
+          default: 50
+          description: Page size
+          maximum: 100
+          minimum: 1
+          title: Size
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_GroupInfo_'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all groups info
+      tags:
+      - UserGroup
+  /api/v1/user_group/all/full-info:
+    get:
+      operationId: get_all_groups_full_info_api_v1_user_group_all_full_info_get
+      parameters:
+      - in: query
+        name: name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      - in: query
+        name: description
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      - in: query
+        name: is_members_can_add_to_group
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Members Can Add To Group
+      - description: Page number
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          description: Page number
+          minimum: 1
+          title: Page
+          type: integer
+      - description: Page size
+        in: query
+        name: size
+        required: false
+        schema:
+          default: 50
+          description: Page size
+          maximum: 100
+          minimum: 1
+          title: Size
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_GroupInfoWithUsers_'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all groups info with members
+      tags:
+      - UserGroup
+  /api/v1/user_group/full-info:
+    get:
+      description: '## Get user group info with members by id
+
+        Get information about the group and all its members'
+      operationId: get_user_group_full_info_api_v1_user_group_full_info_get
+      parameters:
+      - in: query
+        name: group_id
+        required: true
+        schema:
+          format: uuid
+          title: Group Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupInfoWithUsers'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get user group info with members by id
+      tags:
+      - UserGroup
+  /api/v1/user_group/info:
+    get:
+      description: '## Get user group info by id
+
+        Get base information without group members'
+      operationId: get_user_group_info_api_v1_user_group_info_get
+      parameters:
+      - in: query
+        name: group_id
+        required: true
+        schema:
+          format: uuid
+          title: Group Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupInfo'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get user group info by id
+      tags:
+      - UserGroup
+    put:
+      operationId: update_user_group_info_api_v1_user_group_info_put
+      parameters:
+      - in: query
+        name: group_id
+        required: true
+        schema:
+          format: uuid
+          title: Group Id
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupOptionalInfo'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupInfo'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Update group info by id
+      tags:
+      - UserGroup
+  /api/v1/user_group/member:
+    delete:
+      operationId: remove_member_group_api_v1_user_group_member_delete
+      parameters:
+      - in: query
+        name: group_id
+        required: true
+        schema:
+          format: uuid
+          title: Group Id
+          type: string
+      - in: query
+        name: user_id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: User Id
+      - in: query
+        name: username
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+      - in: query
+        name: email
+        required: false
+        schema:
+          anyOf:
+          - format: email
+            type: string
+          - type: 'null'
+          title: Email
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Remove member user from group
+      tags:
+      - UserGroup
+    post:
+      operationId: add_member_group_api_v1_user_group_member_post
+      parameters:
+      - in: query
+        name: group_id
+        required: true
+        schema:
+          format: uuid
+          title: Group Id
+          type: string
+      - in: query
+        name: user_id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: User Id
+      - in: query
+        name: username
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+      - in: query
+        name: email
+        required: false
+        schema:
+          anyOf:
+          - format: email
+            type: string
+          - type: 'null'
+          title: Email
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Add member user for group
+      tags:
+      - UserGroup
+  /api/v1/user_group/members:
+    get:
+      operationId: get_members_user_group_api_v1_user_group_members_get
+      parameters:
+      - in: query
+        name: group_id
+        required: true
+        schema:
+          format: uuid
+          title: Group Id
+          type: string
+      - description: Page number
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          description: Page number
+          minimum: 1
+          title: Page
+          type: integer
+      - description: Page size
+        in: query
+        name: size
+        required: false
+        schema:
+          default: 50
+          description: Page size
+          maximum: 100
+          minimum: 1
+          title: Size
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_UserBaseInfoResponse_'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get members group by id
+      tags:
+      - UserGroup
+  /api/v1/user_group/user/full-info:
+    get:
+      operationId: get_groups_full_info_for_user_api_v1_user_group_user_full_info_get
+      parameters:
+      - in: query
+        name: user_id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: User Id
+      - in: query
+        name: username
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+      - in: query
+        name: email
+        required: false
+        schema:
+          anyOf:
+          - format: email
+            type: string
+          - type: 'null'
+          title: Email
+      - in: query
+        name: name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      - in: query
+        name: description
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      - in: query
+        name: is_members_can_add_to_group
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Members Can Add To Group
+      - description: Page number
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          description: Page number
+          minimum: 1
+          title: Page
+          type: integer
+      - description: Page size
+        in: query
+        name: size
+        required: false
+        schema:
+          default: 50
+          description: Page size
+          maximum: 100
+          minimum: 1
+          title: Size
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_GroupInfoWithUsers_'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get groups info for user with members
+      tags:
+      - UserGroup
+  /api/v1/user_group/user/info:
+    get:
+      operationId: get_groups_info_for_user_api_v1_user_group_user_info_get
+      parameters:
+      - in: query
+        name: user_id
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          title: User Id
+      - in: query
+        name: username
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+      - in: query
+        name: email
+        required: false
+        schema:
+          anyOf:
+          - format: email
+            type: string
+          - type: 'null'
+          title: Email
+      - in: query
+        name: name
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+      - in: query
+        name: description
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      - in: query
+        name: is_members_can_add_to_group
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Members Can Add To Group
+      - description: Page number
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          description: Page number
+          minimum: 1
+          title: Page
+          type: integer
+      - description: Page size
+        in: query
+        name: size
+        required: false
+        schema:
+          default: 50
+          description: Page size
+          maximum: 100
+          minimum: 1
+          title: Size
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_GroupInfo_'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get groups info for user
+      tags:
+      - UserGroup
+  /api/v1/versioning/block/{block_id}/diff:
+    get:
+      description: Find the difference between the contents of the block versions
+        in diff format.
+      operationId: get_diff_versions_document_block_api_v1_versioning_block__block_id__diff_get
+      parameters:
+      - in: path
+        name: block_id
+        required: true
+        schema:
+          format: uuid
+          title: Block Id
+          type: string
+      - in: query
+        name: commit_id_1
+        required: true
+        schema:
+          title: Commit Id 1
+          type: string
+      - in: query
+        name: commit_id_2
+        required: true
+        schema:
+          title: Commit Id 2
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                title: Response Get Diff Versions Document Block Api V1 Versioning
+                  Block  Block Id  Diff Get
+                type: string
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get the difference between the blocks
+      tags:
+      - WorkspaceVersioning
+  /api/v1/versioning/block/{block_id}/info:
+    get:
+      operationId: get_list_versions_document_block_api_v1_versioning_block__block_id__info_get
+      parameters:
+      - in: path
+        name: block_id
+        required: true
+        schema:
+          format: uuid
+          title: Block Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/VersionBlockInfo'
+                title: Response Get List Versions Document Block Api V1 Versioning
+                  Block  Block Id  Info Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get info as a list of all versions block
+      tags:
+      - WorkspaceVersioning
+  /api/v1/versioning/block/{block_id}/rollback:
+    post:
+      description: '## Rollback block
+
+        The state of the specified version of the block will be received,
+
+        an update will be performed, and a commit will be performed (a new version
+        will appear).'
+      operationId: version_rollback_document_block_api_v1_versioning_block__block_id__rollback_post
+      parameters:
+      - in: path
+        name: block_id
+        required: true
+        schema:
+          format: uuid
+          title: Block Id
+          type: string
+      - in: query
+        name: rollback_commit_id
+        required: true
+        schema:
+          title: Rollback Commit Id
+          type: string
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockDataResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Rollback block contents to the specified version
+      tags:
+      - WorkspaceVersioning
+  /api/v1/versioning/document/{document_id}/info:
+    get:
+      operationId: get_list_versions_document_api_v1_versioning_document__document_id__info_get
+      parameters:
+      - in: path
+        name: document_id
+        required: true
+        schema:
+          format: uuid
+          title: Document Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/VersionDocumentInfo'
+                title: Response Get List Versions Document Api V1 Versioning Document  Document
+                  Id  Info Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get info as a list of all versions document
+      tags:
+      - WorkspaceVersioning
+  /api/v1/versioning/document/{document_id}/rollback:
+    post:
+      description: '## Rollback document
+
+        The state of the specified version of the document will be retrieved,
+
+        all blocks will be updated, and a commit will be performed (a new version
+        will appear).'
+      operationId: version_rollback_document_api_v1_versioning_document__document_id__rollback_post
+      parameters:
+      - in: path
+        name: document_id
+        required: true
+        schema:
+          format: uuid
+          title: Document Id
+          type: string
+      - in: query
+        name: rollback_commit_id
+        required: true
+        schema:
+          title: Rollback Commit Id
+          type: string
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/BlockDataResponse'
+                title: Response Version Rollback Document Api V1 Versioning Document  Document
+                  Id  Rollback Post
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Rollback document contents to the specified version
+      tags:
+      - WorkspaceVersioning
+  /api/v1/workspace/:
+    post:
+      operationId: create_workspace_api_v1_workspace__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWorkspace'
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkspaceInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Create workspace
+      tags:
+      - Workspace
+  /api/v1/workspace/all:
+    get:
+      operationId: get_workspaces_api_v1_workspace_all_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/WorkspaceInfoResponse'
+                title: Response Get Workspaces Api V1 Workspace All Get
+                type: array
+          description: Successful Response
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get all workspace
+      tags:
+      - Workspace
+  /api/v1/workspace/info:
+    get:
+      operationId: get_workspace_info_api_v1_workspace_info_get
+      parameters:
+      - in: query
+        name: workspace_id
+        required: true
+        schema:
+          format: uuid
+          title: Workspace Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkspaceInfoResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - WikiRootApiKey: []
+      - WikiApiKey: []
+      - WikiApiKey: []
+      - WikiAccessToken: []
+      - WikiBearer: []
+      summary: Get workspace info
+      tags:
+      - Workspace
+  /health:
+    get:
+      description: "## Perform a Health Check\nEndpoint to perform a healthcheck on.\
+        \ This endpoint can primarily be used Docker\nto ensure a robust container\
+        \ orchestration and management is in place. Other\nservices which rely on\
+        \ proper functioning of the API service will not deploy if this\nendpoint\
+        \ returns any other HTTP status code except 200 (OK).\nReturns:\n    HealthCheck:\
+        \ Returns a JSON response with the health status"
+      operationId: get_health_health_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheck'
+          description: Return HTTP Status Code 200 (OK)
+      summary: Perform a Health Check
+      tags:
+      - HealthCheck
+servers:
+- description: Local server
+  url: http://localhost:8000/
+- description: Demo server
+  url: https://api.wiki.example.com/
+- description: Ngrok free server
+  url: https://poorly-ideal-cobra.ngrok-free.app/

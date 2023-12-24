@@ -1,0 +1,53 @@
+.login-form{
+    width: 400px;
+    position: absolute;
+    align-items: center;
+    align-self: center;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    background-color: #f1f1f1;
+
+    padding: 20px;
+
+    border: 1px outset rgba(0, 0, 0, 0.2);
+    border-radius: 25px;
+
+    justify-content: center;
+}
+
+#login {
+    height: auto;
+}
+
+#signup {
+    height: 400px;
+    overflow: auto;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    /* Ширина полоски прокрутки */
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #1C6CD5; /* Цвет полоски прокрутки */
+    border-radius: 10px;
+}
+
+/*::-webkit-scrollbar-button {
+    background-image: url('путь_к_вашему_изображению'); !* Путь к вашему изображению *!
+    background-size: cover; !* Подогнать размер изображения *!
+    background-repeat: no-repeat; !* Запретить повторение изображения *!
+    display: block; !* Показать изображение *!
+    width: 20px; !* Ширина стрелочки *!
+    height: 20px; !* Высота стрелочки *!
+}*/
+
+#text-field{
+    margin-bottom: 5%;
+    margin-top: 1%;
+    background-color: #FFFFFF;
+    color: #222222;
+}

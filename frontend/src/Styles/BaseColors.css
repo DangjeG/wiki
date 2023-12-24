@@ -1,0 +1,63 @@
+#base-button{
+    color: #1C6CD5;
+    background-color: #FFFFFF;
+    border: 1px solid #1C6CD5;
+    font-family: Inter, serif;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 15px;
+    letter-spacing: 0em;
+    text-align: left;
+    border-radius: 10px;
+    width: 157px;
+    height: 44px;
+    box-shadow: none;
+}
+
+#base-button:hover{
+    color: #222222;
+    background-color: #C0D6F4;
+
+}
+
+#accent-button{
+    color: #FFFFFF;
+    background-color: #1C6CD5;
+    font-family: Inter, serif;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 15px;
+    letter-spacing: 0em;
+    text-align: left;
+    border-radius: 10px;
+    width: 157px;
+    height: 44px;
+    box-shadow: none;
+}
+
+#accent-button:hover{
+    background-color: #001847;
+}
+
+#main-background{
+    background-color: #FFFFFF;
+}
+
+#notaccent-button{
+    color: #12151a;
+    background-color: #6b98f2;
+}
+
+#notaccent-button:hover{
+    background-color: #5983d9;
+}
+
+#button-with-border{
+    background-color: #f1f1f1;
+    color: #0f0f0f;
+    border: 2px solid #6b98f2;
+}
+
+#button-with-border:hover{
+    background-color: #6b98f2;
+}
