@@ -21,6 +21,19 @@ export default function BlockComponent(props) {
     const [block, setBlock] = useState(props.block)
     const [anchorEl, setAnchorEl] = useState(null);
     const [showMenu, setShowMenu] = useState(false);
+
+    const listStyles = {
+        background: "white",
+        "border-radius": "10px",
+        "max-height": "300px",
+        "min-height": "10px",
+        "min-width": "300px",
+        overflow: "auto",
+        position: "absolute",
+        "z-index": "100",
+        right : "100px"
+
+    }
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -41,19 +54,19 @@ export default function BlockComponent(props) {
         setShowMenu(false);
     };
 
-    const getBlockView = (type_block) =>{
-        switch(type_block) {
+    const getBlockView = (type_block) => {
+        switch (type_block) {
             case 'TEXT':
-            return <TextBlock block={block}/>
+                return <TextBlock block={block}/>
             case 'IMG':
-                return <ImageBlock block={block} />
+                return <ImageBlock block={block}/>
             default:
                 return null;
         }
     }
 
     const getBlockEditor = (type_block) => {
-        switch(type_block) {
+        switch (type_block) {
             case 'TEXT':
                 return <Wysiwyg block={block} onChange={handleChange}/>
             case 'IMG':
@@ -61,23 +74,23 @@ export default function BlockComponent(props) {
         }
     }
 
-/*
-    const handleAddAbove = () => {
-        //props.onAddAbove(block)
-    }
+    /*
+        const handleAddAbove = () => {
+            //props.onAddAbove(block)
+        }
 
-    const handleAddBelow = () => {
-        //props.onAddBelow(block)
-    }
+        const handleAddBelow = () => {
+            //props.onAddBelow(block)
+        }
 
-    const handleMoveDown = () => {
-        //props.onMoveDown(block)
-    }
+        const handleMoveDown = () => {
+            //props.onMoveDown(block)
+        }
 
-    const handleMoveUp = () => {
-        //props.onMoveUp(block)
-    }
-*/
+        const handleMoveUp = () => {
+            //props.onMoveUp(block)
+        }
+    */
     const handleDelete = () => {
         props.onDelete(block)
     }
@@ -92,15 +105,15 @@ export default function BlockComponent(props) {
     }
 
     const handleRollback = (newBlock) => {
-        if (newBlock !== null) {
+       /* if (newBlock !== null) {
             setBlock(newBlock)
             props.onChange()
-        }
+        }*/
     }
 
-    switch(props.mode){
+    switch (props.mode) {
         case "view" :
-            return(
+            return (
                 <div className={"block-container"}>
                     <div className={"block-view"}>
                         {getBlockView(block.type_block)}
@@ -111,13 +124,6 @@ export default function BlockComponent(props) {
         case "edit" :
             return (
                 <>
-                    <VersionList
-                        wikiObject={block}
-                        show={showVersions}
-                        onRollback={handleRollback} // нужно перерисовать блок после отката к новой версии
-                        onMouseLeave={handleHistoryButtonClick}
-                        isBlock={true}
-                    />
                     <div
                         className={"block-container block-container_hover"}
                         onMouseEnter={handleMouseEnter}
@@ -132,7 +138,16 @@ export default function BlockComponent(props) {
                             </div>
                         }
                         <div className={"tools-container"}>
-                            <div className={showMenu? "block__toolbar_visibility_visible" : "block__toolbar_visibility_hidden"}>
+                            <VersionList
+                                wikiObject={block}
+                                show={showVersions}
+                                onRollback={handleRollback} // нужно перерисовать блок после отката к новой версии
+                                onMouseLeave={handleHistoryButtonClick}
+                                isBlock={true}
+                                listStyles={listStyles}
+                            />
+                            <div
+                                className={showMenu ? "block__toolbar_visibility_visible" : "block__toolbar_visibility_hidden"}>
                                 <Button onClick={handleClick}>
                                     <MoreVertIcon/>
                                 </Button>
@@ -141,7 +156,7 @@ export default function BlockComponent(props) {
                                     onClose={handleClose}
                                     anchorEl={anchorEl}
                                 >
-                                    <div >
+                                    <div>
                                         <MenuItem onClick={handleDelete}>
                                             <Delete/>
                                         </MenuItem>
@@ -157,6 +172,17 @@ export default function BlockComponent(props) {
                         </div>
                     </div>
                 </>
+            )
+        case "version" :
+            return (
+                <>
+                    <div className={"block-container"}>
+                        <div className={"block-view"}>
+                            {getBlockView(block.type_block)}
+                        </div>
+                    </div>
+                </>
+
             )
     }
 }

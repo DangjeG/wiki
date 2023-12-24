@@ -4,19 +4,10 @@ import {Version} from "./Version";
 import {Divider, List} from "@mui/material";
 import Preload from "../../Preload";
 
-const listStyles = {
-    background: "white",
-    "border-radius": "10px",
-    "max-height": "300px",
-    "min-height": "10px",
-    "min-width": "300px",
-    overflow: "auto",
-    position: "absolute",
-    "z-index": "100"
-}
 
 
-export const VersionList = ({wikiObject, show, onRollback, onMouseLeave, isBlock}) => {
+
+export const VersionList = ({wikiObject, show, onRollback, onMouseLeave, isBlock, listStyles}) => {
 
 
     const [versions, setVersions] = useState([]);
@@ -41,14 +32,7 @@ export const VersionList = ({wikiObject, show, onRollback, onMouseLeave, isBlock
     }
 
     const handleRollback = async (object_id, commit_id) => {
-        if (isBlock) {
-            const blockData = await api.rollbackBlock(object_id, commit_id)
-            onRollback(blockData)
-        } else {
-            await api.rollbackDoc(object_id, commit_id)
-            onRollback()
-        }
-        fetchVersions()
+        onRollback(object_id, commit_id)
     }
     
     useEffect(() => {

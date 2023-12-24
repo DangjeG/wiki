@@ -55,16 +55,16 @@ export default function Admin() {
                     <></>
                 </Grid>
                 <Grid item xs={11}>
-                    <Tabs textColor="primary" indicatorColor="primary" value={activeTab} onChange={handleTabChange} variant="fullWidth">
+                    {/* <Tabs textColor="primary" indicatorColor="primary" value={activeTab} onChange={handleTabChange} variant="fullWidth">
                         <Tab sx={{color: '#423e42' , ':hover': {backgroundColor: '#cdf'} }} value="users" label="Пользователи" />
                         <Tab sx={{color: '#423e42' , ':hover': {backgroundColor: '#cdf'} }} value="organizations" label="Группы" />
-                    </Tabs>
+                    </Tabs>*/}
                 </Grid>
                 <Grid item xs={1} sx={{display: 'flex'}}>
-                    {renderButtonAdd()}
+                    <ButtonAddUser />
                 </Grid>
                 <Grid item xs={11}>
-                    {renderTable()}
+                    <UsersTable />
                 </Grid>
             </Grid>
 

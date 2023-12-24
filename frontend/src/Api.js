@@ -85,7 +85,7 @@ export default class Api {
         } )
     }
 
-    async createApprovedUser(email, username, firstName, lastName, secondName,position, responsibility){
+    async createApprovedUser(email, username, firstName, lastName,position, responsibility){
         await instance.post(`/user/verified`, {
             "email": email,
             "first_name": firstName,
@@ -94,7 +94,6 @@ export default class Api {
             "is_verified_email": true,
             "last_name": lastName,
             "position": position,
-            "second_name": secondName,
             "username": username,
             "wiki_api_client": {
                 "description": "",
@@ -234,9 +233,12 @@ export default class Api {
         return block
     }
 
-    async getBlocks(document_id){
+    async getBlocks(document_id,commit_id){
+        const url = commit_id !== undefined
+            ? `/blocks/data/all?document_id=${document_id}&version_commit_id=${commit_id}`
+            : `/blocks/data/all?document_id=${document_id}`
         let res = []
-        await instance.get(`/blocks/data/all?document_id=${document_id}`).then((resp)=>{
+        await instance.get(url).then((resp)=>{
             resp.data.forEach((item) => {
                 res.push(item)
             })}

@@ -36,12 +36,8 @@ export default function WorkspaceSelect () {
 
     return (
         <>
-            <Form.Group className="mb-3"  style={{width: '360px', marginTop: '70px'}}>
-                <Form.Control as="textarea" rows={1}
-                              placeholder="Поиск"/>
-            </Form.Group>
             <List
-                sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper'}}
+                sx={{margin:"100px 50px", width: '100%', maxWidth: 360, bgcolor: 'background.paper'}}
                 component="nav"
                 aria-labelledby="nested-list-subheader"
                 subheader={
