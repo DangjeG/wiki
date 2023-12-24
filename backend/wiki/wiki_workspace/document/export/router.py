@@ -61,8 +61,8 @@ async def export_document(
                                                      ya_disk)
     if export_type.DOCX:
         res = converters.docx.convert(html)
-        headers = {"Content-Disposition": f'attachment; filename*=UTF-8\'\'"{title}"'}
-        return Response(res, headers=headers, media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+        headers = {"Content-Disposition": f'attachment; filename="{title}"'}
+        return Response(res, headers=headers, media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document;")
 
     raise Exception
 
@@ -110,7 +110,7 @@ async def get_html_content_from_blocks(document_id: UUID,
                     link = ""
                     if data != "":
                         asset = await asset_repository.get_asset_by_id(UUID(data))
-                        link = await ya_storage.download_asset(asset)
+                        link = await ya_storage.download_asset(asset, is_base64_link=True)
                     content.append(get_html_base_img_teg(link))
                 case TypeBlock.FILE:
                     # rewrite the display
@@ -127,7 +127,7 @@ async def get_html_content_from_blocks(document_id: UUID,
                         link = await ya_storage.download_asset(asset)
                     content.append(get_html_base_file(link, f"video-{asset.id}"))
 
-    title = f"document-{document.title}-{utcnow()}.pdf"
+    title = f"document-{document.id}-{int(utcnow().timestamp())}"
     return title, get_html_frame(content)
 
 
@@ -169,7 +169,7 @@ async def document_to_docx(
         )
         list_content_document.append(content)
 
-    title = f"document-{document.title}-{utcnow()}.docx"
+    title = f"document-{document.title}-{utcnow().strftime('%Y-%m-%d_%H-%M-%S')}.docx"
     res = export_document_docx(list_content_document, title)
     headers = {"Content-Disposition": f'attachment; filename="{title}"'}
     resp = Response(content=res, headers=headers, media_type='application/msword;charset="ISO-8859-1"')

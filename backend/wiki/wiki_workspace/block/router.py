@@ -237,7 +237,7 @@ async def update_block_data_file(
         type_block=block.type_block,
         content=content,
         created_at=block.created_at,
-        link=await ya_storage.download_asset(asset),
+        link=await ya_storage.download_asset(asset, is_base64_link=True),
         permission_mode=get_permission_mode_by_responsibility(
             block.permission_mode,
             user.wiki_api_client.responsibility
@@ -467,6 +467,6 @@ async def set_asset_link_for_block(data: list[BlockDataResponse],
                 r.content != "" and
                 r.permission_mode > ObjectPermissionMode.INACCESSIBLE):
             asset = await asset_repository.get_asset_by_id(UUID(r.content))
-            r.link = await ya_storage.download_asset(asset)
+            r.link = await ya_storage.download_asset(asset, is_base64_link=True)
 
     return data
