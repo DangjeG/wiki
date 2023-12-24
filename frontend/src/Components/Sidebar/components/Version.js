@@ -4,10 +4,14 @@ import {IconButton, ListItem, ListItemText, Tooltip} from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 
 export const Version = ({version, onRollback}) => {
+
+
+
     const handleClickRollback = (event) => {
         event.stopPropagation();
         onRollback(version.object_id, version.commit_id)
     }
+
 
     const addLeadingZero = (number) => {
         if (number < 10) {
@@ -17,7 +21,6 @@ export const Version = ({version, onRollback}) => {
     }
 
     const getFormattedDate = (date) => {
-        console.log(typeof date);
         const year = date.getFullYear();
         const month = date.toLocaleString("default", { month: "short" });
         const day = date.getDate();
@@ -28,19 +31,19 @@ export const Version = ({version, onRollback}) => {
     }
 
     return (
-        <ListItem>
+        <ListItem onClick={handleClickRollback}>
             <EditIcon style={{"margin-right": "20px"}} />
             <Tooltip title="Нажмите для просмотра" arrow>
                 <ListItemText
                     primary={`Кем изменино: ${version.committer_user.username}`}
-                    secondary={getFormattedDate(Date(version.created_at))} //"Jan 9, 2014"
+                    secondary={getFormattedDate(new Date(version.created_at))} //"Jan 9, 2014"
                 />
             </Tooltip>
-            <Tooltip title="Откатиться к версии" arrow>
+            {/*<Tooltip title="Откатиться к версии" arrow>
                 <IconButton onClick={handleClickRollback}>
                     <UndoIcon/>
                 </IconButton>
-            </Tooltip>
+            </Tooltip>*/}
         </ListItem>
     )
 }

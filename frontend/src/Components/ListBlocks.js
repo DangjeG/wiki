@@ -6,7 +6,7 @@ import ImageIcon from "@mui/icons-material/Image";
 import BlockComponent from "./Block/Block";
 import React, {useEffect, useState} from "react";
 import {api} from "../Config/app.config";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import Menu from '@mui/material/Menu';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
 import MenuItem from '@mui/material/MenuItem';
@@ -15,9 +15,10 @@ import {
     createTheme,
     responsiveFontSizes,
     ThemeProvider,
-  } from '@mui/material/styles';
+} from '@mui/material/styles';
 import "../Styles/DocumentSpace.css"
 import Preload from "./Preload";
+import UndoIcon from "@mui/icons-material/Undo";
 
 
 export default function ListBlocks() {
@@ -28,22 +29,29 @@ export default function ListBlocks() {
     const [uncommented, setUncommented] = useState(false)
     const [blocks, setBlocks] = useState([]);
     const [document, setDocument] = useState(null)
-    let {doc_id, mode} = useParams();
+    let {wp_id,doc_id, mode, commit_id} = useParams();
     let theme = createTheme();
+    let navigate = useNavigate()
 
     theme = responsiveFontSizes(theme);
 
     useEffect(() => {
         setBlocksLoad(true)
         setDocLoad(true)
-        fetchBlocks(doc_id)
+        fetchBlocks()
         fetchDoc(doc_id)
-    }, [doc_id]);
+    }, [doc_id, commit_id]);
 
-    const fetchBlocks = async (ID) => {
+
+
+    const fetchBlocks = async () => {
         try {
             setBlocks([])
-            const response = await api.getBlocks(ID)
+            let response = []
+            if (commit_id !== undefined)
+                response = await api.getBlocks(doc_id, commit_id)
+            else
+                response = await api.getBlocks(doc_id)
             setBlocks(response)
 
         } catch (e) {
@@ -97,14 +105,78 @@ export default function ListBlocks() {
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
-    
+
     const handleClose = () => {
         setAnchorEl(null);
     };
 
+    const handleRollback = async () => {
+        await api.rollbackDoc(doc_id, commit_id)
+        navigate(`/workspace/${wp_id}`)
+    }
+
+    const renderModeDocInfo = () => {
+        switch (mode) {
+            case "edit":
+                return "Вы редактируете"
+            case "view":
+                return "Вы в режиме просмотра"
+            case "version":
+                return "Вы в режиме просмотра версии"
+        }
+    }
+
+    const renderToolbar = () => {
+        switch (mode) {
+            case "edit" :
+                return (
+                    <>
+                        <Button
+                            // id="base-button"
+                             sx={{widh : '40px', height: '40px'}}
+                            variant="outlined"
+                            disabled={!uncommented}
+                            onClick={handleSave}>
+                            <Tooltip sx={{width: '10px', height: '10px'}}
+                                     title="Сохранить"
+                                     placement="top"
+                                     arrow>
+                                <SaveIcon sx={{color: '#1976d2'}}/>
+                            </Tooltip>
+                        </Button>
+                        <Button
+                            sx={{widh : '40px', height: '40px'}}
+                            variant="contained"
+                            onClick={handleClick}>
+                            <Tooltip sx={{width: '10px', height: '10px'}}
+                                     title="Добавить блок"
+                                     placement="top"
+                                     arrow>
+                                <AddIcon sx={{color: '#FFFFFF'}}/>
+                            </Tooltip>
+                        </Button>
+                    </>
+                )
+            case "version" :
+                return (
+                    <Button
+                        sx={{widh : '40px', height: '40px'}}
+                        variant="outlined"
+                        onClick={handleRollback}>
+                        <Tooltip sx={{width: '10px', height: '10px'}}
+                                 title="Откатиться к версии" arrow
+                                 placement="top">
+                                <UndoIcon sx={{color: '#1976d2'}}/>
+                        </Tooltip>
+                    </Button>
+                )
+        }
+
+    }
+
     return (
         <>
-            { docLoad || blocksLoad? <Preload/> :
+            {docLoad || blocksLoad ? <Preload/> :
                 <div className="container">
                     <div className="documentHeader">
                         <ThemeProvider theme={theme}>
@@ -112,41 +184,15 @@ export default function ListBlocks() {
                                 variant="h4"
                                 style={{"margin-right": "20px"}}
                             >
-                                {document ? document.title: null}
+                                {document? document.title : null}
+
                             </Typography>
                             <Chip
-                                label={mode === "edit" ? "Вы редактируете": "Вы в режиме просмотра"}
+                                label={renderModeDocInfo()}
                                 style={{"margin-right": "auto"}}
                             />
                         </ThemeProvider>
-                        {mode === "edit" ?
-                            <>
-                                <Button
-                                    // id="base-button"
-                                    // sx={{marginTop: '20px', marginBottom: '20px', marginLeft: '80%'}}
-                                    variant="outlined"
-                                    disabled={!uncommented}
-                                    onClick={handleSave}>
-                                    <Tooltip sx={{width: '10px', height: '10px'}}
-                                             title="Сохранить"
-                                             placement="top"
-                                             arrow>
-                                        <SaveIcon sx={{color: '#1976d2'}}/>
-                                    </Tooltip>
-                                </Button>
-                                <Button variant="contained"
-                                        onClick={handleClick}>
-                                    <Tooltip sx={{width: '10px', height: '10px'}}
-                                             title="Добавить блок"
-                                             placement="top"
-                                             arrow>
-                                        <AddIcon sx={{color: '#FFFFFF'}}/>
-                                    </Tooltip>
-                                </Button>
-                            </>
-
-                            :<></>
-                        }
+                        {renderToolbar()}
                         <Menu
                             anchorEl={anchorEl}
                             open={Boolean(anchorEl)}

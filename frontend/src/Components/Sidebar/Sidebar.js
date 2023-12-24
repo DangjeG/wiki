@@ -26,6 +26,7 @@ export function Sidebar(){
     let {wp_id, mode} = useParams();
 
 
+
     useEffect(() => {
 
         setDocsLoad(true)
@@ -46,7 +47,6 @@ export function Sidebar(){
         try {
             const response = await api.getDocumentsTree(workspaceID)
             setSidebarData(response)
-            console.log(sidebarData)
             setDocsLoad(false)
         }
         catch (e){
@@ -76,9 +76,8 @@ export function Sidebar(){
         setSidebarData([])
         fetchDocs(wp_id)
     }
-    const handleRollback = () => {
-        navigate(`/workspace/${wp_id}`)
-        fetchDocs(wp_id)
+    const handleRollback = (doc_id, commit_id) => {
+        navigate(`/workspace/${wp_id}/document/${doc_id}/version/${commit_id}`)
     }
 
     const handleExport = async (document_id, filename) => {

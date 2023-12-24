@@ -15,7 +15,6 @@ export default function ButtonAddUser() {
     const [username, setUsername] = useState("");
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
-    const [secondName, setSecondName] = useState("");
     const [responsibility, setResponsibility] = useState('');
     const [position, setPosition] = useState("")
 
@@ -30,7 +29,7 @@ export default function ButtonAddUser() {
     const handleCreate = () => {
         const fetchData = async () => {
             try {
-                await api.createApprovedUser(email, username, firstName, lastName, secondName,position, responsibility)
+                await api.createApprovedUser(email, username, firstName, lastName,position, responsibility)
             } catch (error) {
                 console.log(error);
             }
@@ -96,28 +95,6 @@ export default function ButtonAddUser() {
                                 onChange={(event) => setLastName(event.target.value)}
                                 as="textarea"
                                 rows={1}
-                            />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Отчество</Form.Label>
-                            <Form.Control
-                                onChange={(event) => setSecondName(event.target.value)}
-                                disabled={isSecondNameExist}
-                                required={!isSecondNameExist}
-                                as="textarea"
-                                rows={1}
-                            />
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={!isSecondNameExist}
-                                        onClick={() => {
-                                            setExist(!isSecondNameExist);
-                                            setSecondName("");
-                                        }}
-                                    />
-                                }
-                                label="Отчество существует"
                             />
                         </Form.Group>
                         <Form.Group className="mb-3">

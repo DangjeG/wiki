@@ -15,7 +15,7 @@ export default function WorkspaceDocs () {
 
                     <Routes>
                         <Route path={"/"} element={<h1>Выберите документ</h1>}/>
-                        <Route path={"/document/:doc_id/:mode"} element={<ListBlocks/>}/>
+                        <Route path={"/document/:doc_id/:mode/:commit_id?"} element={<ListBlocks/>}/>
                     </Routes>
                 </Grid>
             </Grid>
