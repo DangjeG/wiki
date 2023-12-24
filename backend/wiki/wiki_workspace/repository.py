@@ -122,19 +122,34 @@ class WorkspaceRepository(ObjectRepository):
             *whereclause
         )
 
-    async def get_workspaces_with_permission(self, user_id: UUID) -> list[Row]:
-        res = await self._get_result_workspaces_with_permission(user_id)
+    async def get_workspaces_with_permission(self,
+                                             user_id: UUID,
+                                             is_only_existing: bool = True) -> list[Row]:
+        whereclause = []
+        if is_only_existing:
+            whereclause.append(Workspace.is_deleted == False)
+        res = await self._get_result_workspaces_with_permission(user_id, *whereclause)
         return res.all()
 
     @menage_db_not_found_result_method(NotFoundResultMode.EXCEPTION, ex=workspace_not_found_exception)
-    async def get_workspace_with_permission_by_id(self, user_id: UUID, workspace_id: UUID) -> Row:
-        res = await self._get_result_workspaces_with_permission(user_id, Workspace.id == workspace_id)
+    async def get_workspace_with_permission_by_id(self,
+                                                  user_id: UUID,
+                                                  workspace_id: UUID,
+                                                  is_only_existing: bool = True) -> Row:
+        whereclause = [Workspace.id == workspace_id]
+        if is_only_existing:
+            whereclause.append(Workspace.is_deleted == False)
+        res = await self._get_result_workspaces_with_permission(user_id, *whereclause)
         arr = res.all()
         return arr[0] if len(arr) > 0 else None
 
     @menage_db_not_found_result_method(NotFoundResultMode.EXCEPTION, ex=workspace_not_found_exception)
-    async def get_workspace_by_id(self, workspace_id: UUID) -> Workspace:
-        return await self.session.get(Workspace, workspace_id)
+    async def get_workspace_by_id(self, workspace_id: UUID, is_only_existing: bool = True) -> Workspace:
+        whereclause = [Workspace.id == workspace_id]
+        if is_only_existing:
+            whereclause.append(Workspace.is_deleted == False)
+        st = select(Workspace).where(*whereclause)
+        return (await self.session.execute(st)).scalar()
 
     @menage_db_commit_method(CommitMode.FLUSH)
     async def create_workspace(self, title: str, owner_user_id: UUID) -> Workspace:

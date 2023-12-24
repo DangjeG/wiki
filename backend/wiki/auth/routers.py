@@ -47,7 +47,12 @@ async def login(user_in: FrontendUserLogin,
     A confirmation code will be sent to the specified email.
     """
     authenticator = VerificationCodeAuthenticatorInterface(session)
-    code = authenticator.verification_code
+
+    # Test user plug
+    if str(user_in.email) == "testuser@email.com":
+        code = "12345"
+    else:
+        code = authenticator.verification_code
     token = authenticator.create_verify_token(VerifyTokenData(
         email=user_in.email,
         user_ip=request.client.host,
@@ -56,11 +61,12 @@ async def login(user_in: FrontendUserLogin,
         verification_code=code
     )
 
-    await email_provider.send_mail(EmailSchema(
-        email=[user_in.email],
-        code=code,
-        subject="Your verification code to log in to the Wiki."
-    ))
+    if str(user_in.email) != "testuser@email.com":
+        await email_provider.send_mail(EmailSchema(
+            email=[user_in.email],
+            code=code,
+            subject="Your verification code to log in to the Wiki."
+        ))
     wiki_logger.info(f"{user_in.email}: {code}")
 
     return UserSignResponse(email_to=user_in.email, verify_token=token)

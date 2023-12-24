@@ -189,7 +189,7 @@ async def version_rollback_document(
                                                                          document.id,
                                                                          CommitMetadataScheme(
                                                                              committer_user_id=str(user_db.id)))
-    except ServiceException:
+    except Exception:
         raise WikiException(
             message="The current state is identical to the one being rolled back to.",
             error_code=WikiErrorCode.VERSIONING_ROLLBACK_ERROR,
